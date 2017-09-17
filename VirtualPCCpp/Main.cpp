@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 	//:: 30, ;: 31, *: 32, &: 33, ?: 34, A: 35, B: 36, C: 37: D: 38, E: 39,
 	//F: 40, G: 41, H: 42, I: 43, J: 44, K: 45, L: 46, M: 47, N: 48, O: 49,
 	//P: 50, Q: 51, R: 52, S: 53, T: 54, U: 55, V: 56, W: 57, X: 58, Y: 59,
-	//Z: 60, x 61
+	//Z: 60, x: 61
 
 	//Prints B at charcater position 0, 0
 	cpu1.cache.memory[0] = 17;
