@@ -47,12 +47,24 @@ int main(int argc, char* argv[]) {
 	//Z: 60, x: 61
 
 	//Prints B at charcater position 0, 0
-	cpu1.cache.memory[0] = 17;
-	cpu1.cache.memory[1] = 36;
-	cpu1.cache.memory[3] = 0;
-	cpu1.cache.memory[5] = 0;
-	cpu1.cache.memory[7] = 0;
-	
+	cpu1.cache.memory[100] = 0;
+	cpu1.cache.memory[101] = 1;
+	cpu1.cache.memory[102] = 10;
+
+	cpu1.cache.memory[0] = 1;
+	cpu1.cache.memory[1] = 100;
+	cpu1.cache.memory[3] = 2;
+	cpu1.cache.memory[4] = 101;
+	cpu1.cache.memory[6] = 20;
+	cpu1.cache.memory[7] = 40;
+	cpu1.cache.memory[8] = 7;
+	cpu1.cache.memory[9] = 100;
+	cpu1.cache.memory[11] = 2;
+	cpu1.cache.memory[12] = 102;
+	cpu1.cache.memory[14] = 26;
+	cpu1.cache.memory[15] = 31;
+	cpu1.cache.memory[16] = 1;
+	cpu1.cache.memory[17] = 0;
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
