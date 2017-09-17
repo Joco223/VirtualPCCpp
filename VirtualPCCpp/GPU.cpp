@@ -28,7 +28,7 @@ GPU::GPU(byte builtInSize, u16 functionBufferSize, SDLWindow& screen_)
 {
 	characters.memory[  0] = 0b00100;
 	characters.memory[  1] = 0b01010;
-	characters.memory[  2] = 0b01010;
+	characters.memory[  2] = 0b01110;
 	characters.memory[  3] = 0b01010;
 	characters.memory[  4] = 0b00100;
 
@@ -407,7 +407,7 @@ void GPU::executeThreads(byte opCode) {
 		byte yP0 = functionBuffer.memory[opCode + 3];
 		byte yP1 = functionBuffer.memory[opCode + 4];
 		u16 xP = xP0 + (xP1 * 256);
-		u16 yP = yP0 + (yP1 * 256);
+		u16 yP = yP0 + (yP1 * 256) + 1;
 		screen.pixels[yP * 320 + xP] = int(255 << 16) | int(255 << 8) | int(255);
 		
 		break;

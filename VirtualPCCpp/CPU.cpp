@@ -204,7 +204,7 @@ void CPU::execute(u16 register) {
 		if (register1 == condition) {
 			programCounter = memPos;
 		}else if(register1 != condition){	
-			programCounter += 4;
+			programCounter += 3;
 		}	
 		break;
 
