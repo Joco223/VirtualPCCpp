@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Assembly.cpp" />
     <ClCompile Include="CPU.cpp" />
     <ClCompile Include="GPU.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -28,6 +29,7 @@
     <ClCompile Include="SDLWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Assembly.h" />
     <ClInclude Include="CPU.h" />
     <ClInclude Include="GPU.h" />
     <ClInclude Include="Memory.h" />

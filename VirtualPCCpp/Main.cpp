@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 	//P: 50, Q: 51, R: 52, S: 53, T: 54, U: 55, V: 56, W: 57, X: 58, Y: 59,
 	//Z: 60, x: 61
 
-	//Prints B at charcater position 0, 0
+	//Prints Fibonacci sequence up to 255
 	cpu1.cache.memory[100] = 0;
 	cpu1.cache.memory[101] = 1;
 	cpu1.cache.memory[102] = 255;
