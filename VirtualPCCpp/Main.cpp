@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <vector>
 #include <iostream>
+#include <string>
 
 #include "NSSDL.h"
 #include "SDLWindow.h"
@@ -8,6 +9,7 @@
 #include "CPU.h"
 #include "PC.h"
 #include "GPU.h"
+#include "Assembly.h"
 
 int width = 320;
 int height = 240;
@@ -47,7 +49,7 @@ int main(int argc, char* argv[]) {
 	//Z: 60, x: 61
 
 	//Prints Fibonacci sequence up to 255
-	cpu1.cache.memory[100] = 0;
+	/*cpu1.cache.memory[100] = 0;
 	cpu1.cache.memory[101] = 1;
 	cpu1.cache.memory[102] = 255;
 
@@ -68,7 +70,17 @@ int main(int argc, char* argv[]) {
 	cpu1.cache.memory[17] = 26;
 	cpu1.cache.memory[18] = 31;
 	cpu1.cache.memory[19] = 1;
-	cpu1.cache.memory[20] = 0;
+	cpu1.cache.memory[20] = 0;*/
+
+	cpu1.cache.memory[100] = 8;
+	cpu1.cache.memory[101] = 5;
+
+	//Sums 8 and 5
+	std::vector<std::string> code = { "LOAD0_C", "100", 
+									  "LOAD1_C", "101", 
+									  "SUM", 
+									  "COT0"};
+	Assembly::Compile(code, cpu1);
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 

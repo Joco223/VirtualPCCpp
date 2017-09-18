@@ -201,8 +201,8 @@ namespace Assembly {
 					cpu.cache.memory[currentPos + 3] = Arg1;
 				}
 				currentPos += 2;
-			}else if (instruction == "DRW_C") {
-
+			}else if (instruction == "COT0") {
+				cpu.cache.memory[currentPos] = 40;
 			}
 			currentPos++;
 		}
