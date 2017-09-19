@@ -49,32 +49,32 @@ int main(int argc, char* argv[]) {
 	//Z: 60, x: 61
 
 	//Instruction set:
-	//LOAD0_C - Load to register0 from cache, 1 argument (index of origin memory in cache)
-	//LOAD1_C - Load to register1 from cache, 1 argument (index of origin memory in cache)
-	//LOAD0_R - Load to register0 from ram, 1 argument (index of origin memory in ram)
-	//LOAD1_R - Load to register1 from ram, 1 argument (index of origin memory in ram)
-	//CLR0 - Clear register0, 0 arguments
-	//CLR1 - Clear register1, 0 arguments
-	//WRT0_C - Write from register0 to cache, 1 argument (index of target memory in cache)
-	//WRT1_C - Write from register1 to cache, 1 argument (index of target memory in cache)
-	//WRT0_R - Write from register0 to ram, 1 argument (index of target memory in ram)
-	//WRT1_R - Write from register1 to ram, 1 argument (index of target memory in ram)
-	//WRTC_R - Write from cache to ram, 2 arguments (index of origin memory in cache, index of target memory in ram)
-	//WRTR_C - Write from ram to cache, 2 arguments (index of origin memory in ram, index of target memory in ram)
-	//SUM - Adds register0 and register1, 0 arguments
-	//SUB - Subtracts register0 and register1, 0 arguments
-	//MLT - Multiplies register0 and register1, 0 arguments
-	//DIV - Divides register0 and register1, 0 arguments
-	//REG0_B - Check if register0 is bigger than register1, 0 arguments
-	//REG0_BE - Check if register0 is bigger or equal to register1, 0 arguments
-	//REG1_B - Check if register1 is bigger than register0, 0 arguments
-	//REG1_BE - Check if register1 is bigger or equal to register0, 0 arguments
-	//REG_EQL - Check if register0 and register1 are the same size, 0 arguments
+	//LOAD0_C - Load to register0 from cache,                        1 argument  (index of origin memory in cache)
+	//LOAD1_C - Load to register1 from cache,                        1 argument  (index of origin memory in cache)
+	//LOAD0_R - Load to register0 from ram,                          1 argument  (index of origin memory in ram)
+	//LOAD1_R - Load to register1 from ram,                          1 argument  (index of origin memory in ram)
+	//CLR0    - Clear register0,                                     0 arguments
+	//CLR1    - Clear register1,                                     0 arguments
+	//WRT0_C  - Write from register0 to cache,                       1 argument  (index of target memory in cache)
+	//WRT1_C  - Write from register1 to cache,                       1 argument  (index of target memory in cache)
+	//WRT0_R  - Write from register0 to ram,                         1 argument  (index of target memory in ram)
+	//WRT1_R  - Write from register1 to ram,                         1 argument  (index of target memory in ram)
+	//WRTC_R  - Write from cache to ram,                             2 arguments (index of origin memory in cache, index of target memory in ram)
+	//WRTR_C  - Write from ram to cache,                             2 arguments (index of origin memory in ram, index of target memory in ram)
+	//SUM     - Adds register0 and register1,                        0 arguments
+	//SUB     - Subtracts register0 and register1,                   0 arguments
+	//MLT     - Multiplies register0 and register1,                  0 arguments
+	//DIV     - Divides register0 and register1,                     0 arguments
+	//REG0_B  - Check if register0 is bigger than register1,         0 arguments
+	//REG0_BE - Check if register0 is bigger or equal to register1,  0 arguments
+	//REG1_B  - Check if register1 is bigger than register0,         0 arguments
+	//REG1_BE - Check if register1 is bigger or equal to register0,  0 arguments
+	//REG_EQL - Check if register0 and register1 are the same size,  0 arguments
 	//REG_DIF - Check if register0 and register1 are different size, 0 arguments
-	//JMP - Sets program counter to target position, 1 argument (target position)
-	//CMP - Compares register0 to a condition, 2 arguments (0 or 1 for the condition (false or true), jump position if condition is met)
-	//COT0 - Print to console contents of register0, 0 arguments
-	//COT1 - Print to console contents of register1, 0 arguments
+	//JMP     - Sets program counter to target position,             1 argument  (target position)
+	//CMP     - Compares register0 to a condition,                   2 arguments (0 or 1 for the condition (false or true), jump position if condition is met)
+	//COT0    - Print to console contents of register0,              0 arguments
+	//COT1    - Print to console contents of register1,              0 arguments
 
 
 	//Assembly example
