@@ -48,39 +48,51 @@ int main(int argc, char* argv[]) {
 	//P: 50, Q: 51, R: 52, S: 53, T: 54, U: 55, V: 56, W: 57, X: 58, Y: 59,
 	//Z: 60, x: 61
 
-	//Prints Fibonacci sequence up to 255
-	/*cpu1.cache.memory[100] = 0;
-	cpu1.cache.memory[101] = 1;
-	cpu1.cache.memory[102] = 255;
+	//Instruction set:
+	//LOAD0_C - Load to register0 from cache, 1 argument (index of origin memory in cache)
+	//LOAD1_C - Load to register1 from cache, 1 argument (index of origin memory in cache)
+	//LOAD0_R - Load to register0 from ram, 1 argument (index of origin memory in ram)
+	//LOAD1_R - Load to register1 from ram, 1 argument (index of origin memory in ram)
+	//CLR0 - Clear register0, 0 arguments
+	//CLR1 - Clear register1, 0 arguments
+	//WRT0_C - Write from register0 to cache, 1 argument (index of target memory in cache)
+	//WRT1_C - Write from register1 to cache, 1 argument (index of target memory in cache)
+	//WRT0_R - Write from register0 to ram, 1 argument (index of target memory in ram)
+	//WRT1_R - Write from register1 to ram, 1 argument (index of target memory in ram)
+	//WRTC_R - Write from cache to ram, 2 arguments (index of origin memory in cache, index of target memory in ram)
+	//WRTR_C - Write from ram to cache, 2 arguments (index of origin memory in ram, index of target memory in ram)
+	//SUM - Adds register0 and register1, 0 arguments
+	//SUB - Subtracts register0 and register1, 0 arguments
+	//MLT - Multiplies register0 and register1, 0 arguments
+	//DIV - Divides register0 and register1, 0 arguments
+	//REG0_B - Check if register0 is bigger than register1, 0 arguments
+	//REG0_BE - Check if register0 is bigger or equal to register1, 0 arguments
+	//REG1_B - Check if register1 is bigger than register0, 0 arguments
+	//REG1_BE - Check if register1 is bigger or equal to register0, 0 arguments
+	//REG_EQL - Check if register0 and register1 are the same size, 0 arguments
+	//REG_DIF - Check if register0 and register1 are different size, 0 arguments
+	//JMP - Sets program counter to target position, 1 argument (target position)
+	//CMP - Compares register0 to a condition, 2 arguments (0 or 1 for the condition (false or true), jump position if condition is met)
+	//COT0 - Print to console contents of register0, 0 arguments
+	//COT1 - Print to console contents of register1, 0 arguments
 
-	cpu1.cache.memory[0] = 1;
-	cpu1.cache.memory[1] = 100;
-	cpu1.cache.memory[3] = 2;
-	cpu1.cache.memory[4] = 101;
-	cpu1.cache.memory[6] = 20;
-	cpu1.cache.memory[7] = 40;
 
-	cpu1.cache.memory[8] = 8;
-	cpu1.cache.memory[9] = 100;
-	cpu1.cache.memory[11] = 7;
-	cpu1.cache.memory[12] = 101;
+	//Assembly example
 
-	cpu1.cache.memory[14] = 2;
-	cpu1.cache.memory[15] = 102;
-	cpu1.cache.memory[17] = 26;
-	cpu1.cache.memory[18] = 31;
-	cpu1.cache.memory[19] = 1;
-	cpu1.cache.memory[20] = 0;*/
-
+	//Set memory
 	cpu1.cache.memory[100] = 8;
 	cpu1.cache.memory[101] = 5;
 
-	//Sums 8 and 5
+	//Loads register0 and register1, sums them, prints contents of register0
 	std::vector<std::string> code = { "LOAD0_C", "100", 
 									  "LOAD1_C", "101", 
 									  "SUM", 
 									  "COT0"};
+
+	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);
+
+	//End of Assembly example
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
