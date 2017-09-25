@@ -30,12 +30,12 @@ int main(int argc, char* argv[]) {
 
 	SDLWindow pc1W(window2, surface2, pixelSpace2, renderer2, texture2, pixels2);
 
-	Memory ram1(256);
+	Memory ram1(4096);
 	Memory hdd1(2048);
 
 	NSSDL::initSDL(pc1W, width, height);
 
-	GPU gpu1(255, 1024, pc1W);
+	GPU gpu1(255, 2048, pc1W);
 
 	CPU cpu1(1024, ram1, gpu1);
 
@@ -87,7 +87,8 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> code = { "LOAD0_C", "100", 
 									  "LOAD1_C", "101", 
 									  "SUM", 
-									  "COT0"};
+									  "COT0",
+									  "DRAWP", "105", "105", "115", "115", "60", "60", "60"};
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);

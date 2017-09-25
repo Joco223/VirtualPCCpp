@@ -38,6 +38,10 @@ void CPU::execute(u16 register) {
 	byte opCodeArg3p2;
 	byte opCodeArg4p1;
 	byte opCodeArg4p2;
+	byte opCodeArg5p1;
+	byte opCodeArg5p2;
+	byte opCodeArg6p1;
+	byte opCodeArg6p2;
 	u16 memPos;
 	u16 memPos2;
 	u16 programPos;
@@ -216,28 +220,45 @@ void CPU::execute(u16 register) {
 		std::cout << register2 << '\n';
 		break;
 
-	case 50:
+	case 50: //Copy from RAM to VRAM
 		opCodeArg1p1 = cache.memory[programCounter + 1];
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		opCodeArg2p1 = cache.memory[programCounter + 3];
 		opCodeArg2p2 = cache.memory[programCounter + 4];
 		opCodeArg3p1 = cache.memory[programCounter + 5];
 		opCodeArg3p2 = cache.memory[programCounter + 6];
-		opCodeArg4p1 = cache.memory[programCounter + 7];
-		opCodeArg4p2 = cache.memory[programCounter + 8];
-		programPos = opCodeArg4p1 + (opCodeArg4p2 * 256);
-		gpu.commandBuffer.memory[programPos] = 1;
-		gpu.argBuffer.memory[programPos * 6 + 0] = opCodeArg1p1;
-		gpu.argBuffer.memory[programPos * 6 + 1] = opCodeArg1p2;
-		gpu.argBuffer.memory[programPos * 6 + 2] = opCodeArg2p1;
-		gpu.argBuffer.memory[programPos * 6 + 3] = opCodeArg2p2;
-		gpu.argBuffer.memory[programPos * 6 + 4] = opCodeArg3p1;
-		gpu.argBuffer.memory[programPos * 6 + 5] = opCodeArg3p2;
-		programCounter += 8;
+
+		gpu.commandBuffer.memory[gpu.commandCounter] = 1;
+
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = opCodeArg1p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = opCodeArg1p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = opCodeArg2p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3] = opCodeArg2p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = opCodeArg3p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = opCodeArg3p2;
+
+		programCounter += 6;
 		break;
 
-	case 51:
-		
+	case 51: //Copy from VRAM to RAM
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		opCodeArg2p1 = cache.memory[programCounter + 3];
+		opCodeArg2p2 = cache.memory[programCounter + 4];
+		opCodeArg3p1 = cache.memory[programCounter + 5];
+		opCodeArg3p2 = cache.memory[programCounter + 6];
+
+		gpu.commandBuffer.memory[gpu.commandCounter] = 1;
+
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = opCodeArg1p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = opCodeArg1p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = opCodeArg2p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3] = opCodeArg2p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = opCodeArg3p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = opCodeArg3p2;
+
+		programCounter += 6;
+
 		break;
 	}
 }

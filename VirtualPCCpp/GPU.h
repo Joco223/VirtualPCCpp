@@ -8,22 +8,23 @@
 typedef unsigned char byte;
 typedef uint16_t u16;
 
+
 class GPU {
 public:
 	Memory commandBuffer;
-	Memory argBuffer;
-	Memory functionBuffer;
-	Memory builtIn;
-	Memory characters;
-	SDLWindow& screen;
-	u16 programCounter;
+	Memory commandArgBuffer;
+	Memory vRam;
+	Memory* ram;
+	SDLWindow* screen;
+	u16 functionCounter;
 	u16 commandCounter;
-	u16 programSize;
+	u16 commandArgCounter;
+	u16 firstAvailableByte;
+	u16 coreCount;
 
 	GPU();
-	GPU(byte, u16, SDLWindow&);
-	void executeThreads(byte);
-	void spawnThreads(byte, u16, u16, u16);
-	void execute();
+	GPU(u16, u16, u16, u16, SDLWindow*, Memory*);
+	void executeCommand();
+	void executeThread();
 	void tick();
 };

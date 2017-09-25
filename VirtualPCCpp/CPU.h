@@ -16,7 +16,7 @@ public:
 	u16 registerOP2;
 	u16 register1;
 	u16 register2;
-	byte programCounter;
+	u16 programCounter;
 	GPU& gpu;
 	bool halt;
 

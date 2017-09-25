@@ -15,8 +15,8 @@ namespace Assembly {
 		}
 	}
 
-	bool checkArgSize(int& arg, int argc, std::string& instruction, int& instructionC) {
-		if (arg > 65535) {
+	bool checkArgSize(int& arg, int argc, std::string& instruction, int& instructionC, int maxSize) {
+		if (arg > maxSize) {
 			std::cout << "Error: Argument " << argc << " exceeds size limit at instruction " << instruction << " at position " << instructionC + 1 + argc << '\n';
 			return true;
 		}
@@ -31,15 +31,19 @@ namespace Assembly {
 			std::string arg1 = code[i + 1];
 			std::string arg2 = code[i + 2];
 			std::string arg3 = code[i + 3];
+			std::string arg4 = code[i + 4];
+			std::string arg5 = code[i + 5];
+			std::string arg6 = code[i + 6];
+			std::string arg7 = code[i + 7];
 
-			bool has_only_digits = (instruction.find_first_not_of( "0123456789" )) == std::string::npos;
+
+			bool has_only_digits = (instruction.find_first_not_of("0123456789")) == std::string::npos;
 
 			if (instruction == "LOAD0_C") {
 				cpu.cache.memory[currentPos] = 1;
-
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -52,7 +56,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -65,7 +69,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -78,7 +82,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -95,7 +99,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -108,7 +112,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -121,7 +125,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -134,7 +138,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -147,7 +151,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -156,7 +160,7 @@ namespace Assembly {
 
 				int Arg2 = std::stoi(arg2);
 
-				if(checkArgSize(Arg2, 2, instruction, i) == true) { break; }
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
 				byte b3, b4;
 				convertByte(Arg2, b3, b4);
@@ -169,7 +173,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -178,7 +182,7 @@ namespace Assembly {
 
 				int Arg2 = std::stoi(arg2);
 
-				if(checkArgSize(Arg2, 2, instruction, i) == true) { break; }
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
 				byte b3, b4;
 				convertByte(Arg2, b3, b4);
@@ -211,7 +215,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -228,7 +232,7 @@ namespace Assembly {
 
 				int Arg2 = std::stoi(arg2);
 
-				if(checkArgSize(Arg2, 2, instruction, i) == true) { break; }
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg2, b1, b2);
@@ -240,6 +244,68 @@ namespace Assembly {
 				cpu.cache.memory[currentPos] = 40;
 			}else if (instruction == "COT1") {
 				cpu.cache.memory[currentPos] = 41;
+			}else if (instruction == "WRT_R_VR") {
+				cpu.cache.memory[currentPos] = 50;
+
+				int Arg1 = std::stoi(arg1);
+
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+				byte b1, b2;
+				convertByte(Arg1, b1, b2);
+				cpu.cache.memory[currentPos + 1] = b1;
+				cpu.cache.memory[currentPos + 2] = b2;
+
+				int Arg2 = std::stoi(arg2);
+
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
+
+				byte b3, b4;
+				convertByte(Arg2, b3, b4);
+				cpu.cache.memory[currentPos + 3] = b3;
+				cpu.cache.memory[currentPos + 4] = b4;
+
+				int Arg3 = std::stoi(arg3);
+
+				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
+
+				byte b5, b6;
+				convertByte(Arg3, b5, b6);
+				cpu.cache.memory[currentPos + 5] = b5;
+				cpu.cache.memory[currentPos + 6] = b6;
+
+				currentPos += 3;
+			}else if (instruction == "WRT_VR_R") {
+				cpu.cache.memory[currentPos] = 51;
+
+				int Arg1 = std::stoi(arg1);
+
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+				byte b1, b2;
+				convertByte(Arg1, b1, b2);
+				cpu.cache.memory[currentPos + 1] = b1;
+				cpu.cache.memory[currentPos + 2] = b2;
+
+				int Arg2 = std::stoi(arg2);
+
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
+
+				byte b3, b4;
+				convertByte(Arg2, b3, b4);
+				cpu.cache.memory[currentPos + 3] = b3;
+				cpu.cache.memory[currentPos + 4] = b4;
+
+				int Arg3 = std::stoi(arg3);
+
+				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
+
+				byte b5, b6;
+				convertByte(Arg3, b5, b6);
+				cpu.cache.memory[currentPos + 5] = b5;
+				cpu.cache.memory[currentPos + 6] = b6;
+
+				currentPos += 3;
 			}else if(has_only_digits == false){
 				std::cout << "Error: Invalid instruction " << instruction << " at position " << i + 1 << '\n';
 				cpu.cache.Clear();
