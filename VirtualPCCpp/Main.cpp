@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 	Memory ram1(4096);
 	Memory hdd1(2048);
 
-	GPU gpu1(256, 4096, 32, 1024, &pc1W, &ram1);
+	GPU gpu1(2048, 4096, 32, 4096, &pc1W, &ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
@@ -85,15 +85,17 @@ int main(int argc, char* argv[]) {
 
 	//Loads register0 and register1, sums them, prints contents of register0
 	std::vector<std::string> code = { "LOAD0_C", "100", 
-									  "LOAD1_C", "101", 
-									  "SUM", 
-									  "COT0",
-									  "DRAWP", "50", "50", "100", "100", "60", "60", "60"};
+		"LOAD1_C", "101", 
+		"SUM", 
+		"COT0",
+		"DRAWP", "50", "50", "100", "100", "60", "60", "60"};
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);
 
 	//End of Assembly example
+
+	gpu1.functionCounter = 0;
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
@@ -107,7 +109,7 @@ int main(int argc, char* argv[]) {
 		}	
 		pc1.cpu.tick();
 		gpu1.executeCommand();
-		gpu1.tick();
+		gpu1.executeThread();
 		NSSDL::updateSDL(pc1.screen);
 	}
 

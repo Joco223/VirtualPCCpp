@@ -1,5 +1,7 @@
 #include "GPU.h"
 
+#include <iostream>
+
 GPU::GPU()
 	:
 	commandBuffer(Memory(0)),
@@ -13,7 +15,7 @@ GPU::GPU()
 	firstAvailableByte(0),
 	coreCount(0) {}
 
-GPU::GPU(u16 commandBufferSize, u16 vRamSize, u16 coreCount_, u16 commandArgBufferSize, SDLWindow* screen_, Memory* ram_)
+GPU::GPU(int commandBufferSize, int vRamSize, int coreCount_, int commandArgBufferSize, SDLWindow* screen_, Memory* ram_)
 	:
 	commandBuffer(Memory(commandBufferSize)),
 	commandArgBuffer(Memory(commandArgBufferSize)),
@@ -38,7 +40,7 @@ void getArgument(u16& arg, byte& b1, byte& b2) {
 }
 
 void GPU::executeCommand() {
-	byte instruction = commandBuffer.read[commandCounter];
+	byte instruction = commandBuffer.memory[commandCounter];
 
 	switch (instruction) {
 
@@ -49,12 +51,12 @@ void GPU::executeCommand() {
 		break; }
 
 	case 1: {
-		byte arg1b1 = vRam.read(functionCounter + 0);
-		byte arg1b2 = vRam.read(functionCounter + 1);
-		byte arg2b1 = vRam.read(functionCounter + 2);
-		byte arg2b2 = vRam.read(functionCounter + 3);
-		byte arg3b1 = vRam.read(functionCounter + 4);
-		byte arg3b2 = vRam.read(functionCounter + 5);
+		byte arg1b1 = commandArgBuffer.memory[commandArgCounter + 0];
+		byte arg1b2 = commandArgBuffer.memory[commandArgCounter + 1];
+		byte arg2b1 = commandArgBuffer.memory[commandArgCounter + 2];
+		byte arg2b2 = commandArgBuffer.memory[commandArgCounter + 3];
+		byte arg3b1 = commandArgBuffer.memory[commandArgCounter + 4];
+		byte arg3b2 = commandArgBuffer.memory[commandArgCounter + 5];
 
 		u16 arg1 = arg1b1 + (arg1b2 * 256);
 		u16 arg2 = arg2b1 + (arg2b2 * 256);
@@ -67,11 +69,11 @@ void GPU::executeCommand() {
 			getArgument(arg1p, arg1b1p, arg1b2p);
 			getArgument(arg2p, arg2b1p, arg2b2p);
 
-			vRam.write(firstAvailableByte + 0, 1);
-			vRam.write(firstAvailableByte + 0, arg1b1p);
-			vRam.write(firstAvailableByte + 0, arg1b2p);
-			vRam.write(firstAvailableByte + 0, arg2b1p);
-			vRam.write(firstAvailableByte + 0, arg2b2p);
+			vRam.memory[firstAvailableByte + 0] = 1;
+			vRam.memory[firstAvailableByte + 1] = arg1b1p;
+			vRam.memory[firstAvailableByte + 2] = arg1b2p;
+			vRam.memory[firstAvailableByte + 3] = arg2b1p;
+			vRam.memory[firstAvailableByte + 4] = arg2b2p;
 
 			firstAvailableByte += 5;
 		}
@@ -81,12 +83,12 @@ void GPU::executeCommand() {
 		break; }
 
 	case 2: {
-		byte arg1b1 = vRam.read(functionCounter + 0);
-		byte arg1b2 = vRam.read(functionCounter + 1);
-		byte arg2b1 = vRam.read(functionCounter + 2);
-		byte arg2b2 = vRam.read(functionCounter + 3);
-		byte arg3b1 = vRam.read(functionCounter + 4);
-		byte arg3b2 = vRam.read(functionCounter + 5);
+		byte arg1b1 = commandArgBuffer.memory[commandArgCounter + 0];
+		byte arg1b2 = commandArgBuffer.memory[commandArgCounter + 1];
+		byte arg2b1 = commandArgBuffer.memory[commandArgCounter + 2];
+		byte arg2b2 = commandArgBuffer.memory[commandArgCounter + 3];
+		byte arg3b1 = commandArgBuffer.memory[commandArgCounter + 4];
+		byte arg3b2 = commandArgBuffer.memory[commandArgCounter + 5];
 
 		u16 arg1 = arg1b1 + (arg1b2 * 256);
 		u16 arg2 = arg2b1 + (arg2b2 * 256);
@@ -99,11 +101,11 @@ void GPU::executeCommand() {
 			getArgument(arg1p, arg1b1p, arg1b2p);
 			getArgument(arg2p, arg2b1p, arg2b2p);
 
-			vRam.write(firstAvailableByte + 0, 2);
-			vRam.write(firstAvailableByte + 0, arg1b1p);
-			vRam.write(firstAvailableByte + 0, arg1b2p);
-			vRam.write(firstAvailableByte + 0, arg2b1p);
-			vRam.write(firstAvailableByte + 0, arg2b2p);
+			vRam.memory[firstAvailableByte + 0] = 1;
+			vRam.memory[firstAvailableByte + 1] = arg1b1p;
+			vRam.memory[firstAvailableByte + 2] = arg1b2p;
+			vRam.memory[firstAvailableByte + 3] = arg2b1p;
+			vRam.memory[firstAvailableByte + 4] = arg2b2p;
 
 			firstAvailableByte += 5;
 		}
@@ -113,17 +115,17 @@ void GPU::executeCommand() {
 		break; }
 
 	case 3: {
-		byte arg1b1 = vRam.read(functionCounter + 0);
-		byte arg1b2 = vRam.read(functionCounter + 1);
-		byte arg2b1 = vRam.read(functionCounter + 2);
-		byte arg2b2 = vRam.read(functionCounter + 3);
-		byte arg3b1 = vRam.read(functionCounter + 4);
-		byte arg3b2 = vRam.read(functionCounter + 5);
-		byte arg4b1 = vRam.read(functionCounter + 6);
-		byte arg4b2 = vRam.read(functionCounter + 7);
-		byte arg5 = vRam.read(functionCounter + 8);
-		byte arg6 = vRam.read(functionCounter + 9);
-		byte arg7 = vRam.read(functionCounter + 10);
+		byte arg1b1 = commandArgBuffer.memory[commandArgCounter + 0];
+		byte arg1b2 = commandArgBuffer.memory[commandArgCounter + 1];
+		byte arg2b1 = commandArgBuffer.memory[commandArgCounter + 2];
+		byte arg2b2 = commandArgBuffer.memory[commandArgCounter + 3];
+		byte arg3b1 = commandArgBuffer.memory[commandArgCounter + 4];
+		byte arg3b2 = commandArgBuffer.memory[commandArgCounter + 5];
+		byte arg4b1 = commandArgBuffer.memory[commandArgCounter + 6];
+		byte arg4b2 = commandArgBuffer.memory[commandArgCounter + 7];
+		byte arg5 = commandArgBuffer.memory[commandArgCounter + 8];
+		byte arg6 = commandArgBuffer.memory[commandArgCounter + 9];
+		byte arg7 = commandArgBuffer.memory[commandArgCounter + 10];
 
 		u16 arg1 = arg1b1 + (arg1b2 * 256);
 		u16 arg2 = arg2b1 + (arg2b2 * 256);
@@ -144,14 +146,14 @@ void GPU::executeCommand() {
 				getArgument(cXPos, x1 ,x2);
 				getArgument(cYPos, y1, y2);
 
-				vRam.write(firstAvailableByte + 0, 3);
-				vRam.write(firstAvailableByte + 1, x1);
-				vRam.write(firstAvailableByte + 2, x2);
-				vRam.write(firstAvailableByte + 3, y1);
-				vRam.write(firstAvailableByte + 4, y2);
-				vRam.write(firstAvailableByte + 5, arg5);
-				vRam.write(firstAvailableByte + 6, arg6);
-				vRam.write(firstAvailableByte + 7, arg7);
+				vRam.memory[firstAvailableByte + 0] = 3;
+				vRam.memory[firstAvailableByte + 1] = x1;
+				vRam.memory[firstAvailableByte + 2] = x2;
+				vRam.memory[firstAvailableByte + 3] = y1;
+				vRam.memory[firstAvailableByte + 4] = y2;
+				vRam.memory[firstAvailableByte + 5] = arg5;
+				vRam.memory[firstAvailableByte + 6] = arg6;
+				vRam.memory[firstAvailableByte + 7] = arg7;
 
 				firstAvailableByte += 8;
 			}
@@ -164,7 +166,7 @@ void GPU::executeCommand() {
 }
 
 void GPU::executeThread() {
-	byte instruction = vRam.read(functionCounter);
+	byte instruction = vRam.memory[functionCounter];
 
 	switch (instruction) {
 
@@ -176,53 +178,23 @@ void GPU::executeThread() {
 		break; }	
 
 	case 3: {
-		byte arg1b1 = vRam.read(functionCounter + 1);
-		byte arg1b2 = vRam.read(functionCounter + 2);
-		byte arg2b1 = vRam.read(functionCounter + 3);
-		byte arg2b2 = vRam.read(functionCounter + 4);
-		byte arg3 = vRam.read(functionCounter + 5);
-		byte arg4 = vRam.read(functionCounter + 6);
-		byte arg5 = vRam.read(functionCounter + 7);
+		byte arg1b1 = vRam.memory[functionCounter + 1];
+		byte arg1b2 = vRam.memory[functionCounter + 2];
+		byte arg2b1 = vRam.memory[functionCounter + 3];
+		byte arg2b2 = vRam.memory[functionCounter + 4];
+		byte arg3 = vRam.memory[functionCounter + 5];
+		byte arg4 = vRam.memory[functionCounter + 6];
+		byte arg5 = vRam.memory[functionCounter + 7];
 
 		u16 arg1 = arg1b1 + (arg1b2 * 256);
-		u16 arg2 = arg2b1 + (arg2b2 * 256);
+		u16 arg2 = arg2b1 + (arg2b2 * 256);	
 
 		byte r = arg3 * 4;
 		byte g = arg4 * 4;
 		byte b = arg5 * 4;
 
-		this->screen->pixels[arg2 * 320 + arg1] = int(b << 16) | int(g << 8) | int(r);
+		screen->pixels[arg2 * 320 + arg1] = int(b << 16) | int(g << 8) | int(r);
 		functionCounter += 8;
-		break; }
-	}
-}
-
-void GPU::tick() {
-	for (int i = 0; i < coreCount; i++) {
-		executeThread();
-	}
-}
-
-void GPU::accessCommandBuffer(std::string choice, u16 pos, byte value = 0, byte& output) {
-	if (choice == "write") {
-		commandBuffer.write(pos, value);
-	}else if (choice == "read") {
-		output = commandBuffer.read(pos);
-	}
-}
-
-void GPU::accessCommandArgBuffer(std::string choice, u16 pos, byte value = 0, byte& output) {
-	if (choice == "write") {
-		commandArgBuffer.write(pos, value);
-	}else if (choice == "read") {
-		output = commandArgBuffer.read(pos);
-	}
-}
-
-void GPU::accessVRam(std::string choice, u16 pos, byte value = 0, byte& output) {
-	if (choice == "write") {
-		vRam.write(pos, value);
-	}else if (choice == "read") {
-		output = vRam.read(pos);
+		break; }	
 	}
 }

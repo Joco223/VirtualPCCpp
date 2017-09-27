@@ -5,6 +5,7 @@
 CPU::CPU()
 	:
 	registerOP1(0),
+	registerOP2(0),
 	register1(0),
 	register2(0),
 	ram(Memory(0)),
@@ -17,6 +18,7 @@ CPU::CPU()
 CPU::CPU(int cacheSize, Memory& ram_, GPU& gpu_)
 	:
 	registerOP1(0),
+	registerOP2(0),
 	register1(0),
 	register2(0),
 	programCounter(0),
@@ -24,245 +26,267 @@ CPU::CPU(int cacheSize, Memory& ram_, GPU& gpu_)
 	halt(false),
 	cache(Memory(cacheSize)),
 	gpu(gpu_){
-	}
+}
 
 void CPU::execute(u16 register) {
 	u16 opCode = registerOP1;
+	byte opCodeArg1p1;
+	byte opCodeArg1p2;
+	byte opCodeArg2p1;
+	byte opCodeArg2p2;
+	byte opCodeArg3p1;
+	byte opCodeArg3p2;
+	byte opCodeArg4p1;
+	byte opCodeArg4p2;
+	byte opCodeArg5p1;
+	byte opCodeArg5p2;
+	byte opCodeArg6p1;
+	byte opCodeArg6p2;
+	u16 memPos;
+	u16 memPos2;
+	u16 programPos;
+	u16 condition;
 
 	switch (opCode) {
-	case 0: {
+	case 0: //Halt
 		halt = true;
-		break; }
+		break;
 
-	case 1:{
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = arg1p1 + (arg1p2 * 256);
-		register1 = cache.read(memPos);
-		programCounter += 2;
-		break; }
+	case 1: //Load register1 from cache
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		register1 = cache.memory[memPos];
+		programCounter++;
+		programCounter++;
+		break;
 
-	case 2: {
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = arg1p1 + (arg1p2 * 256);
-		register2 = cache.read(memPos);
-		programCounter += 2;
-		break; }
+	case 2: //Load register2 from cache
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		register2 = cache.memory[memPos];
+		programCounter++;
+		programCounter++;
+		break;
 
-	case 3: {
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = arg1p1 + (arg1p2 * 256);
-		register1 = ram.read(memPos);
-		programCounter += 2;
-		break; }
+	case 3: //Load register1 from ram
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		register1 = cache.memory[memPos];
+		programCounter++;
+		programCounter++;
+		break;
 
-	case 4:{
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = arg1p1 + (arg1p2 * 256);
-		register1 = ram.read(memPos);
-		programCounter += 2;
-		break; }
+	case 4: //Load register2 from ram
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		register2 = cache.memory[memPos];
+		programCounter++;
+		programCounter++;
+		break;
 
-	case 5:{
+	case 5: //clear register1
 		register1 = 0;
-		break; }
+		break;
 
-	case 6: {
+	case 6: //Clear register2
 		register2 = 0;
-		break; }
+		break;
 
-	case 7: {
-		byte agr1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = agr1p1 + (arg1p2 * 256);
-		cache.write(memPos, register1);
-		programCounter += 2;
-		break; }
+	case 7: //Write from register1 to cache
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		cache.memory[memPos] = register1;
+		programCounter++;
+		programCounter++;
+		break;
 
-	case 8: {
-		byte agr1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = agr1p1 + (arg1p2 * 256);
-		cache.write(memPos, register2);
-		programCounter += 2;
-		break; }
+	case 8: //Write from register2 to cache
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		cache.memory[memPos] = register2;
+		programCounter++;
+		programCounter++;
+		break;
 
-	case 9: {
-		byte agr1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = agr1p1 + (arg1p2 * 256);
-		ram.write(memPos, register1);
-		programCounter += 2;
-		break; }
+	case 9: //Write from register1 to ram
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		ram.memory[memPos] = register1;
+		programCounter++;
+		programCounter++;
+		break;
 
-	case 10: {
-		byte agr1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = agr1p1 + (arg1p2 * 256);
-		ram.write(memPos, register2);
-		programCounter += 2;
-		break; }
+	case 10: //Write from register2 to ram
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		ram.memory[memPos] = register2;
+		programCounter++;
+		programCounter++;
+		break;
 
-	case 11: {
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		byte arg2p1 = cache.read(programCounter + 3);
-		byte arg2p2 = cache.read(programCounter + 4);
-		u16 memPos = arg1p1 + (arg1p2 * 256);
-		u16 memPos2 = arg2p1 + (arg2p2 * 256);
-		ram.write(memPos2, cache.read(memPos));
-		break; }
+	case 11: //Write from cache to ram
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		opCodeArg2p1 = cache.memory[programCounter + 3];
+		opCodeArg2p2 = cache.memory[programCounter + 4];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		memPos2 = opCodeArg2p1 + (opCodeArg2p2 * 256);
+		ram.memory[memPos2] = cache.memory[memPos];
+		break;
 
-	case 12: {
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		byte arg2p1 = cache.read(programCounter + 3);
-		byte arg2p2 = cache.read(programCounter + 4);
-		u16 memPos = arg1p1 + (arg1p2 * 256);
-		u16 memPos2 = arg2p1 + (arg2p2 * 256);
-		cache.write(memPos2, ram.read(memPos));
-		break; }
+	case 12: //Write from ram to cache
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		opCodeArg2p1 = cache.memory[programCounter + 3];
+		opCodeArg2p2 = cache.memory[programCounter + 4];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
+		memPos2 = opCodeArg2p1 + (opCodeArg2p2 * 256);
+		cache.memory[memPos2] = ram.memory[memPos];
+		break;
 
-	case 20: {
+	case 20: //Sum register1 and register2
 		register1 = register1 + register2;
-		break; }
+		break;
 
-	case 21: {
+	case 21: //Subtract register1 and register2
 		register1 = register1 - register2;
-		break; }
+		break;
 
-	case 22: {
+	case 22: //Multiply register1 and register2
 		register1 = register1 * register2;
-		break; }
+		break;
 
-	case 23: {
+	case 23: //Divide register1 and register2
 		register1 = register1 / register2;
-		break; }
+		break;
 
-	case 24: {
+	case 24: //Check if register1 is bigger than register2
 		register1 = register1 > register2;
-		break; }
+		break;
 
-	case 25: {
+	case 25: //Check if register1 is bigger or equal to register2
 		register1 = register1 >= register2;
-		break; }
+		break;
 
-	case 26: {
+	case 26: //Check if register2 is bigger than register1
 		register1 = register1 < register2;
-		break; }
+		break;
 
-	case 27: {
+	case 27: //Check if register2 is bigger or equal to register1
 		register1 = register1 <= register2;
-		break; }
+		break;
 
-	case 28: {
+	case 28: //Checl if register1 and register2 have same values
 		register1 = register1 == register2;
-		break; }
+		break;
 
-	case 29: {
+	case 29: //Check if register1 is different than register2
 		register1 = register1 != register2;
-		break; }
+		break;
 
-	case 30: {
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		u16 memPos = arg1p1 + (arg1p2 * 256) - 1;	
+	case 30: //Jump to place in code
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256) - 1;	
 		programCounter = memPos;
-		break; }
+		break;
 
-	case 31: {
-		byte arg1 = cache.read(programCounter + 1);
-		byte arg2p1 = cache.read(programCounter + 2);
-		byte arg2p2 = cache.read(programCounter + 3);
-		byte condition = arg1;
-		u16 memPos = arg2p1 + (arg2p2 * 256) - 1;
+	case 31: //Compare to true/false
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg2p1 = cache.memory[programCounter + 2];
+		opCodeArg2p2 = cache.memory[programCounter + 3];
+		condition = opCodeArg1p1;
+		memPos = opCodeArg2p1 + (opCodeArg2p2 * 256) - 1;
 		if (register1 == condition) {
 			programCounter = memPos;
 		}else if(register1 != condition){	
 			programCounter += 3;
 		}	
-		break; }
+		break;
 
-	case 40: {
+	case 40: //Cout from register1
 		std::cout << register1 << '\n';
-		break; }
+		break;
 
-	case 41: {
+	case 41: //Cout from register2
 		std::cout << register2 << '\n';
-		break; }
+		break;
 
-	case 50: {
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		byte arg2p1 = cache.read(programCounter + 3);
-		byte arg2p2 = cache.read(programCounter + 4);
-		byte arg3p1 = cache.read(programCounter + 5);
-		byte arg3p2 = cache.read(programCounter + 6);
-		byte temp;
+	case 50: //Copy from RAM to VRAM
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		opCodeArg2p1 = cache.memory[programCounter + 3];
+		opCodeArg2p2 = cache.memory[programCounter + 4];
+		opCodeArg3p1 = cache.memory[programCounter + 5];
+		opCodeArg3p2 = cache.memory[programCounter + 6];
 
-		gpu.accessCommandBuffer("write", gpu.commandCounter, 1, temp);
+		gpu.commandBuffer.memory[gpu.commandCounter] = 1;
 
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 0, arg1p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 1, arg1p2, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 2, arg2p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 3, arg2p2, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 4, arg3p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 5, arg3p2, temp);
-
-		programCounter += 6;
-		break; }
-
-	case 51: {
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		byte arg2p1 = cache.read(programCounter + 3);
-		byte arg2p2 = cache.read(programCounter + 4);
-		byte arg3p1 = cache.read(programCounter + 5);
-		byte arg3p2 = cache.read(programCounter + 6);
-		byte temp;
-
-		gpu.accessCommandBuffer("write", gpu.commandCounter, 2, temp);
-
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 0, arg1p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 1, arg1p2, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 2, arg2p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 3, arg2p2, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 4, arg3p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 5, arg3p2, temp);
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = opCodeArg1p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = opCodeArg1p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = opCodeArg2p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3] = opCodeArg2p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = opCodeArg3p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = opCodeArg3p2;
 
 		programCounter += 6;
-		break; }
+		break;
+
+	case 51: //Copy from VRAM to RAM
+		opCodeArg1p1 = cache.memory[programCounter + 1];
+		opCodeArg1p2 = cache.memory[programCounter + 2];
+		opCodeArg2p1 = cache.memory[programCounter + 3];
+		opCodeArg2p2 = cache.memory[programCounter + 4];
+		opCodeArg3p1 = cache.memory[programCounter + 5];
+		opCodeArg3p2 = cache.memory[programCounter + 6];
+
+		gpu.commandBuffer.memory[gpu.commandCounter] = 1;
+
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = opCodeArg1p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = opCodeArg1p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = opCodeArg2p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3] = opCodeArg2p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = opCodeArg3p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = opCodeArg3p2;
+
+		programCounter += 6;
+
+		break;
 
 	case 52: {
-		byte arg1p1 = cache.read(programCounter + 1);
-		byte arg1p2 = cache.read(programCounter + 2);
-		byte arg2p1 = cache.read(programCounter + 3);
-		byte arg2p2 = cache.read(programCounter + 4);
-		byte arg3p1 = cache.read(programCounter + 5);
-		byte arg3p2 = cache.read(programCounter + 6);
-		byte arg4p1 = cache.read(programCounter + 7);
-		byte arg4p2 = cache.read(programCounter + 8);
-		byte arg5 = cache.read(programCounter + 9);
-		byte arg6 = cache.read(programCounter + 10);
-		byte arg7 = cache.read(programCounter + 11);
-		byte temp;
+		byte arg1p1 = cache.memory[programCounter + 1];
+		byte arg1p2 = cache.memory[programCounter + 2];
+		byte arg2p1 = cache.memory[programCounter + 3];
+		byte arg2p2 = cache.memory[programCounter + 4];
+		byte arg3p1 = cache.memory[programCounter + 5];
+		byte arg3p2 = cache.memory[programCounter + 6];
+		byte arg4p1 = cache.memory[programCounter + 7];
+		byte arg4p2 = cache.memory[programCounter + 8];
+		byte arg5 = cache.memory[programCounter +  9];
+		byte arg6 = cache.memory[programCounter + 10];
+		byte arg7 = cache.memory[programCounter + 11];
 
-		gpu.accessCommandBuffer("write", gpu.commandCounter, 3, temp);
+		gpu.commandBuffer.memory[gpu.commandCounter] = 3;
 
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 0 , arg1p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 1 , arg1p2, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 2 , arg2p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 3 , arg2p2, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 4 , arg3p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 5 , arg3p2, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 6 , arg4p1, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 7 , arg4p2, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 8 , arg5, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 9 , arg6, temp);
-		gpu.accessCommandArgBuffer("write", gpu.commandArgCounter + 10, arg7, temp);
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  0] = arg1p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  1] = arg1p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  2] = arg2p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  3] = arg2p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  4] = arg3p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  5] = arg3p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  6] = arg4p1;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  7] = arg4p2;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  8] = arg5;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter +  9] = arg6;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 10] = arg7;
 
 		programCounter += 11;
 		break; }
@@ -271,24 +295,8 @@ void CPU::execute(u16 register) {
 
 void CPU::tick() {
 	if (halt == false) {
-		registerOP1 = cache.read(programCounter);
+		registerOP1 = cache.memory[programCounter];
 		execute(register1);
 		programCounter++;
-	}
-}
-
-void CPU::accessCache(std::string choice, u16 pos, byte value = 0, byte& output) {
-	if (choice == "write") {
-		cache.write(pos, value);
-	}else if (choice == "read") {
-		output = cache.read(pos);
-	}
-}
-
-void CPU::accessRam(std::string choice, u16 pos, byte value = 0, byte& output) {
-	if (choice == "write") {
-		ram.write(pos, value);
-	}else if (choice == "read") {
-		output = ram.read(pos);
 	}
 }
