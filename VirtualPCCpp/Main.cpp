@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
 	Memory ram1(4096);
 	Memory hdd1(2048);
 
-	NSSDL::initSDL(pc1W, width, height);
+	GPU gpu1(256, 4096, 32, 1024, &pc1W, &ram1);
 
-	GPU gpu1(255, 2048, pc1W);
+	NSSDL::initSDL(gpu1.screen, width, height);
 
 	CPU cpu1(1024, ram1, gpu1);
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 									  "LOAD1_C", "101", 
 									  "SUM", 
 									  "COT0",
-									  "DRAWP", "105", "105", "115", "115", "60", "60", "60"};
+									  "DRAWP", "50", "50", "100", "100", "60", "60", "60"};
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);
@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
 			}
 		}	
 		pc1.cpu.tick();
-		gpu1.execute();
+		gpu1.executeCommand();
 		gpu1.tick();
 		NSSDL::updateSDL(pc1.screen);
 	}

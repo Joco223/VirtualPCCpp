@@ -27,3 +27,11 @@ bool Memory::Empty() {
 	}
 	return true;
 }
+
+byte Memory::read(u16 position) {
+	return memory[position];
+}
+
+void Memory::write(u16 position, byte value) {
+	memory[position] = value;
+}

@@ -6,7 +6,7 @@ PC::PC()
 	ram(),
 	hdd() {}
 
-PC::PC(CPU cpu_, Memory ram_, Memory hdd_, SDLWindow screen_) 
+PC::PC(CPU cpu_, Memory ram_, Memory hdd_, SDLWindow* screen_) 
 	:
 	cpu(cpu_),
 	ram(ram_),

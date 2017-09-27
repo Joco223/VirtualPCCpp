@@ -11,8 +11,8 @@ public:
 	CPU cpu;
 	Memory ram;
 	Memory hdd;
-	SDLWindow screen;
+	SDLWindow* screen;
 
 	PC();
-	PC(CPU, Memory, Memory, SDLWindow);
+	PC(CPU, Memory, Memory, SDLWindow*);
 };

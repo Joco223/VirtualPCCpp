@@ -22,7 +22,6 @@
     <ClCompile Include="Assembly.cpp" />
     <ClCompile Include="CPU.cpp" />
     <ClCompile Include="GPU.cpp" />
-    <ClCompile Include="GPUOld.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="NSSDL.cpp" />
@@ -33,7 +32,6 @@
     <ClInclude Include="Assembly.h" />
     <ClInclude Include="CPU.h" />
     <ClInclude Include="GPU.h" />
-    <ClInclude Include="GPUOld.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="NSSDL.h" />
     <ClInclude Include="PC.h" />

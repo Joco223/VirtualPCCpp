@@ -28,18 +28,12 @@ namespace Assembly {
 		for (int i = 0; i < code.size(); i++) {
 
 			std::string instruction = code[i];
-			std::string arg1 = code[i + 1];
-			std::string arg2 = code[i + 2];
-			std::string arg3 = code[i + 3];
-			std::string arg4 = code[i + 4];
-			std::string arg5 = code[i + 5];
-			std::string arg6 = code[i + 6];
-			std::string arg7 = code[i + 7];
-
 
 			bool has_only_digits = (instruction.find_first_not_of("0123456789")) == std::string::npos;
 
 			if (instruction == "LOAD0_C") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 1;
 				int Arg1 = std::stoi(arg1);
 
@@ -52,6 +46,8 @@ namespace Assembly {
 
 				currentPos++;
 			}else if (instruction == "LOAD1_C") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 2;
 
 				int Arg1 = std::stoi(arg1);
@@ -65,6 +61,8 @@ namespace Assembly {
 
 				currentPos++;
 			}else if (instruction == "LOAD0_C") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 3;
 
 				int Arg1 = std::stoi(arg1);
@@ -78,6 +76,8 @@ namespace Assembly {
 
 				currentPos++;
 			}else if (instruction == "LOAD1_R") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 4;
 
 				int Arg1 = std::stoi(arg1);
@@ -95,6 +95,8 @@ namespace Assembly {
 			}else if (instruction == "CLR1") {
 				cpu.cache.memory[currentPos] = 5;
 			}else if (instruction == "WRT0_C") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 7;
 
 				int Arg1 = std::stoi(arg1);
@@ -108,6 +110,8 @@ namespace Assembly {
 
 				currentPos++;
 			}else if (instruction == "WRT1_C") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 8;
 
 				int Arg1 = std::stoi(arg1);
@@ -121,6 +125,8 @@ namespace Assembly {
 
 				currentPos++;
 			}else if (instruction == "WRT0_R") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 9;
 
 				int Arg1 = std::stoi(arg1);
@@ -134,6 +140,8 @@ namespace Assembly {
 
 				currentPos++;
 			}else if (instruction == "WRT1_R") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 10;
 
 				int Arg1 = std::stoi(arg1);
@@ -147,6 +155,9 @@ namespace Assembly {
 
 				currentPos++;
 			}else if (instruction == "WRTC_R") {
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+
 				cpu.cache.memory[currentPos] = 11;
 
 				int Arg1 = std::stoi(arg1);
@@ -169,6 +180,9 @@ namespace Assembly {
 
 				currentPos += 2;
 			}else if (instruction == "WRTR_C") {
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+
 				cpu.cache.memory[currentPos] = 12;
 
 				int Arg1 = std::stoi(arg1);
@@ -211,6 +225,8 @@ namespace Assembly {
 			}else if (instruction == "REG_DIF") {
 				cpu.cache.memory[currentPos] = 29;
 			}else if (instruction == "JMP") {
+				std::string arg1 = code[i + 1];
+
 				cpu.cache.memory[currentPos] = 30;
 
 				int Arg1 = std::stoi(arg1);
@@ -224,6 +240,9 @@ namespace Assembly {
 
 				currentPos++;
 			}else if (instruction == "CMP") {
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+
 				cpu.cache.memory[currentPos] = 31;
 
 				int Arg1 =  std::stoi(arg1);
@@ -245,6 +264,10 @@ namespace Assembly {
 			}else if (instruction == "COT1") {
 				cpu.cache.memory[currentPos] = 41;
 			}else if (instruction == "WRT_R_VR") {
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+				std::string arg3 = code[i + 3];
+
 				cpu.cache.memory[currentPos] = 50;
 
 				int Arg1 = std::stoi(arg1);
@@ -276,6 +299,10 @@ namespace Assembly {
 
 				currentPos += 3;
 			}else if (instruction == "WRT_VR_R") {
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+				std::string arg3 = code[i + 3];
+
 				cpu.cache.memory[currentPos] = 51;
 
 				int Arg1 = std::stoi(arg1);
@@ -306,6 +333,72 @@ namespace Assembly {
 				cpu.cache.memory[currentPos + 6] = b6;
 
 				currentPos += 3;
+			}else if (instruction == "DRAWP") {
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+				std::string arg3 = code[i + 3];
+				std::string arg4 = code[i + 4];
+				std::string arg5 = code[i + 5];
+				std::string arg6 = code[i + 6];
+				std::string arg7 = code[i + 7];
+
+				cpu.cache.memory[currentPos] = 52;
+
+				int Arg1 = std::stoi(arg1);
+
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+				byte b1, b2;
+				convertByte(Arg1, b1, b2);
+				cpu.cache.memory[currentPos + 1] = b1;
+				cpu.cache.memory[currentPos + 2] = b2;
+
+				int Arg2 = std::stoi(arg2);
+
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
+
+				byte b3, b4;
+				convertByte(Arg2, b3, b4);
+				cpu.cache.memory[currentPos + 3] = b3;
+				cpu.cache.memory[currentPos + 4] = b4;
+
+				int Arg3 = std::stoi(arg3);
+
+				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
+
+				byte b5, b6;
+				convertByte(Arg3, b5, b6);
+				cpu.cache.memory[currentPos + 5] = b5;
+				cpu.cache.memory[currentPos + 6] = b6;
+
+				int Arg4 = std::stoi(arg4);
+
+				if(checkArgSize(Arg4, 4, instruction, i, 65535) == true) { break; }
+
+				byte b7, b8;
+				convertByte(Arg4, b7, b8);
+				cpu.cache.memory[currentPos + 7] = b7;
+				cpu.cache.memory[currentPos + 8] = b8;
+
+				int Arg5 = std::stoi(arg5);
+
+				if(checkArgSize(Arg5, 5, instruction, i, 65535) == true) { break; }
+
+				cpu.cache.memory[currentPos + 9] = Arg5;
+
+				int Arg6 = std::stoi(arg6);
+
+				if(checkArgSize(Arg6, 6, instruction, i, 65535) == true) { break; }
+
+				cpu.cache.memory[currentPos + 10] = Arg6;
+
+				int Arg7 = std::stoi(arg7);
+
+				if(checkArgSize(Arg7, 7, instruction, i, 65535) == true) { break; }
+
+				cpu.cache.memory[currentPos + 11] = Arg7;
+
+				currentPos += 7;
 			}else if(has_only_digits == false){
 				std::cout << "Error: Invalid instruction " << instruction << " at position " << i + 1 << '\n';
 				cpu.cache.Clear();
