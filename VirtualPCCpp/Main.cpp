@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 		"LOAD1_C", "101", 
 		"SUM", 
 		"COT0",
-		"DRAWP", "50", "50", "100", "100", "60", "60", "60"};
+		"PRINT", "HELLO WORLD!", "1", "1"};
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);

@@ -290,6 +290,24 @@ void CPU::execute(u16 register) {
 
 		programCounter += 11;
 		break; }
+
+	case 53: {
+		byte size = cache.memory[programCounter + 1];
+		byte xPos = cache.memory[programCounter + 2];
+		byte yPos = cache.memory[programCounter + 3];
+
+		gpu.commandBuffer.memory[gpu.commandCounter + 0] = 4;
+
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = size;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = xPos;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = yPos;
+
+		for (int i = 0; i < size; i++) {
+			gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3 + i] = cache.memory[programCounter + 4 + i];
+		}
+
+		programCounter += 3 + size;
+		break; }
 	}
 }
 

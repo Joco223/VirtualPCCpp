@@ -1,6 +1,8 @@
 #include "GPU.h"
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 GPU::GPU()
 	:
@@ -26,7 +28,31 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCount_, int commandArgBuff
 	commandCounter(0),
 	commandArgCounter(0),
 	firstAvailableByte(0),
-	coreCount(coreCount_) {}
+	coreCount(coreCount_) 
+{
+	int countR = 0;
+	int characterCount = 0;
+	characters.resize(68);
+	
+	std::string line;
+	std::ifstream myfile ("C:/Users/jovanipavle/Desktop/Characters 7x7/fontBasic.txt");
+
+	for (int i = 0; i < 68; i++) {
+		characters[i].rows.resize(7);
+	}
+	
+	if (myfile.is_open()){
+		while (getline (myfile,line)) {
+			if (countR < 7) {
+				characters[characterCount].rows[countR] = line;
+				countR++;
+			}else{
+				characterCount++;
+				countR = 0;
+			}
+		}
+	}
+}
 
 void getArgument(u16& arg, byte& b1, byte& b2) {
 	if (arg > 255) {
@@ -78,9 +104,9 @@ void GPU::executeCommand() {
 			firstAvailableByte += 5;
 		}
 
-		commandArgCounter += 6;
-		commandCounter++;
-		break; }
+	commandArgCounter += 6;
+	commandCounter++;
+	break; }
 
 	case 2: {
 		byte arg1b1 = commandArgBuffer.memory[commandArgCounter + 0];
@@ -143,7 +169,7 @@ void GPU::executeCommand() {
 				cXPos = arg1 + x;
 
 				byte x1, x2, y1, y2;
-				getArgument(cXPos, x1 ,x2);
+				getArgument(cXPos, x1, x2);
 				getArgument(cYPos, y1, y2);
 
 				vRam.memory[firstAvailableByte + 0] = 3;
@@ -160,6 +186,56 @@ void GPU::executeCommand() {
 		}
 
 		commandArgCounter += 11;
+		commandCounter++;
+		break; }
+
+	case 4: {
+		byte size = commandArgBuffer.memory[commandArgCounter + 0];
+		byte xPos = commandArgBuffer.memory[commandArgCounter + 1];
+		byte yPos = commandArgBuffer.memory[commandArgCounter + 2];
+
+		std::vector<byte> chars;
+
+		for (int i = 0; i < size; i++) {
+			chars.push_back(commandArgBuffer.memory[commandArgCounter + 3 + i]);
+		}
+
+		for (int i = 0; i < chars.size(); i++) {
+			character currentC = characters[chars[i]];
+			std::vector<u16> xPositions;
+			std::vector<u16> yPositions;
+			int cSize = 0;
+
+			for (int j = 0; j < currentC.rows.size(); j++){
+				for (int k = 0; k < 5; k++) {
+					if (currentC.rows[j][k] == '1') {
+						xPositions.push_back((xPos + i) * 5 + k);
+						yPositions.push_back(yPos * 5 + j);
+						cSize++;
+					}
+				}
+			}
+
+			for (int j = 0; j < cSize; j++) {
+				byte x1, x2, y1, y2;
+				u16 xPosition = xPositions[j];
+				getArgument(xPosition, x1, x2);
+				getArgument(yPositions[j], y1, y2);
+
+				vRam.memory[firstAvailableByte + 0] = 3;
+				vRam.memory[firstAvailableByte + 1] = x1;
+				vRam.memory[firstAvailableByte + 2] = x2;
+				vRam.memory[firstAvailableByte + 3] = y1;
+				vRam.memory[firstAvailableByte + 4] = y2;
+				vRam.memory[firstAvailableByte + 5] = 60;
+				vRam.memory[firstAvailableByte + 6] = 60;
+				vRam.memory[firstAvailableByte + 7] = 60;
+
+				firstAvailableByte += 8;
+			}
+		}
+
+		commandArgCounter += 3 + size;
 		commandCounter++;
 		break; }
 	}

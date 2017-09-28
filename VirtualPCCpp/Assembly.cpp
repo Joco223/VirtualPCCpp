@@ -23,6 +23,8 @@ namespace Assembly {
 	}
 
 	void Assembly::Compile(std::vector<std::string>& code, CPU& cpu) {
+		std::vector<char> charactersA = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', '-', ',', '.', '/', '\\', ':', ';', '<', '>', '=', '?', '[', ']', '{', '}', '`', '^', '|', '~', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', ' '};
+
 		int currentPos = 0;
 		int gpuCommand = 0;
 		for (int i = 0; i < code.size(); i++) {
@@ -399,9 +401,36 @@ namespace Assembly {
 				cpu.cache.memory[currentPos + 11] = Arg7;
 
 				currentPos += 7;
+			}else if (instruction == "PRINT") {
+				cpu.cache.memory[currentPos] = 53;
+
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+				std::string arg3 = code[i + 3];
+
+				int Arg2 = std::stoi(arg2);
+				int Arg3 = std::stoi(arg3);
+				int size = arg1.size();
+
+				cpu.cache.memory[currentPos + 1] = size;
+				cpu.cache.memory[currentPos + 2] = Arg2;
+				cpu.cache.memory[currentPos + 3] = Arg3;
+
+				for (int i = 0; i < size; i++) {
+					byte cC;
+					for (int j = 0; j < charactersA.size(); j++) {
+						if (arg1[i] == charactersA[j]) {
+							cC = j;
+							break;
+						}
+					}
+					cpu.cache.memory[currentPos + 4 + i] = cC;
+				}
+
+				currentPos += 3;
 			}else if(has_only_digits == false){
 				std::cout << "Error: Invalid instruction " << instruction << " at position " << i + 1 << '\n';
-				cpu.cache.Clear();
+				//cpu.cache.Clear();
 				break;	
 			}
 			currentPos++;
