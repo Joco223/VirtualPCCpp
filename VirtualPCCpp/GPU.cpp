@@ -207,10 +207,10 @@ void GPU::executeCommand() {
 			int cSize = 0;
 
 			for (int j = 0; j < currentC.rows.size(); j++){
-				for (int k = 0; k < 5; k++) {
+				for (int k = 0; k < 6; k++) {
 					if (currentC.rows[j][k] == '1') {
-						xPositions.push_back((xPos + i) * 5 + k);
-						yPositions.push_back(yPos * 5 + j);
+						xPositions.push_back((xPos + i) * 6 + k);
+						yPositions.push_back(yPos * 6 + j);
 						cSize++;
 					}
 				}
