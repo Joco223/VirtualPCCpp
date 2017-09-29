@@ -80,9 +80,10 @@ int main(int argc, char* argv[]) {
 	//Assembly example
 
 	//Loads register0 and register1, sums them, prints contents of register0
-	std::vector<std::string> code = { "PRINT", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "1", "1", "60", "10", "10",
-									  "PRINT", "0123456789",                 "1", "2", "10", "60", "10",
-									  "PRINT", "+-=*/;:()[]{}!#$%^&><_~",    "1", "3", "20", "20", "60", };
+	std::vector<std::string> code = { "PRINT", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "1", "1", "60", "60", "60",
+									  "PRINT", "abcdefghijklmnopqrstuvwxyz", "1", "2", "60", "10", "10",
+									  "PRINT", "0123456789",                 "1", "3", "10", "60", "10",
+									  "PRINT", "+-=*/;:()[]{}!#$%^&><_~\'\"&?@",    "1", "4", "20", "20", "60", };
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);
