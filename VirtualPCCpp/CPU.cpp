@@ -47,6 +47,8 @@ void CPU::execute(u16 register) {
 	u16 programPos;
 	u16 condition;
 
+	//std::cout << opCode << std::endl;
+
 	switch (opCode) {
 	case 0: //Halt
 		halt = true;
@@ -295,18 +297,26 @@ void CPU::execute(u16 register) {
 		byte size = cache.memory[programCounter + 1];
 		byte xPos = cache.memory[programCounter + 2];
 		byte yPos = cache.memory[programCounter + 3];
+		byte r = cache.memory[programCounter + 4];
+		byte g = cache.memory[programCounter + 5];
+		byte b = cache.memory[programCounter + 6];
 
-		gpu.commandBuffer.memory[gpu.commandCounter + 0] = 4;
+		gpu.commandBuffer.memory[gpu.commandCounter] = 4;
+
+		
 
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = size;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = xPos;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = yPos;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3] = r;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = g;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = b;
 
 		for (int i = 0; i < size; i++) {
-			gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3 + i] = cache.memory[programCounter + 4 + i];
+			gpu.commandArgBuffer.memory[gpu.commandArgCounter + 6 + i] = cache.memory[programCounter + 7 + i];
 		}
 
-		programCounter += 3 + size;
+		programCounter += (6 + size);
 		break; }
 	}
 }

@@ -27,6 +27,8 @@ namespace Assembly {
 
 		int currentPos = 0;
 		int gpuCommand = 0;
+		int wordsize = 0;
+
 		for (int i = 0; i < code.size(); i++) {
 
 			std::string instruction = code[i];
@@ -402,36 +404,41 @@ namespace Assembly {
 
 				currentPos += 7;
 			}else if (instruction == "PRINT") {
-				cpu.cache.memory[currentPos] = 53;
+				cpu.cache.memory[currentPos + wordsize] = 53;
 
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
 				std::string arg3 = code[i + 3];
+				std::string arg4 = code[i + 4];
+				std::string arg5 = code[i + 5];
+				std::string arg6 = code[i + 6];
 
+				int size = arg1.size();
 				int Arg2 = std::stoi(arg2);
 				int Arg3 = std::stoi(arg3);
-				int size = arg1.size();
+				int Arg4 = std::stoi(arg4);
+				int Arg5 = std::stoi(arg5);
+				int Arg6 = std::stoi(arg6);
 
-				cpu.cache.memory[currentPos + 1] = size;
-				cpu.cache.memory[currentPos + 2] = Arg2;
-				cpu.cache.memory[currentPos + 3] = Arg3;
+				cpu.cache.memory[currentPos + wordsize + 1] = size;
+				cpu.cache.memory[currentPos + wordsize + 2] = Arg2;
+				cpu.cache.memory[currentPos + wordsize + 3] = Arg3;
+				cpu.cache.memory[currentPos + wordsize + 4] = Arg4;
+				cpu.cache.memory[currentPos + wordsize + 5] = Arg5;
+				cpu.cache.memory[currentPos + wordsize + 6] = Arg6;
 
-				for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size; j++) {
 					byte cC;
-					for (int j = 0; j < charactersA.size(); j++) {
-						if (arg1[i] == charactersA[j]) {
-							cC = j;
+					for (int k = 0; k < charactersA.size(); k++) {
+						if (arg1[j] == charactersA[k]) {
+							cC = k;
 							break;
 						}
 					}
-					cpu.cache.memory[currentPos + 4 + i] = cC;
+					cpu.cache.memory[currentPos + wordsize + 7 + j] = cC;
 				}
 
-				currentPos += 3;
-			}else if(has_only_digits == false){
-				std::cout << "Error: Invalid instruction " << instruction << " at position " << i + 1 << '\n';
-				//cpu.cache.Clear();
-				break;	
+				wordsize += size;
 			}
 			currentPos++;
 		}

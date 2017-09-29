@@ -38,12 +38,12 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCount_, int commandArgBuff
 	std::ifstream myfile ("C:/Users/jovanipavle/Desktop/Characters 7x7/fontBasic.txt");
 
 	for (int i = 0; i < 68; i++) {
-		characters[i].rows.resize(7);
+		characters[i].rows.resize(8);
 	}
 	
 	if (myfile.is_open()){
 		while (getline (myfile,line)) {
-			if (countR < 7) {
+			if (countR < 8) {
 				characters[characterCount].rows[countR] = line;
 				countR++;
 			}else{
@@ -193,11 +193,14 @@ void GPU::executeCommand() {
 		byte size = commandArgBuffer.memory[commandArgCounter + 0];
 		byte xPos = commandArgBuffer.memory[commandArgCounter + 1];
 		byte yPos = commandArgBuffer.memory[commandArgCounter + 2];
+		byte r = commandArgBuffer.memory[commandArgCounter + 3];
+		byte g = commandArgBuffer.memory[commandArgCounter + 4];
+		byte b = commandArgBuffer.memory[commandArgCounter + 5];
 
 		std::vector<byte> chars;
 
 		for (int i = 0; i < size; i++) {
-			chars.push_back(commandArgBuffer.memory[commandArgCounter + 3 + i]);
+			chars.push_back(commandArgBuffer.memory[commandArgCounter + 6 + i]);
 		}
 
 		for (int i = 0; i < chars.size(); i++) {
@@ -210,7 +213,7 @@ void GPU::executeCommand() {
 				for (int k = 0; k < 6; k++) {
 					if (currentC.rows[j][k] == '1') {
 						xPositions.push_back((xPos + i) * 6 + k);
-						yPositions.push_back(yPos * 6 + j);
+						yPositions.push_back(yPos * 8 + j);
 						cSize++;
 					}
 				}
@@ -227,15 +230,15 @@ void GPU::executeCommand() {
 				vRam.memory[firstAvailableByte + 2] = x2;
 				vRam.memory[firstAvailableByte + 3] = y1;
 				vRam.memory[firstAvailableByte + 4] = y2;
-				vRam.memory[firstAvailableByte + 5] = 60;
-				vRam.memory[firstAvailableByte + 6] = 60;
-				vRam.memory[firstAvailableByte + 7] = 60;
+				vRam.memory[firstAvailableByte + 5] = b;
+				vRam.memory[firstAvailableByte + 6] = g;
+				vRam.memory[firstAvailableByte + 7] = r;
 
 				firstAvailableByte += 8;
 			}
 		}
 
-		commandArgCounter += 3 + size;
+		commandArgCounter += 3 + size - 1;
 		commandCounter++;
 		break; }
 	}
@@ -272,5 +275,11 @@ void GPU::executeThread() {
 		screen->pixels[arg2 * 320 + arg1] = int(b << 16) | int(g << 8) | int(r);
 		functionCounter += 8;
 		break; }	
+	}
+}
+
+void GPU::tick() {
+	for (int i = 0; i < coreCount; i++) {
+		executeThread();
 	}
 }
