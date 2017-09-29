@@ -33,11 +33,11 @@ int main(int argc, char* argv[]) {
 	Memory ram1(4096);
 	Memory hdd1(2048);
 
-	GPU gpu1(2048, 16384, 32, 4096, &pc1W, &ram1);
+	GPU gpu1(8192, 524288, 64, 16384, &pc1W, &ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
-	CPU cpu1(4096, ram1, gpu1);
+	CPU cpu1(8192, ram1, gpu1);
 
 	//Characters:
 	//0:  0, 1:  1, 2:  2, 3:  3, 4:  4, 5:  5, 6:  6, 7:  7, 8:  8, 9:  9,
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 	//Loads register0 and register1, sums them, prints contents of register0
 	std::vector<std::string> code = { "PRINT", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "1", "1", "60", "10", "10",
 									  "PRINT", "0123456789",                 "1", "2", "10", "60", "10",
-									  "PRINT", "+-*/;:()[]{}",               "1", "3", "20", "20", "60", };
+									  "PRINT", "+-=*/;:()[]{}!#$%^&><_~",    "1", "3", "20", "20", "60", };
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);
