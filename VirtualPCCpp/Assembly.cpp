@@ -64,7 +64,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos + additionalMemory + 2] = b2;
 
 				currentPos++;
-			}else if (instruction == "LOAD0_C") {
+			}else if (instruction == "LOAD0_R") {
 				std::string arg1 = code[i + 1];
 
 				cpu.cache.memory[currentPos + additionalMemory] = 3;
