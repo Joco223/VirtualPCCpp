@@ -39,15 +39,6 @@ int main(int argc, char* argv[]) {
 
 	CPU cpu1(8192, ram1, gpu1);
 
-	//Characters:
-	//0:  0, 1:  1, 2:  2, 3:  3, 4:  4, 5:  5, 6:  6, 7:  7, 8:  8, 9:  9,
-	//!: 10, #: 11, %: 12, (: 13, ): 14, `: 15, -: 16, [: 17, ]: 18, ^: 19,
-	//_: 20, {: 21, }: 22, +: 23, =: 24, >: 25, <: 26, \: 27, |: 28, /: 29,
-	//:: 30, ;: 31, *: 32, &: 33, ?: 34, A: 35, B: 36, C: 37: D: 38, E: 39,
-	//F: 40, G: 41, H: 42, I: 43, J: 44, K: 45, L: 46, M: 47, N: 48, O: 49,
-	//P: 50, Q: 51, R: 52, S: 53, T: 54, U: 55, V: 56, W: 57, X: 58, Y: 59,
-	//Z: 60, x: 61
-
 	//Instruction set:
 	//LOAD0_C - Load to register0 from cache,                        1 argument  (index of origin memory in cache)
 	//LOAD1_C - Load to register1 from cache,                        1 argument  (index of origin memory in cache)
