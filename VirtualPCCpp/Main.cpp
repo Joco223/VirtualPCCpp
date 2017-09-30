@@ -72,12 +72,25 @@ int main(int argc, char* argv[]) {
 	//PRINT    - Print string to screen,                              6 arguments (string itself, x position in character space, y position in character space, r value, g value, b value)
 	//RGB values are limited from 0 to 63
 
-	std::vector<std::string> code = { "PRINT", "ABCDEFGHIJKLMNOPQRSTUVWXYZ",        "1", "1", "60", "60", "60",
-									  "PRINT", "abcdefghijklmnopqrstuvwxyz",        "1", "2", "60", "10", "10",
-									  "PRINT", "0123456789",                        "1", "3", "10", "60", "10",
-									  "PRINT", "+-=*/;:()[]{}!#$%^&><_~\'\"&?@",    "1", "4", "20", "20", "60", 
-									  "CLR_COMM", "CLR_VRAM"};
+	//std::vector<std::string> code = { "PRINT", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "1", "1", "60", "60", "60",
+	//								  "PRINT", "abcdefghijklmnopqrstuvwxyz", "1", "2", "60", "10", "10",
+	//								  "PRINT", "0123456789",                 "1", "3", "10", "60", "10",
+	//								  "PRINT", "+-=*/;:()[]{}!#$%^&><_~\'\"&?@",    "1", "4", "20", "20", "60", 
+	//								  "CLR_COMM", "CLR_VRAM"};
 
+	std::vector<std::string> code = { "PRINT", ">", "1", "1", "60", "60", "60",
+									  "PRINT", "Well hello there.", "2", "1", "60", "60", "60",
+									  "PRINT", ">", "1", "2", "60", "60", "60",
+									  "PRINT", "I am V.S.A.I.", "2", "2", "60", "60", "60",
+									  "PRINT", ">", "1", "3", "60", "60", "60",
+									  "PRINT", "The virtual PC Joco223 has been making.", "2", "3", "60", "60", "60",
+									  "PRINT", ">", "1", "4", "60", "60", "60",
+									  "PRINT", "I have taken over his PC.", "2", "4", "60", "60", "60",
+									  "PRINT", ">", "1", "5", "60", "60", "60",
+									  "PRINT", "And your PC will be next.", "2", "5", "60", "60", "60",
+									  "PRINT", ">", "1", "6", "60", "60", "60",
+									  "PRINT", ":)", "2", "6", "63", "0", "0",
+									  "CLR_COMM", "CLR_VRAM"};
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);

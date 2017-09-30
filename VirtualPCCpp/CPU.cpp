@@ -211,9 +211,8 @@ void CPU::execute(u16 register) {
 	case 30: //Jump to place in code
 		opCodeArg1p1 = cache.memory[programCounter + 1];
 		opCodeArg1p2 = cache.memory[programCounter + 2];
-		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256) - 1;	
+		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		programCounter = memPos;
-		//programCounter++;
 		break;
 
 	case 31: //Compare to true/false
@@ -229,6 +228,17 @@ void CPU::execute(u16 register) {
 		}
 		programCounter++;
 		break;
+
+	case 32: {
+		u16 waitTime = cache.memory[programCounter + 1];
+		u16 currentTime = 0;
+		if (currentTime < waitTime) {
+			std::cout << currentTime << std::endl;
+			currentTime++;
+		}else if (currentTime >= waitTime) {
+			programCounter++;
+		}
+	}
 
 	case 40: //Cout from register1
 		std::cout << register1 << '\n';
