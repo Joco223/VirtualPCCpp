@@ -40,37 +40,38 @@ int main(int argc, char* argv[]) {
 	CPU cpu1(8192, ram1, gpu1);
 
 	//Instruction set:
-	//LOAD0_C - Load to register0 from cache,                        1 argument  (index of origin memory in cache)
-	//LOAD1_C - Load to register1 from cache,                        1 argument  (index of origin memory in cache)
-	//LOAD0_R - Load to register0 from ram,                          1 argument  (index of origin memory in ram)
-	//LOAD1_R - Load to register1 from ram,                          1 argument  (index of origin memory in ram)
-	//CLR0    - Clear register0,                                     0 arguments
-	//CLR1    - Clear register1,                                     0 arguments
-	//WRT0_C  - Write from register0 to cache,                       1 argument  (index of target memory in cache)
-	//WRT1_C  - Write from register1 to cache,                       1 argument  (index of target memory in cache)
-	//WRT0_R  - Write from register0 to ram,                         1 argument  (index of target memory in ram)
-	//WRT1_R  - Write from register1 to ram,                         1 argument  (index of target memory in ram)
-	//WRTC_R  - Write from cache to ram,                             2 arguments (index of origin memory in cache, index of target memory in ram)
-	//WRTR_C  - Write from ram to cache,                             2 arguments (index of origin memory in ram, index of target memory in ram)
-	//SUM     - Adds register0 and register1,                        0 arguments
-	//SUB     - Subtracts register0 and register1,                   0 arguments
-	//MLT     - Multiplies register0 and register1,                  0 arguments
-	//DIV     - Divides register0 and register1,                     0 arguments
-	//REG0_B  - Check if register0 is bigger than register1,         0 arguments
-	//REG0_BE - Check if register0 is bigger or equal to register1,  0 arguments
-	//REG1_B  - Check if register1 is bigger than register0,         0 arguments
-	//REG1_BE - Check if register1 is bigger or equal to register0,  0 arguments
-	//REG_EQL - Check if register0 and register1 are the same size,  0 arguments
-	//REG_DIF - Check if register0 and register1 are different size, 0 arguments
-	//JMP     - Sets program counter to target position,             1 argument  (target position)
-	//CMP     - Compares register0 to a condition,                   2 arguments (0 or 1 for the condition (false or true), jump position if condition is met)
-	//COT0    - Print to console contents of register0,              0 arguments
-	//COT1    - Print to console contents of register1,              0 arguments
+	//LOAD0_C  - Load to register0 from cache,                        1 argument  (index of origin memory in cache)
+	//LOAD1_C  - Load to register1 from cache,                        1 argument  (index of origin memory in cache)
+	//LOAD0_R  - Load to register0 from ram,                          1 argument  (index of origin memory in ram)
+	//LOAD1_R  - Load to register1 from ram,                          1 argument  (index of origin memory in ram)
+	//CLR0     - Clear register0,                                     0 arguments
+	//CLR1     - Clear register1,                                     0 arguments
+	//WRT0_C   - Write from register0 to cache,                       1 argument  (index of target memory in cache)
+	//WRT1_C   - Write from register1 to cache,                       1 argument  (index of target memory in cache)
+	//WRT0_R   - Write from register0 to ram,                         1 argument  (index of target memory in ram)
+	//WRT1_R   - Write from register1 to ram,                         1 argument  (index of target memory in ram)
+	//WRTC_R   - Write from cache to ram,                             2 arguments (index of origin memory in cache, index of target memory in ram)
+	//WRTR_C   - Write from ram to cache,                             2 arguments (index of origin memory in ram, index of target memory in ram)
+	//SUM      - Adds register0 and register1,                        0 arguments
+	//SUB      - Subtracts register0 and register1,                   0 arguments
+	//MLT      - Multiplies register0 and register1,                  0 arguments
+	//DIV      - Divides register0 and register1,                     0 arguments
+	//REG0_B   - Check if register0 is bigger than register1,         0 arguments
+	//REG0_BE  - Check if register0 is bigger or equal to register1,  0 arguments
+	//REG1_B   - Check if register1 is bigger than register0,         0 arguments
+	//REG1_BE  - Check if register1 is bigger or equal to register0,  0 arguments
+	//REG_EQL  - Check if register0 and register1 are the same size,  0 arguments
+	//REG_DIF  - Check if register0 and register1 are different size, 0 arguments
+	//JMP      - Sets program counter to target position,             1 argument  (target position)
+	//CMP      - Compares register0 to a condition,                   2 arguments (0 or 1 for the condition (false or true), jump position if condition is met)
+	//COT0     - Print to console contents of register0,              0 arguments
+	//COT1     - Print to console contents of register1,              0 arguments
+	//WRT_R_VR - Write from RAM to vRAM,                              3 arguments (start position of memory in ram, end position of memory in ram, start position in memory of vram)
+	//WRT_VR_R - Write from vRAM to RAM,                              3 arguments (start position of memory in vram, end position of memory in vram, start position in memory of ram)
+	//DRAWP    - Draw rectangle on screen,                            7 arguments (start x position, start y position, end x position, end y position, r value, g value, b value)
+	//PRINT    - Print string to screen,                              6 arguments (string itself, x position in character space, y position in character space, r value, g value, b value)
+	//RGB values are limited from 0 to 63
 
-
-	//Assembly example
-
-	//Loads register0 and register1, sums them, prints contents of register0
 	std::vector<std::string> code = { "PRINT", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "1", "1", "60", "60", "60",
 									  "PRINT", "abcdefghijklmnopqrstuvwxyz", "1", "2", "60", "10", "10",
 									  "PRINT", "0123456789",                 "1", "3", "10", "60", "10",

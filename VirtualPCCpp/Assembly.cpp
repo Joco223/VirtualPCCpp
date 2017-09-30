@@ -350,7 +350,7 @@ namespace Assembly {
 
 				int Arg1 = std::stoi(arg1);
 
-				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 320) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -359,7 +359,7 @@ namespace Assembly {
 
 				int Arg2 = std::stoi(arg2);
 
-				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
+				if(checkArgSize(Arg2, 2, instruction, i, 240) == true) { break; }
 
 				byte b3, b4;
 				convertByte(Arg2, b3, b4);
@@ -368,7 +368,7 @@ namespace Assembly {
 
 				int Arg3 = std::stoi(arg3);
 
-				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
+				if(checkArgSize(Arg3, 3, instruction, i, 320) == true) { break; }
 
 				byte b5, b6;
 				convertByte(Arg3, b5, b6);
@@ -377,7 +377,7 @@ namespace Assembly {
 
 				int Arg4 = std::stoi(arg4);
 
-				if(checkArgSize(Arg4, 4, instruction, i, 65535) == true) { break; }
+				if(checkArgSize(Arg4, 4, instruction, i, 240) == true) { break; }
 
 				byte b7, b8;
 				convertByte(Arg4, b7, b8);
@@ -386,19 +386,19 @@ namespace Assembly {
 
 				int Arg5 = std::stoi(arg5);
 
-				if(checkArgSize(Arg5, 5, instruction, i, 65535) == true) { break; }
+				if(checkArgSize(Arg5, 5, instruction, i, 63) == true) { break; }
 
 				cpu.cache.memory[currentPos + 9] = Arg5;
 
 				int Arg6 = std::stoi(arg6);
 
-				if(checkArgSize(Arg6, 6, instruction, i, 65535) == true) { break; }
+				if(checkArgSize(Arg6, 6, instruction, i, 63) == true) { break; }
 
 				cpu.cache.memory[currentPos + 10] = Arg6;
 
 				int Arg7 = std::stoi(arg7);
 
-				if(checkArgSize(Arg7, 7, instruction, i, 65535) == true) { break; }
+				if(checkArgSize(Arg7, 7, instruction, i, 63) == true) { break; }
 
 				cpu.cache.memory[currentPos + 11] = Arg7;
 
@@ -419,6 +419,12 @@ namespace Assembly {
 				int Arg4 = std::stoi(arg4);
 				int Arg5 = std::stoi(arg5);
 				int Arg6 = std::stoi(arg6);
+
+				if(checkArgSize(Arg2, 2, instruction, i, 53) == true) { break; }
+				if(checkArgSize(Arg3, 3, instruction, i, 26) == true) { break; }
+				if(checkArgSize(Arg4, 4, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg5, 5, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg6, 6, instruction, i, 63) == true) { break; }
 
 				cpu.cache.memory[currentPos + wordsize + 1] = size;
 				cpu.cache.memory[currentPos + wordsize + 2] = Arg2;
