@@ -241,6 +241,19 @@ void GPU::executeCommand() {
 		commandArgCounter += 3 + size - 1;
 		commandCounter++;
 		break; }
+
+	case 5: {
+		commandBuffer.Clear();
+		commandArgBuffer.Clear();
+		commandCounter = 0;
+		commandArgCounter = 0;
+		break; }
+
+	case 6: {
+		vRam.Clear();
+		functionCounter = 0;
+		firstAvailableByte = 0;
+		break; }
 	}
 }
 

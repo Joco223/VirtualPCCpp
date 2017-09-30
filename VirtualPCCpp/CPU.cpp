@@ -59,7 +59,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		register1 = cache.memory[memPos];
-		programCounter++;
+		programCounter += 2;
 		programCounter++;
 		break;
 
@@ -68,7 +68,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		register2 = cache.memory[memPos];
-		programCounter++;
+		programCounter += 2;
 		programCounter++;
 		break;
 
@@ -77,7 +77,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		register1 = ram.memory[memPos];
-		programCounter++;
+		programCounter += 2;
 		programCounter++;
 		break;
 
@@ -86,16 +86,18 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		register2 = ram.memory[memPos];
-		programCounter++;
+		programCounter += 2;
 		programCounter++;
 		break;
 
 	case 5: //clear register1
 		register1 = 0;
+		programCounter++;
 		break;
 
 	case 6: //Clear register2
 		register2 = 0;
+		programCounter++;
 		break;
 
 	case 7: //Write from register1 to cache
@@ -103,7 +105,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		cache.memory[memPos] = register1;
-		programCounter++;
+		programCounter += 2;
 		programCounter++;
 		break;
 
@@ -112,7 +114,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		cache.memory[memPos] = register2;
-		programCounter++;
+		programCounter += 2;
 		programCounter++;
 		break;
 
@@ -121,7 +123,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		ram.memory[memPos] = register1;
-		programCounter++;
+		programCounter += 2;
 		programCounter++;
 		break;
 
@@ -130,7 +132,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		ram.memory[memPos] = register2;
-		programCounter++;
+		programCounter += 2;
 		programCounter++;
 		break;
 
@@ -142,6 +144,7 @@ void CPU::execute(u16 register) {
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		memPos2 = opCodeArg2p1 + (opCodeArg2p2 * 256);
 		ram.memory[memPos2] = cache.memory[memPos];
+		programCounter++;
 		break;
 
 	case 12: //Write from ram to cache
@@ -152,46 +155,57 @@ void CPU::execute(u16 register) {
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
 		memPos2 = opCodeArg2p1 + (opCodeArg2p2 * 256);
 		cache.memory[memPos2] = ram.memory[memPos];
+		programCounter++;
 		break;
 
 	case 20: //Sum register1 and register2
 		register1 = register1 + register2;
+		programCounter++;
 		break;
 
 	case 21: //Subtract register1 and register2
 		register1 = register1 - register2;
+		programCounter++;
 		break;
 
 	case 22: //Multiply register1 and register2
 		register1 = register1 * register2;
+		programCounter++;
 		break;
 
 	case 23: //Divide register1 and register2
 		register1 = register1 / register2;
+		programCounter++;
 		break;
 
 	case 24: //Check if register1 is bigger than register2
 		register1 = register1 > register2;
+		programCounter++;
 		break;
 
 	case 25: //Check if register1 is bigger or equal to register2
 		register1 = register1 >= register2;
+		programCounter++;
 		break;
 
 	case 26: //Check if register2 is bigger than register1
 		register1 = register1 < register2;
+		programCounter++;
 		break;
 
 	case 27: //Check if register2 is bigger or equal to register1
 		register1 = register1 <= register2;
+		programCounter++;
 		break;
 
 	case 28: //Checl if register1 and register2 have same values
 		register1 = register1 == register2;
+		programCounter++;
 		break;
 
 	case 29: //Check if register1 is different than register2
 		register1 = register1 != register2;
+		programCounter++;
 		break;
 
 	case 30: //Jump to place in code
@@ -199,6 +213,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256) - 1;	
 		programCounter = memPos;
+		//programCounter++;
 		break;
 
 	case 31: //Compare to true/false
@@ -211,15 +226,18 @@ void CPU::execute(u16 register) {
 			programCounter = memPos;
 		}else if(register1 != condition){	
 			programCounter += 3;
-		}	
+		}
+		programCounter++;
 		break;
 
 	case 40: //Cout from register1
 		std::cout << register1 << '\n';
+		programCounter++;
 		break;
 
 	case 41: //Cout from register2
 		std::cout << register2 << '\n';
+		programCounter++;
 		break;
 
 	case 50: //Copy from RAM to VRAM
@@ -240,6 +258,7 @@ void CPU::execute(u16 register) {
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = opCodeArg3p2;
 
 		programCounter += 6;
+		programCounter++;
 		break;
 
 	case 51: //Copy from VRAM to RAM
@@ -260,7 +279,7 @@ void CPU::execute(u16 register) {
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = opCodeArg3p2;
 
 		programCounter += 6;
-
+		programCounter++;
 		break;
 
 	case 52: {
@@ -291,6 +310,7 @@ void CPU::execute(u16 register) {
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 10] = arg7;
 
 		programCounter += 11;
+		programCounter++;
 		break; }
 
 	case 53: {
@@ -302,8 +322,6 @@ void CPU::execute(u16 register) {
 		byte b = cache.memory[programCounter + 6];
 
 		gpu.commandBuffer.memory[gpu.commandCounter] = 4;
-
-		
 
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = size;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = xPos;
@@ -317,6 +335,19 @@ void CPU::execute(u16 register) {
 		}
 
 		programCounter += (6 + size);
+		programCounter++;
+		break; }
+
+	case 54: {
+		gpu.commandBuffer.memory[gpu.commandCounter] = 5;
+		programCounter++;
+		break; }
+
+	case 55: {
+		if (gpu.functionCounter == gpu.firstAvailableByte) {
+			gpu.commandBuffer.memory[gpu.commandCounter] = 5;
+			programCounter++;
+		}
 		break; }
 	}
 }
@@ -325,6 +356,6 @@ void CPU::tick() {
 	if (halt == false) {
 		registerOP1 = cache.memory[programCounter];
 		execute(register1);
-		programCounter++;
+		
 	}
 }

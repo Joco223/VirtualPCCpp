@@ -72,10 +72,12 @@ int main(int argc, char* argv[]) {
 	//PRINT    - Print string to screen,                              6 arguments (string itself, x position in character space, y position in character space, r value, g value, b value)
 	//RGB values are limited from 0 to 63
 
-	std::vector<std::string> code = { "PRINT", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "1", "1", "60", "60", "60",
-									  "PRINT", "abcdefghijklmnopqrstuvwxyz", "1", "2", "60", "10", "10",
-									  "PRINT", "0123456789",                 "1", "3", "10", "60", "10",
-									  "PRINT", "+-=*/;:()[]{}!#$%^&><_~\'\"&?@",    "1", "4", "20", "20", "60", };
+	std::vector<std::string> code = { "PRINT", "ABCDEFGHIJKLMNOPQRSTUVWXYZ",        "1", "1", "60", "60", "60",
+									  "PRINT", "abcdefghijklmnopqrstuvwxyz",        "1", "2", "60", "10", "10",
+									  "PRINT", "0123456789",                        "1", "3", "10", "60", "10",
+									  "PRINT", "+-=*/;:()[]{}!#$%^&><_~\'\"&?@",    "1", "4", "20", "20", "60", 
+									  "CLR_COMM", "CLR_VRAM"};
+
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);

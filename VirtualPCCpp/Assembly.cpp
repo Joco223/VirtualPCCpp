@@ -445,6 +445,10 @@ namespace Assembly {
 				}
 
 				wordsize += size;
+			}else if (instruction == "CLR_COMM") {
+				cpu.cache.memory[currentPos + wordsize] = 54;
+			}else if (instruction == "CLR_VRAM") {
+				cpu.cache.memory[currentPos + wordsize] = 55;
 			}
 			currentPos++;
 		}
