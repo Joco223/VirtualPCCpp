@@ -35,7 +35,7 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCount_, int commandArgBuff
 	characters.resize(96);
 	
 	std::string line;
-	std::ifstream myfile ("C:/Users/jovanipavle/Desktop/Characters 7x7/fontBasic.txt");
+	std::ifstream myfile ("fontBasic.txt");
 
 	for (int i = 0; i < 96; i++) {
 		characters[i].rows.resize(8);

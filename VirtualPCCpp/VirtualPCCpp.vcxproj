@@ -37,6 +37,9 @@
     <ClInclude Include="PC.h" />
     <ClInclude Include="SDLWindow.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="fontBasic.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{746c87cf-eaff-4ce0-91e6-da8e1e908d04}</ProjectGuid>

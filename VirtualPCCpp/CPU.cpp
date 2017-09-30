@@ -76,7 +76,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p1 = cache.memory[programCounter + 1];
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
-		register1 = cache.memory[memPos];
+		register1 = ram.memory[memPos];
 		programCounter++;
 		programCounter++;
 		break;
@@ -85,7 +85,7 @@ void CPU::execute(u16 register) {
 		opCodeArg1p1 = cache.memory[programCounter + 1];
 		opCodeArg1p2 = cache.memory[programCounter + 2];
 		memPos = opCodeArg1p1 + (opCodeArg1p2 * 256);
-		register2 = cache.memory[memPos];
+		register2 = ram.memory[memPos];
 		programCounter++;
 		programCounter++;
 		break;
