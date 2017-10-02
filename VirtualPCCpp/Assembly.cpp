@@ -244,6 +244,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				cpu.firstAvailable += 3;
 			}else if (instruction == "CMP") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
@@ -446,10 +447,44 @@ namespace Assembly {
 				}
 
 				i += 5;
-			}else if (instruction == "CLR_COMM") {
+			}else if (instruction == "PRINT_A") {
 				cpu.cache.memory[currentPos++] = 54;
-			}else if (instruction == "CLR_VRAM") {
+
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+				std::string arg3 = code[i + 3];
+				std::string arg4 = code[i + 4];
+				std::string arg5 = code[i + 5];
+				std::string arg6 = code[i + 6];
+
+				int Arg1 = std::stoi(arg1);
+				int Arg2 = std::stoi(arg2);
+				int Arg3 = std::stoi(arg3);
+				int Arg4 = std::stoi(arg4);
+				int Arg5 = std::stoi(arg5);
+				int Arg6 = std::stoi(arg6);
+
+				//cpu.cache.memory[currentPos++] = cpu.firstAvailable;
+				cpu.cache.memory[currentPos++] = Arg2;
+				cpu.cache.memory[currentPos++] = Arg3;
+				cpu.cache.memory[currentPos++] = Arg4;
+				cpu.cache.memory[currentPos++] = Arg5;
+				cpu.cache.memory[currentPos++] = Arg6;
+
+				for (int j = 0; j < cpu.inputCount; j++) {
+					byte cC = cpu.cache.memory[Arg1 + j];
+					
+					cpu.cache.memory[currentPos++] = cC;
+				}
+
+				i += 5;
+				cpu.firstAvailable += 7;
+			}else if (instruction == "CLR_COMM") {
 				cpu.cache.memory[currentPos++] = 55;
+				cpu.firstAvailable++;
+			}else if (instruction == "CLR_VRAM") {
+				cpu.cache.memory[currentPos++] = 56;
+				cpu.firstAvailable++;
 			}else if (instruction == "WAIT") {
 				cpu.cache.memory[currentPos++] = 32;
 
@@ -460,6 +495,10 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = Arg1;
 
 				i++;
+			}else if (instruction == "CHK_K") {
+				cpu.cache.memory[currentPos++] = 42;
+				cpu.firstAvailable++;
+				i--;
 			}
 			i++;
 		}

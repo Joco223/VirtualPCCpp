@@ -17,6 +17,9 @@ public:
 	u16 register1;
 	u16 register2;
 	u16 programCounter;
+	u16 keyboardRegister;
+	u16 inputCount;
+	u16 firstAvailable;
 	GPU& gpu;
 	bool halt;
 

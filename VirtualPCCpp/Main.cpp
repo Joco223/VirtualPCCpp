@@ -78,19 +78,23 @@ int main(int argc, char* argv[]) {
 	//								  "PRINT", "+-=*/;:()[]{}!#$%^&><_~\'\"&?@",    "1", "4", "20", "20", "60", 
 	//								  "CLR_COMM", "CLR_VRAM"};
 
-	std::vector<std::string> code = { "PRINT", ">", "1", "1", "60", "60", "60",
-									  "PRINT", "Well hello there.", "2", "1", "60", "60", "60",
-									  "PRINT", ">", "1", "2", "60", "60", "60",
-									  "PRINT", "I am V.S.A.I.", "2", "2", "60", "60", "60",
-									  "PRINT", ">", "1", "3", "60", "60", "60",
-									  "PRINT", "The virtual PC Joco223 has been making.", "2", "3", "60", "60", "60",
-									  "PRINT", ">", "1", "4", "60", "60", "60",
-									  "PRINT", "I have taken over his PC.", "2", "4", "60", "60", "60",
-									  "PRINT", ">", "1", "5", "60", "60", "60",
-									  "PRINT", "And your PC will be next.", "2", "5", "60", "60", "60",
-									  "PRINT", ">", "1", "6", "60", "60", "60",
-									  "PRINT", ":)", "2", "6", "63", "0", "0",
-									  "CLR_COMM", "CLR_VRAM"};
+	//std::vector<std::string> code = { "PRINT", ">", "1", "1", "60", "60", "60",
+	//								  "PRINT", "Well hello there.", "2", "1", "60", "60", "60",
+	//								  "PRINT", ">", "1", "2", "60", "60", "60",
+	//								  "PRINT", "I am V.S.A.I.", "2", "2", "60", "60", "60",
+	//								  "PRINT", ">", "1", "3", "60", "60", "60",
+	//								  "PRINT", "The virtual PC Joco223 has been making.", "2", "3", "60", "60", "60",
+	//								  "PRINT", ">", "1", "4", "60", "60", "60",
+	//								  "PRINT", "I have taken over his PC.", "2", "4", "60", "60", "60",
+	//								  "PRINT", ">", "1", "5", "60", "60", "60",
+	//								  "PRINT", "And your PC will be next.", "2", "5", "60", "60", "60",
+	//								  "PRINT", ">", "1", "6", "60", "60", "60",
+	//								  "PRINT", ":)", "2", "6", "63", "0", "0",
+	//								  "CLR_COMM", "CLR_VRAM"};
+
+
+	std::vector<std::string> code = { "PRINT_A", "9", "1", "1", "60", "60", "60", "CLR_COMM", "CLR_VRAM",
+									  "CHK_K", "JMP", "0"};
 
 	//Compiles Assembly code
 	Assembly::Compile(code, cpu1);
@@ -107,8 +111,24 @@ int main(int argc, char* argv[]) {
 			case SDL_QUIT:
 				quit = true;
 				break;
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym) {
+					case SDLK_0: pc1.cpu.keyboardRegister = 0; break;
+					case SDLK_1: pc1.cpu.keyboardRegister = 1; break;
+					case SDLK_2: pc1.cpu.keyboardRegister = 2; break;
+					case SDLK_3: pc1.cpu.keyboardRegister = 3; break;
+					case SDLK_4: pc1.cpu.keyboardRegister = 4; break;
+					case SDLK_5: pc1.cpu.keyboardRegister = 5; break;
+					case SDLK_6: pc1.cpu.keyboardRegister = 6; break;
+					case SDLK_7: pc1.cpu.keyboardRegister = 7; break;
+					case SDLK_8: pc1.cpu.keyboardRegister = 8; break;
+					case SDLK_9: pc1.cpu.keyboardRegister = 9; break;
+					case SDLK_BACKSPACE: pc1.cpu.keyboardRegister = 63000; break;
+				}
+				break;
 			}
-		}	
+	
+		}
 		pc1.cpu.tick();
 		gpu1.executeCommand();
 		gpu1.tick();
