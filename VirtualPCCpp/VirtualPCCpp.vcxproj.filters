@@ -67,5 +67,8 @@
     <Text Include="fontBasic.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="Program.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

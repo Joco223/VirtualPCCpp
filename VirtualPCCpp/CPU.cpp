@@ -330,8 +330,8 @@ void CPU::execute(u16 register) {
 		programCounter++;
 		break; }
 
-	case 53: { //Draw a string
-		byte size = cache.memory[programCounter + 1];
+	case 53: { //Draw a character
+		byte characterCode = cache.memory[programCounter + 1];
 		byte xPos = cache.memory[programCounter + 2];
 		byte yPos = cache.memory[programCounter + 3];
 		byte r = cache.memory[programCounter + 4];
@@ -340,46 +340,15 @@ void CPU::execute(u16 register) {
 
 		gpu.commandBuffer.memory[gpu.commandCounter] = 4;
 
-		std::cout << (int)size << std::endl;
-
-		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = size;
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = characterCode;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = xPos;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = yPos;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3] = r;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = g;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = b;
 
-		for (int i = 0; i < size; i++) {
-			gpu.commandArgBuffer.memory[gpu.commandArgCounter + 6 + i] = cache.memory[programCounter + 7 + i];
-		}
 
-		programCounter += (6 + size);
-		programCounter++;
-		break; }
-
-	case 54: { //Draw an input string
-		u16 size = inputCount;
-		u16 start = firstAvailable - inputCount;
-		byte xPos = cache.memory[programCounter + 1];
-		byte yPos = cache.memory[programCounter + 2];
-		byte r = cache.memory[programCounter + 3];
-		byte g = cache.memory[programCounter + 4];
-		byte b = cache.memory[programCounter + 5];
-
-		gpu.commandBuffer.memory[gpu.commandCounter] = 4;
-
-		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = size;
-		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = xPos;
-		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = yPos;
-		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3] = r;
-		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = g;
-		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = b;
-
-		for (int i = 0; i < size; i++) {
-			gpu.commandArgBuffer.memory[gpu.commandArgCounter + 6 + i] = cache.memory[start + i];
-		}
-
-		programCounter += 5;
+		programCounter += 6;
 		programCounter++;
 		break; }
 

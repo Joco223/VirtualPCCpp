@@ -190,55 +190,47 @@ void GPU::executeCommand() {
 		break; }
 
 	case 4: {
-		byte size = commandArgBuffer.memory[commandArgCounter + 0];
+		byte characterCode = commandArgBuffer.memory[commandArgCounter + 0];
 		byte xPos = commandArgBuffer.memory[commandArgCounter + 1];
 		byte yPos = commandArgBuffer.memory[commandArgCounter + 2];
 		byte r = commandArgBuffer.memory[commandArgCounter + 3];
 		byte g = commandArgBuffer.memory[commandArgCounter + 4];
 		byte b = commandArgBuffer.memory[commandArgCounter + 5];
 
-		std::vector<byte> chars;
+		character currentC = characters[characterCode];
+		std::vector<u16> xPositions;
+		std::vector<u16> yPositions;
+		int pSize = 0;
 
-		for (int i = 0; i < size; i++) {
-			chars.push_back(commandArgBuffer.memory[commandArgCounter + 6 + i]);
-		}
-
-		for (int i = 0; i < chars.size(); i++) {
-			character currentC = characters[chars[i]];
-			std::vector<u16> xPositions;
-			std::vector<u16> yPositions;
-			int cSize = 0;
-
-			for (int j = 0; j < currentC.rows.size(); j++){
-				for (int k = 0; k < 6; k++) {
-					if (currentC.rows[j][k] == '1') {
-						xPositions.push_back((xPos + i) * 6 + k);
-						yPositions.push_back(yPos * 8 + j);
-						cSize++;
-					}
+		for (int j = 0; j < currentC.rows.size(); j++){
+			for (int k = 0; k < 6; k++) {
+				if (currentC.rows[j][k] == '1') {
+					xPositions.push_back(xPos * 6 + k);
+					yPositions.push_back(yPos * 8 + j);
+					pSize++;
 				}
 			}
-
-			for (int j = 0; j < cSize; j++) {
-				byte x1, x2, y1, y2;
-				u16 xPosition = xPositions[j];
-				getArgument(xPosition, x1, x2);
-				getArgument(yPositions[j], y1, y2);
-
-				vRam.memory[firstAvailableByte + 0] = 3;
-				vRam.memory[firstAvailableByte + 1] = x1;
-				vRam.memory[firstAvailableByte + 2] = x2;
-				vRam.memory[firstAvailableByte + 3] = y1;
-				vRam.memory[firstAvailableByte + 4] = y2;
-				vRam.memory[firstAvailableByte + 5] = b;
-				vRam.memory[firstAvailableByte + 6] = g;
-				vRam.memory[firstAvailableByte + 7] = r;
-
-				firstAvailableByte += 8;
-			}
 		}
 
-		commandArgCounter += 3 + size - 1;
+		for (int j = 0; j < pSize; j++) {
+			byte x1, x2, y1, y2;
+			u16 xPosition = xPositions[j];
+			getArgument(xPosition, x1, x2);
+			getArgument(yPositions[j], y1, y2);
+
+			vRam.memory[firstAvailableByte + 0] = 3;
+			vRam.memory[firstAvailableByte + 1] = x1;
+			vRam.memory[firstAvailableByte + 2] = x2;
+			vRam.memory[firstAvailableByte + 3] = y1;
+			vRam.memory[firstAvailableByte + 4] = y2;
+			vRam.memory[firstAvailableByte + 5] = b;
+			vRam.memory[firstAvailableByte + 6] = g;
+			vRam.memory[firstAvailableByte + 7] = r;
+
+			firstAvailableByte += 8;
+		}
+
+		commandArgCounter += 6;
 		commandCounter++;
 		break; }
 
@@ -253,6 +245,7 @@ void GPU::executeCommand() {
 		vRam.Clear();
 		functionCounter = 0;
 		firstAvailableByte = 0;
+
 		break; }
 	}
 }

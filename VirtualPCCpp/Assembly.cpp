@@ -1,6 +1,8 @@
 #include "Assembly.h"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 namespace Assembly {
 
@@ -19,6 +21,22 @@ namespace Assembly {
 		if (arg > maxSize) {
 			std::cout << "Error: Argument " << argc << " exceeds size limit at instruction " << instruction << " at position " << instructionC + 1 + argc << '\n';
 			return true;
+		}
+	}
+
+	void Assembly::readFile(std::string path, std::vector<std::string>& code) {
+		std::string line;
+		std::ifstream myfile(path);
+
+		if (myfile.is_open()){
+			while (getline (myfile,line)) {
+				std::string buf;
+				std::stringstream ss(line);
+
+				while (ss >> buf) {
+					code.push_back(buf);
+				}
+			}
 		}
 	}
 
@@ -415,48 +433,6 @@ namespace Assembly {
 				std::string arg5 = code[i + 5];
 				std::string arg6 = code[i + 6];
 
-				int size = arg1.size();
-				int Arg2 = std::stoi(arg2);
-				int Arg3 = std::stoi(arg3);
-				int Arg4 = std::stoi(arg4);
-				int Arg5 = std::stoi(arg5);
-				int Arg6 = std::stoi(arg6);
-
-				if(checkArgSize(Arg2, 2, instruction, i, 53) == true) { break; }
-				if(checkArgSize(Arg3, 3, instruction, i, 26) == true) { break; }
-				if(checkArgSize(Arg4, 4, instruction, i, 63) == true) { break; }
-				if(checkArgSize(Arg5, 5, instruction, i, 63) == true) { break; }
-				if(checkArgSize(Arg6, 6, instruction, i, 63) == true) { break; }
-
-				cpu.cache.memory[currentPos++] = size;
-				cpu.cache.memory[currentPos++] = Arg2;
-				cpu.cache.memory[currentPos++] = Arg3;
-				cpu.cache.memory[currentPos++] = Arg4;
-				cpu.cache.memory[currentPos++] = Arg5;
-				cpu.cache.memory[currentPos++] = Arg6;
-
-				for (int j = 0; j < size; j++) {
-					byte cC;
-					for (int k = 0; k < charactersA.size(); k++) {
-						if (arg1[j] == charactersA[k]) {
-							cC = k;
-							break;
-						}
-					}
-					cpu.cache.memory[currentPos++] = cC;
-				}
-
-				i += 5;
-			}else if (instruction == "PRINT_A") {
-				cpu.cache.memory[currentPos++] = 54;
-
-				std::string arg1 = code[i + 1];
-				std::string arg2 = code[i + 2];
-				std::string arg3 = code[i + 3];
-				std::string arg4 = code[i + 4];
-				std::string arg5 = code[i + 5];
-				std::string arg6 = code[i + 6];
-
 				int Arg1 = std::stoi(arg1);
 				int Arg2 = std::stoi(arg2);
 				int Arg3 = std::stoi(arg3);
@@ -464,21 +440,21 @@ namespace Assembly {
 				int Arg5 = std::stoi(arg5);
 				int Arg6 = std::stoi(arg6);
 
-				//cpu.cache.memory[currentPos++] = cpu.firstAvailable;
+				/*if(checkArgSize(Arg1, 1, instruction, i, 70) == true) { break; }
+				if(checkArgSize(Arg2, 2, instruction, i, 53) == true) { break; }
+				if(checkArgSize(Arg3, 3, instruction, i, 26) == true) { break; }
+				if(checkArgSize(Arg4, 4, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg5, 5, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg6, 6, instruction, i, 63) == true) { break; }*/
+
+				cpu.cache.memory[currentPos++] = cpu.cache.memory[Arg1];
 				cpu.cache.memory[currentPos++] = Arg2;
 				cpu.cache.memory[currentPos++] = Arg3;
 				cpu.cache.memory[currentPos++] = Arg4;
 				cpu.cache.memory[currentPos++] = Arg5;
 				cpu.cache.memory[currentPos++] = Arg6;
 
-				for (int j = 0; j < cpu.inputCount; j++) {
-					byte cC = cpu.cache.memory[Arg1 + j];
-					
-					cpu.cache.memory[currentPos++] = cC;
-				}
-
 				i += 5;
-				cpu.firstAvailable += 7;
 			}else if (instruction == "CLR_COMM") {
 				cpu.cache.memory[currentPos++] = 55;
 				cpu.firstAvailable++;
