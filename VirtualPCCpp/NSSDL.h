@@ -1,6 +1,6 @@
 #pragma once
 
-class SDLWindow;
+#include "SDLWindow.h"
 
 namespace NSSDL {
 	int initSDL(SDLWindow* window, int& width, int &height);

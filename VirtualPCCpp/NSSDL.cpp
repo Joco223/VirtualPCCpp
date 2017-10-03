@@ -1,5 +1,5 @@
 #include "NSSDL.h"
-#include "SDLWindow.h"
+
 
 namespace NSSDL{
 	int initSDL(SDLWindow* window, int& width, int& height) {

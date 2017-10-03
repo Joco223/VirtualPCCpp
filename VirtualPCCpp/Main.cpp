@@ -1,4 +1,11 @@
+#ifdef _WIN32
 #include <SDL.h>
+#endif
+
+#ifdef _LINUX
+#include <SDL/SDL.h>
+#endif
+
 #include <vector>
 #include <iostream>
 #include <string>

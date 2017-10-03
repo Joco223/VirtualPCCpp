@@ -1,6 +1,12 @@
 #pragma once
 
+#ifdef _WIN32
 #include <SDL.h>
+#endif
+
+#ifdef _LINUX
+#include <SDL/SDL.h>
+#endif
 
 class SDLWindow {
 public:
