@@ -433,21 +433,21 @@ namespace Assembly {
 				std::string arg5 = code[i + 5];
 				std::string arg6 = code[i + 6];
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+
+				if (arg1 == "KIR") {
+					Arg1 = cpu.keyboardRegister;
+				}else{
+					Arg1 = std::stoi(arg1);
+				}
+
 				int Arg2 = std::stoi(arg2);
 				int Arg3 = std::stoi(arg3);
 				int Arg4 = std::stoi(arg4);
 				int Arg5 = std::stoi(arg5);
 				int Arg6 = std::stoi(arg6);
 
-				/*if(checkArgSize(Arg1, 1, instruction, i, 70) == true) { break; }
-				if(checkArgSize(Arg2, 2, instruction, i, 53) == true) { break; }
-				if(checkArgSize(Arg3, 3, instruction, i, 26) == true) { break; }
-				if(checkArgSize(Arg4, 4, instruction, i, 63) == true) { break; }
-				if(checkArgSize(Arg5, 5, instruction, i, 63) == true) { break; }
-				if(checkArgSize(Arg6, 6, instruction, i, 63) == true) { break; }*/
-
-				cpu.cache.memory[currentPos++] = cpu.cache.memory[Arg1];
+				cpu.cache.memory[currentPos++] = Arg1;
 				cpu.cache.memory[currentPos++] = Arg2;
 				cpu.cache.memory[currentPos++] = Arg3;
 				cpu.cache.memory[currentPos++] = Arg4;
@@ -473,8 +473,17 @@ namespace Assembly {
 				i++;
 			}else if (instruction == "CHK_K") {
 				cpu.cache.memory[currentPos++] = 42;
-				cpu.firstAvailable++;
-				i--;
+
+				std::string arg1 = code[i + 1];
+
+				int Arg1 = std::stoi(arg1);
+
+				byte b1, b2;
+				convertByte(Arg1, b1, b2);
+				cpu.cache.memory[currentPos++] = b1;
+				cpu.cache.memory[currentPos++] = b2;
+
+				//i++;
 			}
 			i++;
 		}

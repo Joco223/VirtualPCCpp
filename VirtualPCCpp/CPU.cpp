@@ -10,7 +10,7 @@ CPU::CPU()
 	register2(0),
 	ram(Memory(0)),
 	programCounter(0),
-	keyboardRegister(65000),
+	keyboardRegister(67),
 	firstAvailable(0),
 	inputCount(0),
 	halt(false),
@@ -25,7 +25,7 @@ CPU::CPU(int cacheSize, Memory& ram_, GPU& gpu_)
 	register1(0),
 	register2(0),
 	programCounter(0),
-	keyboardRegister(65000),
+	keyboardRegister(67),
 	inputCount(0),
 	firstAvailable(0),
 	ram(ram_),
@@ -237,23 +237,12 @@ void CPU::execute(u16 register) {
 		programCounter++;
 		break; }
 
-	case 42: { //Check keyboard inputs
-		if (programCounter > 0) {
-			switch (keyboardRegister) {
-				case 0: cache.memory[firstAvailable] = 0; inputCount++; firstAvailable++; break;
-				case 1: cache.memory[firstAvailable] = 1; inputCount++; firstAvailable++; break;
-				case 2: cache.memory[firstAvailable] = 2; inputCount++; firstAvailable++; break;
-				case 3: cache.memory[firstAvailable] = 3; inputCount++; firstAvailable++; break;
-				case 4: cache.memory[firstAvailable] = 4; inputCount++; firstAvailable++; break;
-				case 5: cache.memory[firstAvailable] = 5; inputCount++; firstAvailable++; break;
-				case 6: cache.memory[firstAvailable] = 6; inputCount++; firstAvailable++; break;
-				case 7: cache.memory[firstAvailable] = 7; inputCount++; firstAvailable++; break;
-				case 8: cache.memory[firstAvailable] = 8; inputCount++; firstAvailable++; break;
-				case 9: cache.memory[firstAvailable] = 9; inputCount++; firstAvailable++; break;
-				case 63000: cache.memory[firstAvailable] = 0; firstAvailable--; inputCount--; break;
-			}
-		}
-		keyboardRegister = 65000;
+	case 42: { //Write from keyboard input register to place in cache
+		byte arg1p1 = cache.memory[programCounter + 1];
+		byte arg1p2 = cache.memory[programCounter + 2];
+		u16 memPos = arg1p1 + (arg1p2 * 256);
+		cache.memory[memPos] = keyboardRegister;
+		programCounter += 2;
 		programCounter++;
 		break; }
 
@@ -331,7 +320,8 @@ void CPU::execute(u16 register) {
 		break; }
 
 	case 53: { //Draw a character
-		byte characterCode = cache.memory[programCounter + 1];
+		byte characterPosition = cache.memory[programCounter + 1];
+		byte characterCode = cache.memory[characterPosition];
 		byte xPos = cache.memory[programCounter + 2];
 		byte yPos = cache.memory[programCounter + 3];
 		byte r = cache.memory[programCounter + 4];
@@ -346,7 +336,6 @@ void CPU::execute(u16 register) {
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 3] = r;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = g;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = b;
-
 
 		programCounter += 6;
 		programCounter++;

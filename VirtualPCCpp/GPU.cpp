@@ -200,6 +200,9 @@ void GPU::executeCommand() {
 		character currentC = characters[characterCode];
 		std::vector<u16> xPositions;
 		std::vector<u16> yPositions;
+		std::vector<byte> redColors;
+		std::vector<byte> greenColors;
+		std::vector<byte> blueColors;
 		int pSize = 0;
 
 		for (int j = 0; j < currentC.rows.size(); j++){
@@ -207,6 +210,17 @@ void GPU::executeCommand() {
 				if (currentC.rows[j][k] == '1') {
 					xPositions.push_back(xPos * 6 + k);
 					yPositions.push_back(yPos * 8 + j);
+					redColors.push_back(r);
+					greenColors.push_back(g);
+					blueColors.push_back(b);
+					pSize++;
+				}
+				if (currentC.rows[j][k] == '0') {
+					xPositions.push_back(xPos * 6 + k);
+					yPositions.push_back(yPos * 8 + j);
+					redColors.push_back(0);
+					greenColors.push_back(0);
+					blueColors.push_back(0);
 					pSize++;
 				}
 			}
@@ -214,8 +228,7 @@ void GPU::executeCommand() {
 
 		for (int j = 0; j < pSize; j++) {
 			byte x1, x2, y1, y2;
-			u16 xPosition = xPositions[j];
-			getArgument(xPosition, x1, x2);
+			getArgument(xPositions[j], x1, x2);
 			getArgument(yPositions[j], y1, y2);
 
 			vRam.memory[firstAvailableByte + 0] = 3;
@@ -223,9 +236,9 @@ void GPU::executeCommand() {
 			vRam.memory[firstAvailableByte + 2] = x2;
 			vRam.memory[firstAvailableByte + 3] = y1;
 			vRam.memory[firstAvailableByte + 4] = y2;
-			vRam.memory[firstAvailableByte + 5] = b;
-			vRam.memory[firstAvailableByte + 6] = g;
-			vRam.memory[firstAvailableByte + 7] = r;
+			vRam.memory[firstAvailableByte + 5] = blueColors[j];
+			vRam.memory[firstAvailableByte + 6] = greenColors[j];
+			vRam.memory[firstAvailableByte + 7] = redColors[j];
 
 			firstAvailableByte += 8;
 		}

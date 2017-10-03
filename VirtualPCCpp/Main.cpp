@@ -70,13 +70,10 @@ int main(int argc, char* argv[]) {
 	//WRT_VR_R - Write from vRAM to RAM,                              3 arguments (start position of memory in vram, end position of memory in vram, start position in memory of ram)
 	//DRAWP    - Draw rectangle on screen,                            7 arguments (start x position, start y position, end x position, end y position, r value, g value, b value)
 	//PRINT    - Print character to screen,                           6 arguments (character position in cpu cache, x position in character space, y position in character space, r value, g value, b value)
+	//CHK_K    - Put current keyboard input value into cache,         1 argument (place in cache)
 	//RGB values are limited from 0 to 63
 
-	cpu1.cache.memory[200] = 47;
-	cpu1.cache.memory[201] = 44;
-	cpu1.cache.memory[202] = 51;
-	cpu1.cache.memory[203] = 51;
-	cpu1.cache.memory[204] = 54;
+	cpu1.cache.memory[200] = 67;
 
 	std::vector<std::string> code;
 
@@ -106,6 +103,33 @@ int main(int argc, char* argv[]) {
 					case SDLK_7: pc1.cpu.keyboardRegister = 7; break;
 					case SDLK_8: pc1.cpu.keyboardRegister = 8; break;
 					case SDLK_9: pc1.cpu.keyboardRegister = 9; break;
+					case SDLK_a: pc1.cpu.keyboardRegister = 40; break;
+					case SDLK_b: pc1.cpu.keyboardRegister = 41; break;
+					case SDLK_c: pc1.cpu.keyboardRegister = 42; break;
+					case SDLK_d: pc1.cpu.keyboardRegister = 43; break;
+					case SDLK_e: pc1.cpu.keyboardRegister = 44; break;
+					case SDLK_f: pc1.cpu.keyboardRegister = 45; break;
+					case SDLK_g: pc1.cpu.keyboardRegister = 46; break;
+					case SDLK_h: pc1.cpu.keyboardRegister = 47; break;
+					case SDLK_i: pc1.cpu.keyboardRegister = 48; break;
+					case SDLK_j: pc1.cpu.keyboardRegister = 49; break;
+					case SDLK_k: pc1.cpu.keyboardRegister = 50; break;
+					case SDLK_l: pc1.cpu.keyboardRegister = 51; break;
+					case SDLK_m: pc1.cpu.keyboardRegister = 52; break;
+					case SDLK_n: pc1.cpu.keyboardRegister = 53; break;
+					case SDLK_o: pc1.cpu.keyboardRegister = 54; break;
+					case SDLK_p: pc1.cpu.keyboardRegister = 55; break;
+					case SDLK_q: pc1.cpu.keyboardRegister = 56; break;
+					case SDLK_r: pc1.cpu.keyboardRegister = 57; break;
+					case SDLK_s: pc1.cpu.keyboardRegister = 58; break;
+					case SDLK_t: pc1.cpu.keyboardRegister = 59; break;
+					case SDLK_u: pc1.cpu.keyboardRegister = 60; break;
+					case SDLK_v: pc1.cpu.keyboardRegister = 61; break;
+					case SDLK_w: pc1.cpu.keyboardRegister = 62; break;
+					case SDLK_x: pc1.cpu.keyboardRegister = 63; break;
+					case SDLK_y: pc1.cpu.keyboardRegister = 64; break;
+					case SDLK_z: pc1.cpu.keyboardRegister = 65; break;
+					case SDLK_SPACE: pc1.cpu.keyboardRegister = 67; break;
 					case SDLK_BACKSPACE: pc1.cpu.keyboardRegister = 63000; break;
 				}
 				break;
