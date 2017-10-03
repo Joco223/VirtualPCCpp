@@ -11,7 +11,6 @@ public:
 	SDL_Texture* texture;
 	unsigned int* pixels;
 
-	SDLWindow();
 	SDLWindow(SDL_Window*&, SDL_Surface*&, SDL_Surface*&, SDL_Renderer*&, SDL_Texture*&, unsigned int*&);
 };
 

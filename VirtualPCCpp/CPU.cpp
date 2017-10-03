@@ -1,33 +1,16 @@
 #include "CPU.h"
 
-#include <iostream>
-
-CPU::CPU()
-	:
-	registerOP1(0),
-	registerOP2(0),
-	register1(0),
-	register2(0),
-	ram(Memory(0)),
-	programCounter(0),
-	keyboardRegister(67),
-	firstAvailable(0),
-	inputCount(0),
-	halt(false),
-	gpu(GPU()) {
-	cache = Memory(128);
-}
-
 CPU::CPU(int cacheSize, Memory& ram_, GPU& gpu_)
 	:
 	registerOP1(0),
 	registerOP2(0),
+	register0(0),
 	register1(0),
-	register2(0),
 	programCounter(0),
 	keyboardRegister(67),
 	inputCount(0),
 	firstAvailable(0),
+	currentTime(0),
 	ram(ram_),
 	halt(false),
 	cache(Memory(cacheSize)),
@@ -46,7 +29,7 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
-		register1 = cache.memory[memPos];
+		register0 = cache.memory[memPos];
 		programCounter += 2;
 		programCounter++;
 		break; }
@@ -55,7 +38,7 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
-		register2 = cache.memory[memPos];
+		register1 = cache.memory[memPos];
 		programCounter += 2;
 		programCounter++;
 		break; }
@@ -64,7 +47,7 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
-		register1 = ram.memory[memPos];
+		register0 = ram.memory[memPos];
 		programCounter += 2;
 		programCounter++;
 		break; }
@@ -73,18 +56,18 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
-		register2 = ram.memory[memPos];
+		register1 = ram.memory[memPos];
 		programCounter += 2;
 		programCounter++;
 		break; }
 
 	case 5: { //clear register1
-		register1 = 0;
+		register0 = 0;
 		programCounter++;
 		break; }
 
 	case 6: { //Clear register2
-		register2 = 0;
+		register1 = 0;
 		programCounter++;
 		break; }
 
@@ -92,7 +75,7 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
-		cache.memory[memPos] = register1;
+		cache.memory[memPos] = register0;
 		programCounter += 2;
 		programCounter++;
 		break; }
@@ -101,7 +84,7 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
-		cache.memory[memPos] = register2;
+		cache.memory[memPos] = register1;
 		programCounter += 2;
 		programCounter++;
 		break; }
@@ -110,7 +93,7 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
-		ram.memory[memPos] = register1;
+		ram.memory[memPos] = register0;
 		programCounter += 2;
 		programCounter++;
 		break; }
@@ -119,7 +102,7 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
-		ram.memory[memPos] = register2;
+		ram.memory[memPos] = register1;
 		programCounter += 2;
 		programCounter++;
 		break; }
@@ -147,52 +130,52 @@ void CPU::execute(u16 register) {
 		break; }
 
 	case 20: { //Sum register1 and register2
-		register1 = register1 + register2;
+		register0 = register0 + register1;
 		programCounter++;
 		break; }
 
 	case 21: { //Subtract register1 and register2
-		register1 = register1 - register2;
+		register0 = register0 - register1;
 		programCounter++;
 		break; }
 
 	case 22: { //Multiply register1 and register2
-		register1 = register1 * register2;
+		register0 = register0 * register1;
 		programCounter++;
 		break; }
 
 	case 23: { //Divide register1 and register2
-		register1 = register1 / register2;
+		register0 = register0 / register1;
 		programCounter++;
 		break; }
 
 	case 24: { //Check if register1 is bigger than register2
-		register1 = register1 > register2;
+		register0 = register0 > register1;
 		programCounter++;
 		break; }
 
 	case 25: { //Check if register1 is bigger or equal to register2
-		register1 = register1 >= register2;
+		register0 = register0 >= register1;
 		programCounter++;
 		break; }
 
 	case 26: { //Check if register2 is bigger than register1
-		register1 = register1 < register2;
+		register0 = register0 < register1;
 		programCounter++;
 		break; }
 
 	case 27: { //Check if register2 is bigger or equal to register1
-		register1 = register1 <= register2;
+		register0 = register0 <= register1;
 		programCounter++;
 		break; }
 
 	case 28: { //Check if register1 and register2 have same values
-		register1 = register1 == register2;
+		register0 = register0 == register1;
 		programCounter++;
 		break; }
 
 	case 29: { //Check if register1 is different than register2
-		register1 = register1 != register2;
+		register0 = register0 != register1;
 		programCounter++;
 		break; }
 
@@ -208,9 +191,9 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 2];
 		byte arg1p2 = cache.memory[programCounter + 3];
 		u16 memPos = arg1p1 + (arg1p2 * 256) - 1;
-		if (register1 == condition) {
+		if (register0 == condition) {
 			programCounter = memPos;
-		}else if(register1 != condition){	
+		}else if(register0 != condition){	
 			programCounter += 3;
 		}
 		programCounter++;
@@ -218,22 +201,22 @@ void CPU::execute(u16 register) {
 
 	case 32: { //Wait a number of cycles
 		u16 waitTime = cache.memory[programCounter + 1];
-		u16 currentTime = 0;
 		if (currentTime < waitTime) {
-			std::cout << currentTime << std::endl;
 			currentTime++;
 		}else if (currentTime >= waitTime) {
+			currentTime = 0;
+			programCounter += 2;
 			programCounter++;
 		}
 		break; }
 
 	case 40: { //Cout from register1
-		std::cout << register1 << '\n';
+		std::cout << register0 << '\n';
 		programCounter++;
 		break; }
 
 	case 41: { //Cout from register2
-		std::cout << register2 << '\n';
+		std::cout << register1 << '\n';
 		programCounter++;
 		break; }
 

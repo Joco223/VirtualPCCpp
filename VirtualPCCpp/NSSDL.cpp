@@ -2,7 +2,7 @@
 #include "SDLWindow.h"
 
 namespace NSSDL{
-	int NSSDL::initSDL(SDLWindow* window, int& width, int& height) {
+	int initSDL(SDLWindow* window, int& width, int& height) {
 		window->window = nullptr;
 		window->surface = nullptr;
 		window->renderer = nullptr;
@@ -19,14 +19,14 @@ namespace NSSDL{
 		return 0;
 	}
 
-	void NSSDL::updateSDL(SDLWindow* window) {
+	void updateSDL(SDLWindow* window) {
 		SDL_UpdateTexture(window->texture, NULL, window->pixels, window->pixelSpace->pitch);
 		SDL_RenderClear(window->renderer);
 		SDL_RenderCopy(window->renderer, window->texture, NULL, NULL);
 		SDL_RenderPresent(window->renderer);
 	}
 
-	void NSSDL::cleanSDL(SDLWindow* window) {
+	void cleanSDL(SDLWindow* window) {
 		SDL_DestroyTexture(window->texture);
 		SDL_DestroyRenderer(window->renderer);
 		SDL_DestroyWindow(window->window);

@@ -10,7 +10,6 @@ class Memory {
 public:
 	std::vector<byte> memory;
 
-	Memory();
 	Memory(int);
 
 	void Clear();

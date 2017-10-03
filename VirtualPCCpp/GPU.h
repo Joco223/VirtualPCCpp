@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 #include "Memory.h"
 #include "SDLWindow.h"
@@ -29,7 +31,6 @@ public:
 	u16 coreCount;
 	std::vector<character> characters;
 
-	GPU();
 	GPU(int, int, int, int, SDLWindow*, Memory*);
 	void executeCommand();
 	void executeThread();

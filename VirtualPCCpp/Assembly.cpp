@@ -1,9 +1,5 @@
 #include "Assembly.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-
 namespace Assembly {
 
 	void convertByte(int& number, byte& b1, byte& b2) {
@@ -24,23 +20,36 @@ namespace Assembly {
 		}
 	}
 
-	void Assembly::readFile(std::string path, std::vector<std::string>& code) {
+	void checkArgType(int& arg, std::string& argument, CPU& cpu) {
+		if (argument == "REG0") {
+			arg = cpu.register0;
+		}else if (argument == "REG1") {
+			arg = cpu.register1;
+		}else{
+			arg = std::stoi(argument);
+		}
+	}
+
+	void readFile(std::string path, std::vector<std::string>& code) {
 		std::string line;
 		std::ifstream myfile(path);
+		std::string prefix = "//";
 
 		if (myfile.is_open()){
 			while (getline (myfile,line)) {
-				std::string buf;
-				std::stringstream ss(line);
+				if (!equal(prefix.begin(), prefix.end(), line.begin())) {
+					std::string buf;
+					std::stringstream ss(line);
 
-				while (ss >> buf) {
-					code.push_back(buf);
+					while (ss >> buf) {
+						code.push_back(buf);
+					}
 				}
 			}
 		}
 	}
 
-	void Assembly::Compile(std::vector<std::string>& code, CPU& cpu) {
+	void Compile(std::vector<std::string>& code, CPU& cpu) {
 		std::vector<char> charactersA = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', '-', ',', '.', '/', '\\', ':', ';', '<', '>', '=', '?', '[', ']', '{', '}', '`', '^', '|', '~', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', ' ', '@', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
 		int currentPos = 0;
@@ -56,8 +65,9 @@ namespace Assembly {
 			if (instruction == "LOAD0_C") {
 				std::string arg1 = code[i + 1];
 
-				cpu.cache.memory[currentPos + additionalMemory] = 1;
-				int Arg1 = std::stoi(arg1);
+				cpu.cache.memory[currentPos++] = 1;
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -72,7 +82,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 2;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -87,7 +98,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 3;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -102,7 +114,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 4;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -122,7 +135,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 7;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -137,7 +151,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 8;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -152,7 +167,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 9;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -167,7 +183,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 10;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -183,7 +200,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 11;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -192,7 +210,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
-				int Arg2 = std::stoi(arg2);
+				int Arg2;
+				checkArgType(Arg2, arg2, cpu);
 
 				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
@@ -208,7 +227,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 12;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -217,7 +237,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
-				int Arg2 = std::stoi(arg2);
+				int Arg2;
+				checkArgType(Arg2, arg2, cpu);
 
 				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
@@ -252,7 +273,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 30;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -262,18 +284,19 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
-				cpu.firstAvailable += 3;
 			}else if (instruction == "CMP") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
 
 				cpu.cache.memory[currentPos++] = 31;
 
-				int Arg1 =  std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				cpu.cache.memory[currentPos++] = Arg1;
 
-				int Arg2 = std::stoi(arg2);
+				int Arg2;
+				checkArgType(Arg2, arg2, cpu);
 
 				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
@@ -294,7 +317,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 50;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -303,7 +327,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
-				int Arg2 = std::stoi(arg2);
+				int Arg2;
+				checkArgType(Arg2, arg2, cpu);
 
 				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
@@ -312,7 +337,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b3;
 				cpu.cache.memory[currentPos++] = b4;
 
-				int Arg3 = std::stoi(arg3);
+				int Arg3;
+				checkArgType(Arg3, arg3, cpu);
 
 				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
 
@@ -329,7 +355,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 51;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -338,7 +365,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
-				int Arg2 = std::stoi(arg2);
+				int Arg2;
+				checkArgType(Arg2, arg2, cpu);
 
 				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
@@ -347,7 +375,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b3;
 				cpu.cache.memory[currentPos++] = b4;
 
-				int Arg3 = std::stoi(arg3);
+				int Arg3;
+				checkArgType(Arg3, arg3, cpu);
 
 				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
 
@@ -368,7 +397,8 @@ namespace Assembly {
 
 				cpu.cache.memory[currentPos++] = 52;
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				if(checkArgSize(Arg1, 1, instruction, i, 320) == true) { break; }
 
@@ -377,7 +407,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
-				int Arg2 = std::stoi(arg2);
+				int Arg2;
+				checkArgType(Arg2, arg2, cpu);
 
 				if(checkArgSize(Arg2, 2, instruction, i, 240) == true) { break; }
 
@@ -386,7 +417,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b3;
 				cpu.cache.memory[currentPos++] = b4;
 
-				int Arg3 = std::stoi(arg3);
+				int Arg3;
+				checkArgType(Arg3, arg3, cpu);
 
 				if(checkArgSize(Arg3, 3, instruction, i, 320) == true) { break; }
 
@@ -395,7 +427,8 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b5;
 				cpu.cache.memory[currentPos++] = b6;
 
-				int Arg4 = std::stoi(arg4);
+				int Arg4;
+				checkArgType(Arg4, arg4, cpu);
 
 				if(checkArgSize(Arg4, 4, instruction, i, 240) == true) { break; }
 
@@ -404,19 +437,22 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b7;
 				cpu.cache.memory[currentPos++] = b8;
 
-				int Arg5 = std::stoi(arg5);
+				int Arg5;
+				checkArgType(Arg5, arg5, cpu);
 
 				if(checkArgSize(Arg5, 5, instruction, i, 63) == true) { break; }
 
 				cpu.cache.memory[currentPos++] = Arg5;
 
-				int Arg6 = std::stoi(arg6);
+				int Arg6;
+				checkArgType(Arg6, arg6, cpu);
 
 				if(checkArgSize(Arg6, 6, instruction, i, 63) == true) { break; }
 
 				cpu.cache.memory[currentPos++] = Arg6;
 
-				int Arg7 = std::stoi(arg7);
+				int Arg7;
+				checkArgType(Arg7, arg7, cpu);
 
 				if(checkArgSize(Arg7, 7, instruction, i, 63) == true) { break; }
 
@@ -434,18 +470,22 @@ namespace Assembly {
 				std::string arg6 = code[i + 6];
 
 				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
-				if (arg1 == "KIR") {
-					Arg1 = cpu.keyboardRegister;
-				}else{
-					Arg1 = std::stoi(arg1);
-				}
+				int Arg2;
+				checkArgType(Arg2, arg2, cpu);
 
-				int Arg2 = std::stoi(arg2);
-				int Arg3 = std::stoi(arg3);
-				int Arg4 = std::stoi(arg4);
-				int Arg5 = std::stoi(arg5);
-				int Arg6 = std::stoi(arg6);
+				int Arg3;
+				checkArgType(Arg3, arg3, cpu);
+
+				int Arg4;
+				checkArgType(Arg4, arg4, cpu);
+
+				int Arg5;
+				checkArgType(Arg5, arg5, cpu);
+
+				int Arg6;
+				checkArgType(Arg6, arg6, cpu);
 
 				cpu.cache.memory[currentPos++] = Arg1;
 				cpu.cache.memory[currentPos++] = Arg2;
@@ -454,7 +494,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = Arg5;
 				cpu.cache.memory[currentPos++] = Arg6;
 
-				i += 5;
+				i += 6;
 			}else if (instruction == "CLR_COMM") {
 				cpu.cache.memory[currentPos++] = 55;
 				cpu.firstAvailable++;
@@ -466,7 +506,8 @@ namespace Assembly {
 
 				std::string arg1 = code[i + 1];
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				cpu.cache.memory[currentPos++] = Arg1;
 
@@ -476,16 +517,31 @@ namespace Assembly {
 
 				std::string arg1 = code[i + 1];
 
-				int Arg1 = std::stoi(arg1);
+				int Arg1;
+				checkArgType(Arg1, arg1, cpu);
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
+				i++;
+			}else if (instruction == "SET") {
+				std::string arg1 = code[i + 1];
+				std::string arg2 = code[i + 2];
+				std::string arg3 = code[i + 3];
 
-				//i++;
+				int Arg2 = std::stoi(arg2);
+
+				int Arg3 = std::stoi(arg3);
+
+				if (arg1 == "C") {
+					cpu.cache.memory[Arg2] = Arg3;
+				}else if (arg1 == "R") {
+					cpu.ram.memory[Arg2] = Arg3;
+				}
+
+				i += 3;
 			}
-			i++;
 		}
 	}
 }

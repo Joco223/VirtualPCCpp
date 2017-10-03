@@ -1,21 +1,5 @@
 #include "GPU.h"
 
-#include <iostream>
-#include <fstream>
-#include <string>
-
-GPU::GPU()
-	:
-	commandBuffer(Memory(0)),
-	commandArgBuffer(Memory(0)),
-	vRam(Memory(0)),
-	ram(nullptr),
-	screen(nullptr),
-	functionCounter(0),
-	commandCounter(0),
-	commandArgCounter(0),
-	firstAvailableByte(0),
-	coreCount(0) {}
 
 GPU::GPU(int commandBufferSize, int vRamSize, int coreCount_, int commandArgBufferSize, SDLWindow* screen_, Memory* ram_)
 	:

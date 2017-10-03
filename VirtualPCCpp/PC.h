@@ -13,6 +13,5 @@ public:
 	Memory hdd;
 	SDLWindow* screen;
 
-	PC();
 	PC(CPU, Memory, Memory, SDLWindow*);
 };

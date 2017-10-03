@@ -70,5 +70,8 @@
     <Text Include="Program.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="Assembly Documentation.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

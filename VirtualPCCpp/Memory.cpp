@@ -1,13 +1,5 @@
 #include "Memory.h"
 
-#include <iostream> 
-#include <new>  
-
-Memory::Memory() {
-	memory.resize(64);
-	Clear();
-}
-
 Memory::Memory(int size) {
 	memory.resize(size);
 	Clear();
