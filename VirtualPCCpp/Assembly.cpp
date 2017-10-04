@@ -55,6 +55,7 @@ namespace Assembly {
 		int currentPos = 0;
 		int gpuCommand = 0;
 		int additionalMemory = 0;
+		std::vector<u16> jumpPositions;
 
 		for (int i = 0; i < code.size(); i++) {
 
@@ -65,7 +66,9 @@ namespace Assembly {
 			if (instruction == "LOAD0_C") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 1;
+
 				int Arg1;
 				checkArgType(Arg1, arg1, cpu);
 
@@ -80,6 +83,7 @@ namespace Assembly {
 			}else if (instruction == "LOAD1_C") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 2;
 
 				int Arg1;
@@ -96,6 +100,7 @@ namespace Assembly {
 			}else if (instruction == "LOAD0_R") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 3;
 
 				int Arg1;
@@ -112,6 +117,7 @@ namespace Assembly {
 			}else if (instruction == "LOAD1_R") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 4;
 
 				int Arg1;
@@ -126,13 +132,16 @@ namespace Assembly {
 
 				i++;
 			}else if (instruction == "CLR0") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 4;
 				currentPos++;
 			}else if (instruction == "CLR1") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 5;
 			}else if (instruction == "WRT0_C") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 7;
 
 				int Arg1;
@@ -149,6 +158,7 @@ namespace Assembly {
 			}else if (instruction == "WRT1_C") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 8;
 
 				int Arg1;
@@ -165,6 +175,7 @@ namespace Assembly {
 			}else if (instruction == "WRT0_R") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 9;
 
 				int Arg1;
@@ -181,6 +192,7 @@ namespace Assembly {
 			}else if (instruction == "WRT1_R") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 10;
 
 				int Arg1;
@@ -198,6 +210,7 @@ namespace Assembly {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 11;
 
 				int Arg1;
@@ -225,6 +238,7 @@ namespace Assembly {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 12;
 
 				int Arg1;
@@ -249,28 +263,39 @@ namespace Assembly {
 
 				i += 2;
 			}else if (instruction == "SUM") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 20;
 			}else if (instruction == "SUB") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 21;
 			}else if (instruction == "MLT") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 22;
 			}else if (instruction == "DIV") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 23;
 			}else if (instruction == "REG0_B") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 24;
 			}else if (instruction == "REG0_BE") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 25;
 			}else if (instruction == "REG1_B") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 26;
 			}else if (instruction == "REG1_BE") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 27;
 			}else if (instruction == "REG_EQL") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 28;
 			}else if (instruction == "REG_DIF") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 29;
 			}else if (instruction == "JMP") {
 				std::string arg1 = code[i + 1];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 30;
 
 				int Arg1;
@@ -279,7 +304,8 @@ namespace Assembly {
 				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
-				convertByte(Arg1, b1, b2);
+				int pos = jumpPositions[Arg1];
+				convertByte(pos, b1, b2);
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
@@ -288,6 +314,7 @@ namespace Assembly {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 31;
 
 				int Arg1;
@@ -297,24 +324,28 @@ namespace Assembly {
 
 				int Arg2;
 				checkArgType(Arg2, arg2, cpu);
+				int pos = jumpPositions[Arg2];
 
 				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
-				convertByte(Arg2, b1, b2);
+				convertByte(pos, b1, b2);
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
 				i += 2;
 			}else if (instruction == "COT0") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 40;
 			}else if (instruction == "COT1") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 41;
 			}else if (instruction == "WRT_R_VR") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
 				std::string arg3 = code[i + 3];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 50;
 
 				int Arg1;
@@ -353,6 +384,7 @@ namespace Assembly {
 				std::string arg2 = code[i + 2];
 				std::string arg3 = code[i + 3];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 51;
 
 				int Arg1;
@@ -395,6 +427,7 @@ namespace Assembly {
 				std::string arg6 = code[i + 6];
 				std::string arg7 = code[i + 7];
 
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 52;
 
 				int Arg1;
@@ -460,6 +493,7 @@ namespace Assembly {
 
 				i += 7;
 			}else if (instruction == "PRINT") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 53;
 
 				std::string arg1 = code[i + 1];
@@ -496,12 +530,15 @@ namespace Assembly {
 
 				i += 6;
 			}else if (instruction == "CLR_COMM") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 55;
 				cpu.firstAvailable++;
 			}else if (instruction == "CLR_VRAM") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 56;
 				cpu.firstAvailable++;
 			}else if (instruction == "WAIT") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 32;
 
 				std::string arg1 = code[i + 1];
@@ -513,6 +550,7 @@ namespace Assembly {
 
 				i++;
 			}else if (instruction == "CHK_K") {
+				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 42;
 
 				std::string arg1 = code[i + 1];

@@ -16,12 +16,12 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCount_, int commandArgBuff
 {
 	int countR = 0;
 	int characterCount = 0;
-	characters.resize(96);
+	characters.resize(98);
 	
 	std::string line;
 	std::ifstream myfile ("fontBasic.txt");
 
-	for (int i = 0; i < 96; i++) {
+	for (int i = 0; i < 98; i++) {
 		characters[i].rows.resize(8);
 	}
 	

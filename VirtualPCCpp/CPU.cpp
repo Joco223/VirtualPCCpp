@@ -7,7 +7,7 @@ CPU::CPU(int cacheSize, Memory& ram_, GPU& gpu_)
 	register0(0),
 	register1(0),
 	programCounter(0),
-	keyboardRegister(67),
+	keyboardRegister(97),
 	inputCount(0),
 	firstAvailable(0),
 	currentTime(0),

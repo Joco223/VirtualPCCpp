@@ -9,7 +9,7 @@ namespace NSSDL{
 		window->texture = nullptr;
 		window->pixelSpace = nullptr;
 
-		window->window = SDL_CreateWindow("V.S.A.I.", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+		window->window = SDL_CreateWindow("Virtual PC", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 		window->surface = SDL_GetWindowSurface(window->window);
 		window->pixelSpace = SDL_CreateRGBSurface(0, width, height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 		window->pixels = (unsigned int*)window->pixelSpace->pixels;

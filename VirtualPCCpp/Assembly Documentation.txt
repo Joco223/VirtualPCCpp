@@ -1,8 +1,20 @@
+General info:
 You can use REG0 and REG1 to use the values from registers as arguments for instructions
-You explicitly need 1 space between instructions and arguments
+You explicitly need 1 space between instructions and arguments (or a new line)
 RGB values are limited from 0 to 63
-Character space is limited X: 0 - 56, Y: 0 - 26
+Character space is limited X: 0 - 56, Y: 0 - 26 (For the resolution of 320x240)
 Comments can be written with //, that line is ignored
+
+SET instruction is not counted when using JMP or CMP, so:
+---
+SET C 200 5
+SET C 201 5
+LOAD0_C 200
+LOAD1_C 201
+SUM
+COT0
+JMP 0 -> it will jump to LOAD0_C rather than SET
+---
 
 Instruction set:
 LOAD0_C  - Load to register0 from cache,                         1 argument  (index of origin memory in cache)
@@ -16,7 +28,7 @@ WRT1_C   - Write from register1 to cache,                        1 argument  (in
 WRT0_R   - Write from register0 to ram,                          1 argument  (index of target memory in ram)
 WRT1_R   - Write from register1 to ram,                          1 argument  (index of target memory in ram)
 WRTC_R   - Write from cache to ram,                              2 arguments (index of origin memory in cache, index of target memory in ram)
-WRTR_C   - Write from ram to cache,                              2 arguments (index of origin memory in ram, index of target memory in ram)
+WRTR_C   - Write from ram to cache,                              2 arguments (index of origin memory in ram, index of target memory in cache)
 SUM      - Adds register0 and register1,                         0 arguments
 SUB      - Subtracts register0 and register1,                    0 arguments
 MLT      - Multiplies register0 and register1,                   0 arguments
@@ -27,7 +39,7 @@ REG1_B   - Check if register1 is greater than register0,         0 arguments
 REG1_BE  - Check if register1 is greater or equal to register0,  0 arguments
 REG_EQL  - Check if register0 and register1 are the same size,   0 arguments
 REG_DIF  - Check if register0 and register1 are different size,  0 arguments
-JMP      - Sets program counter to target position,              1 argument  (target position)
+JMP      - Sets program counter to target position,              1 argument  (target assembly instruction)
 CMP      - Compares register0 to a condition,                    2 arguments (0 or 1 for the condition (false or true), jump position if condition is met)
 COT0     - Print to console contents of register0,               0 arguments
 COT1     - Print to console contents of register1,               0 arguments
@@ -38,6 +50,58 @@ PRINT    - Print character to screen,                            6 arguments (ch
 CHK_K    - Put current keyboard input value into cache,          1 argument  (place in cache)
 WAIT     - CPU waits a number of cycles,                         1 argument  (waiting time)
 SET      - Set a value to a place in cache/ram,                  3 arguments (C/R depending where you want to set the value, position in memory, value)
+
+Examples:
+1. Print pressed keyboard character to PC screen
+---
+CHK_K 220                //Gets current key pressed and stores it at the position 220 in cache
+PRINT 220 1 1 60 60 60   //Prints character at position 220 in cache at position X: 1, Y: 1 and color values R: 60, G: 60, B: 60
+CLR_COMM CLR_VRAM        //Clears GPU command buffer and vRam after printing the character to prevent memory leaks
+JMP 0                    //Jumps to instuction 0 (in this case CHK_K)
+---
+
+2.Arithmetic operations
+---
+SET C 200 1  //Sets value 1 at position 200 in cpu cache
+SET C 201 5  //Sets value 5 at position 201 in cpu cache
+LOAD0_C 200  //Loads value from position 200 in cpu cache to register 0
+LOAD1_C 201  //Loads value from position 201 in cpu cache to register 1
+SUM          //Adds values from register 0 and register 1 and puts the result in register 0
+COT0         //Prints value of register 0 to console
+---
+
+3.Logic operations
+---
+SET C 200 5   //Sets value 5 at position 200 in cpu cache
+SET C 201 10  //Sets value 10 at position 201 in cpu cache
+LOAD0_C 200   //Loads value from position 200 in cpu cache to register 0
+LOAD1_C 201   //Loads value from position 201 in cpu cache to register 1
+REG0_BE       //Checks if register 0 holds a greater value than register 1, the result is stored in register 0
+COT0          //Prints the result (0 for false, 1 for true) to console
+---
+
+4.If statement
+---
+SET C 200 5   //Sets value 5 at position 200 in cpu cache
+SET C 201 10  //Sets value 10 at position 201 in cpu cache
+LOAD0_C 200   //Loads value from position 200 in cpu cache to register 0
+LOAD1_C 201   //Loads value from position 201 in cpu cache to register 1
+REG0_BE       //Checks if register 0 holds a greater value than register 1, the result is stored in register 0
+CMP 0 10      //Check if register 0 value is equal to 0 (false), if it is, jump to the end of the if statement (The trick is to CMP to the opposite of what you are checking for, since if you check for 1 and the condition is true, its going to jump over your if statement)
+---
+
+5.For loop
+---
+SET C 200 0   //Sets value 0 to position 200 in cpu cache
+SET C 201 1   //Sets value 1 to position 201 in cpu cache
+SET C 202 10  //Sets value 10 to position 202 in cpu cache
+LOAD0_C 200   //Loads value from position 200 in cpu cache to register 0
+LOAD1_C 201   //Loads value from position 201 in cpu cache to register 1
+SUM           //Adds values from register 0 and register 1 and puts the result in register 0
+LOAD1_C 202   //Loads value from position 202 in cpu cache to register 1
+REG1_B        //Checks if register 1 holds a greater value than register 0 and stores the result in register 0
+CMP 1 0       //Checks if register 0 is equal to 1 (true), if yes, jump to start of the code at position 0, if not, continue with the code
+---
 
 Character codes:
 0:  0, -: 21, C: 42, X: 63, p: 84
