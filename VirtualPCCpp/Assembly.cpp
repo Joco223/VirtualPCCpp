@@ -2,6 +2,8 @@
 
 namespace Assembly {
 
+	std::vector<std::string> lines;
+
 	void convertByte(int& number, byte& b1, byte& b2) {
 		if (number > 255) {
 			b1 = number & 0xff;
@@ -16,6 +18,8 @@ namespace Assembly {
 		if (arg > maxSize) {
 			std::cout << "Error: Argument " << argc << " exceeds size limit at instruction " << instruction << " at position " << instructionC + 1 + argc << '\n';
 			return true;
+		}else{
+			return false;
 		}
 	}
 
@@ -37,12 +41,15 @@ namespace Assembly {
 		if (myfile.is_open()){
 			while (getline (myfile,line)) {
 				if (!equal(prefix.begin(), prefix.end(), line.begin())) {
-					std::string buf;
-					std::stringstream ss(line);
+					if (line != "") {
+						lines.push_back(line);
+						std::string buf;
+						std::stringstream ss(line);
 
-					while (ss >> buf) {
-						code.push_back(buf);
-					}
+						while (ss >> buf) {
+							code.push_back(buf);
+						}
+					}		
 				}
 			}
 		}
@@ -54,13 +61,12 @@ namespace Assembly {
 		int currentPos = 0;
 		int gpuCommand = 0;
 		int additionalMemory = 0;
+		int line = 0;
 		std::vector<u16> jumpPositions;
 
 		for (int i = 0; i < code.size(); i++) {
 
 			std::string instruction = code[i];
-
-			bool has_only_digits = (instruction.find_first_not_of("0123456789")) == std::string::npos;
 
 			if (instruction == "LOAD0_C") {
 				std::string arg1 = code[i + 1];
@@ -79,6 +85,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "LOAD1_C") {
 				std::string arg1 = code[i + 1];
 
@@ -96,6 +103,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "LOAD0_R") {
 				std::string arg1 = code[i + 1];
 
@@ -113,6 +121,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "LOAD1_R") {
 				std::string arg1 = code[i + 1];
 
@@ -130,13 +139,16 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "CLR0") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 4;
 				currentPos++;
+				line++;
 			}else if (instruction == "CLR1") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 5;
+				line++;
 			}else if (instruction == "WRT0_C") {
 				std::string arg1 = code[i + 1];
 
@@ -154,6 +166,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "WRT1_C") {
 				std::string arg1 = code[i + 1];
 
@@ -171,6 +184,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "WRT0_R") {
 				std::string arg1 = code[i + 1];
 
@@ -188,6 +202,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "WRT1_R") {
 				std::string arg1 = code[i + 1];
 
@@ -205,6 +220,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "WRTC_R") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
@@ -233,6 +249,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b4;
 
 				i += 2;
+				line++;
 			}else if (instruction == "WRTR_C") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
@@ -261,36 +278,47 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b4;
 
 				i += 2;
+				line++;
 			}else if (instruction == "SUM") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 20;
+				line++;
 			}else if (instruction == "SUB") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 21;
+				line++;
 			}else if (instruction == "MLT") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 22;
+				line++;
 			}else if (instruction == "DIV") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 23;
+				line++;
 			}else if (instruction == "REG0_B") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 24;
+				line++;
 			}else if (instruction == "REG0_BE") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 25;
+				line++;
 			}else if (instruction == "REG1_B") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 26;
+				line++;
 			}else if (instruction == "REG1_BE") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 27;
+				line++;
 			}else if (instruction == "REG_EQL") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 28;
+				line++;
 			}else if (instruction == "REG_DIF") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 29;
+				line++;
 			}else if (instruction == "JMP") {
 				std::string arg1 = code[i + 1];
 
@@ -309,6 +337,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
+				line++;
 			}else if (instruction == "CMP") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
@@ -318,6 +347,8 @@ namespace Assembly {
 
 				int Arg1;
 				checkArgType(Arg1, arg1, cpu);
+
+				if(checkArgSize(Arg1, 1, instruction, i, 1) == true) { break; }
 
 				cpu.cache.memory[currentPos++] = Arg1;
 
@@ -333,12 +364,15 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b2;
 
 				i += 2;
+				line++;
 			}else if (instruction == "COT0") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 40;
+				line++;
 			}else if (instruction == "COT1") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 41;
+				line++;
 			}else if (instruction == "WRT_R_VR") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
@@ -378,6 +412,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b6;
 
 				i += 3;
+				line++;
 			}else if (instruction == "WRT_VR_R") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
@@ -417,6 +452,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = b6;
 
 				i += 3;
+				line++;
 			}else if (instruction == "DRAWP") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
@@ -491,6 +527,7 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = Arg7;
 
 				i += 7;
+				line++;
 			}else if (instruction == "PRINT") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 53;
@@ -505,20 +542,32 @@ namespace Assembly {
 				int Arg1;
 				checkArgType(Arg1, arg1, cpu);
 
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
 				int Arg2;
 				checkArgType(Arg2, arg2, cpu);
+
+				if(checkArgSize(Arg2, 2, instruction, i, 56) == true) { break; }
 
 				int Arg3;
 				checkArgType(Arg3, arg3, cpu);
 
+				if(checkArgSize(Arg3, 3, instruction, i, 26) == true) { break; }
+
 				int Arg4;
 				checkArgType(Arg4, arg4, cpu);
+
+				if(checkArgSize(Arg4, 4, instruction, i, 63) == true) { break; }
 
 				int Arg5;
 				checkArgType(Arg5, arg5, cpu);
 
+				if(checkArgSize(Arg5, 1, instruction, i, 63) == true) { break; }
+
 				int Arg6;
 				checkArgType(Arg6, arg6, cpu);
+
+				if(checkArgSize(Arg6, 1, instruction, i, 63) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -532,13 +581,16 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = Arg6;
 
 				i += 6;
+				line++;
 			}else if (instruction == "CLR_COMM") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 55;
+				line++;
 				cpu.firstAvailable++;
 			}else if (instruction == "CLR_VRAM") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 56;
+				line++;
 				cpu.firstAvailable++;
 			}else if (instruction == "WAIT") {
 				jumpPositions.push_back(currentPos);
@@ -549,9 +601,12 @@ namespace Assembly {
 				int Arg1;
 				checkArgType(Arg1, arg1, cpu);
 
+				if(checkArgSize(Arg1, 1, instruction, i, 255) == true) { break; }
+
 				cpu.cache.memory[currentPos++] = Arg1;
 
 				i++;
+				line++;
 			}else if (instruction == "CHK_K") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 42;
@@ -561,11 +616,14 @@ namespace Assembly {
 				int Arg1;
 				checkArgType(Arg1, arg1, cpu);
 
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 				i++;
+				line++;
 			}else if (instruction == "SET") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
@@ -573,7 +631,11 @@ namespace Assembly {
 
 				int Arg2 = std::stoi(arg2);
 
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
+
 				int Arg3 = std::stoi(arg3);
+
+				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
 
 				if (arg1 == "C") {
 					cpu.cache.memory[Arg2] = Arg3;
@@ -582,6 +644,16 @@ namespace Assembly {
 				}
 
 				i += 3;
+				line++;
+			}else{
+				std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
+				std::cout << '\n';
+				std::cout << lines[line] << '\n';
+				std::cout << "^" << '\n';
+				std::cout << '\n';
+				std::cout << "Compilation terminated" << '\n';
+				cpu.cache.Clear();
+				break;
 			}
 		}
 	}

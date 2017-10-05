@@ -4,6 +4,7 @@ You explicitly need 1 space between instructions and arguments (or a new line)
 RGB values are limited from 0 to 63
 Character space is limited X: 0 - 56, Y: 0 - 26 (For the resolution of 320x240)
 Comments can be written with //, that line is ignored
+Each instruction needs to be in its own seperate line or error checking may be wrong
 
 SET instruction is not counted when using JMP or CMP, so:
 ---
@@ -49,6 +50,8 @@ DRAWP    - Draw rectangle on screen,                             7 arguments (st
 PRINT    - Print character to screen,                            6 arguments (character position in cpu cache, x position in character space, y position in character space, r value, g value, b value)
 CHK_K    - Put current keyboard input value into cache,          1 argument  (place in cache)
 WAIT     - CPU waits a number of cycles,                         1 argument  (waiting time)
+CLR_COMM - Clears GPU command bufer,                             0 arguments
+CLR_VRAM - Clears GPU vRam,                                      0 arguments
 SET      - Set a value to a place in cache/ram,                  3 arguments (C/R depending where you want to set the value, position in memory, value)
 
 Examples:
