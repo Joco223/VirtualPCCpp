@@ -16,7 +16,7 @@ namespace Assembly {
 
 	bool checkArgSize(int& arg, int argc, std::string& instruction, int& instructionC, int maxSize) {
 		if (arg > maxSize) {
-			std::cout << "Error: Argument " << argc << " exceeds size limit at instruction " << instruction << " at position " << instructionC + 1 + argc << '\n';
+			std::cout << "Error: Argument " << argc << " exceeds size limit of " << maxSize << " at instruction " << instruction << " at position " << instructionC + 1 + argc << '\n';
 			return true;
 		}else{
 			return false;
