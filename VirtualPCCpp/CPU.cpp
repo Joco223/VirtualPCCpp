@@ -71,7 +71,7 @@ void CPU::execute(u16 register) {
 		programCounter++;
 		break; }
 
-	case 7: { //Write from register1 to cache
+	case 7: { //Write from register0 to cache
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
@@ -80,7 +80,7 @@ void CPU::execute(u16 register) {
 		programCounter++;
 		break; }
 
-	case 8: { //Write from register2 to cache
+	case 8: { //Write from register1 to cache
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
@@ -89,7 +89,7 @@ void CPU::execute(u16 register) {
 		programCounter++;
 		break; }
 
-	case 9: { //Write from register1 to ram
+	case 9: { //Write from register0 to ram
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
@@ -98,7 +98,7 @@ void CPU::execute(u16 register) {
 		programCounter++;
 		break; }
 
-	case 10: { //Write from register2 to ram
+	case 10: { //Write from register1 to ram
 		byte arg1p1 = cache.memory[programCounter + 1];
 		byte arg1p2 = cache.memory[programCounter + 2];
 		u16 memPos = arg1p1 + (arg1p2 * 256);
@@ -303,13 +303,15 @@ void CPU::execute(u16 register) {
 		break; }
 
 	case 53: { //Draw a character
-		byte characterPosition = cache.memory[programCounter + 1];
+		byte characterPositionp1 = cache.memory[programCounter + 1];
+		byte characterPositionp2 = cache.memory[programCounter + 2];
+		u16 characterPosition = characterPositionp1 + (characterPositionp2 * 256);
 		byte characterCode = cache.memory[characterPosition];
-		byte xPos = cache.memory[programCounter + 2];
-		byte yPos = cache.memory[programCounter + 3];
-		byte r = cache.memory[programCounter + 4];
-		byte g = cache.memory[programCounter + 5];
-		byte b = cache.memory[programCounter + 6];
+		byte xPos = cache.memory[programCounter + 3];
+		byte yPos = cache.memory[programCounter + 4];
+		byte r = cache.memory[programCounter + 5];
+		byte g = cache.memory[programCounter + 6];
+		byte b = cache.memory[programCounter + 7];
 
 		gpu.commandBuffer.memory[gpu.commandCounter] = 4;
 
@@ -320,7 +322,7 @@ void CPU::execute(u16 register) {
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 4] = g;
 		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 5] = b;
 
-		programCounter += 6;
+		programCounter += 7;
 		programCounter++;
 		break; }
 

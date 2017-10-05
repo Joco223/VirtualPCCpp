@@ -4,9 +4,8 @@ namespace Assembly {
 
 	void convertByte(int& number, byte& b1, byte& b2) {
 		if (number > 255) {
-			int temp = (number - 255) / 256;
-			b1 = 255;
-			b2 = temp;
+			b1 = number & 0xff;
+			b2 = (byte)(number >> 8);
 		}else{
 			b1 = number;
 			b2 = 0;
@@ -521,7 +520,11 @@ namespace Assembly {
 				int Arg6;
 				checkArgType(Arg6, arg6, cpu);
 
-				cpu.cache.memory[currentPos++] = Arg1;
+				byte b1, b2;
+				convertByte(Arg1, b1, b2);
+				cpu.cache.memory[currentPos++] = b1;
+				cpu.cache.memory[currentPos++] = b2;
+
 				cpu.cache.memory[currentPos++] = Arg2;
 				cpu.cache.memory[currentPos++] = Arg3;
 				cpu.cache.memory[currentPos++] = Arg4;
