@@ -349,7 +349,7 @@ namespace Assembly {
 				int Arg1;
 				checkArgType(Arg1, arg1, cpu);
 
-				if(checkArgSize(Arg1, 1, instruction, i, 1) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
@@ -472,47 +472,71 @@ namespace Assembly {
 				int Arg1;
 				checkArgType(Arg1, arg1, cpu);
 
-				if(checkArgSize(Arg1, 1, instruction, i, 320) == true) { break; }
+				if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
+				int Arg1p2 = Arg1 + 1;
+				byte bp1, bp2;
+				convertByte(Arg1p2, bp1, bp2);
+				cpu.cache.memory[currentPos++] = bp1;
+				cpu.cache.memory[currentPos++] = bp2;
+
 				int Arg2;
 				checkArgType(Arg2, arg2, cpu);
 
-				if(checkArgSize(Arg2, 2, instruction, i, 240) == true) { break; }
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
 				byte b3, b4;
 				convertByte(Arg2, b3, b4);
 				cpu.cache.memory[currentPos++] = b3;
 				cpu.cache.memory[currentPos++] = b4;
 
+				int Arg2p2 = Arg2 + 1;
+				byte bp3, bp4;
+				convertByte(Arg2p2, bp3, bp4);
+				cpu.cache.memory[currentPos++] = bp3;
+				cpu.cache.memory[currentPos++] = bp4;
+
 				int Arg3;
 				checkArgType(Arg3, arg3, cpu);
 
-				if(checkArgSize(Arg3, 3, instruction, i, 320) == true) { break; }
+				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
 
 				byte b5, b6;
 				convertByte(Arg3, b5, b6);
 				cpu.cache.memory[currentPos++] = b5;
 				cpu.cache.memory[currentPos++] = b6;
 
+				int Arg3p2 = Arg3 + 1;
+				byte bp5, bp6;
+				convertByte(Arg3p2, bp5, bp6);
+				cpu.cache.memory[currentPos++] = bp5;
+				cpu.cache.memory[currentPos++] = bp6;
+
 				int Arg4;
 				checkArgType(Arg4, arg4, cpu);
 
-				if(checkArgSize(Arg4, 4, instruction, i, 240) == true) { break; }
+				if(checkArgSize(Arg4, 4, instruction, i, 65535) == true) { break; }
 
 				byte b7, b8;
 				convertByte(Arg4, b7, b8);
 				cpu.cache.memory[currentPos++] = b7;
 				cpu.cache.memory[currentPos++] = b8;
 
+				int Arg4p2 = Arg4 + 1;
+				byte bp7, bp8;
+				convertByte(Arg4p2, bp7, bp8);
+				cpu.cache.memory[currentPos++] = bp7;
+				cpu.cache.memory[currentPos++] = bp8;
+
 				int Arg5;
 				checkArgType(Arg5, arg5, cpu);
 
-				if(checkArgSize(Arg5, 5, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg5, 5, instruction, i, 65535) == true) { break; }
 
 				byte b9, b10;
 				convertByte(Arg5, b9, b10);
@@ -522,7 +546,7 @@ namespace Assembly {
 				int Arg6;
 				checkArgType(Arg6, arg6, cpu);
 
-				if(checkArgSize(Arg6, 6, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg6, 6, instruction, i, 65535) == true) { break; }
 
 				byte b11, b12;
 				convertByte(Arg6, b11, b12);
@@ -532,7 +556,7 @@ namespace Assembly {
 				int Arg7;
 				checkArgType(Arg7, arg7, cpu);
 
-				if(checkArgSize(Arg7, 7, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg7, 7, instruction, i, 65535) == true) { break; }
 
 				byte b13, b14;
 				convertByte(Arg7, b13, b14);
@@ -674,9 +698,15 @@ namespace Assembly {
 				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
 
 				if (arg1 == "C") {
-					cpu.cache.memory[Arg2] = Arg3;
+					byte b1, b2;
+					convertByte(Arg3, b1, b2);
+					cpu.cache.memory[Arg2] = b1;
+					cpu.cache.memory[Arg2 + 1] = b2;
 				}else if (arg1 == "R") {
-					cpu.ram.memory[Arg2] = Arg3;
+					byte b1, b2;
+					convertByte(Arg3, b1, b2);
+					cpu.ram.memory[Arg2] = b1;
+					cpu.ram.memory[Arg2 + 1] = b2;
 				}
 
 				i += 3;

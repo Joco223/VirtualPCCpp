@@ -40,9 +40,8 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCount_, int commandArgBuff
 
 void getArgument(u16& arg, byte& b1, byte& b2) {
 	if (arg > 255) {
-		int temp = (arg - 255) / 256;
-		b1 = 255;
-		b2 = temp;
+		b1 = arg & 0xff;
+		b2 = (byte)(arg >> 8);
 	}else{
 		b1 = arg;
 		b2 = 0;
@@ -137,13 +136,15 @@ void GPU::executeCommand() {
 		byte arg6 = commandArgBuffer.memory[commandArgCounter + 9];
 		byte arg7 = commandArgBuffer.memory[commandArgCounter + 10];
 
-		u16 arg1 = arg1b1 + (arg1b2 * 256);
-		u16 arg2 = arg2b1 + (arg2b2 * 256);
-		u16 arg3 = arg3b1 + (arg3b2 * 256);
-		u16 arg4 = arg4b1 + (arg4b2 * 256);
+		u16 arg1  = arg1b2 << 8 | (arg1b1 & 0xFF);
+		u16 arg2  = arg2b2 << 8 | (arg2b1 & 0xFF);
+		u16 arg3  = arg3b2 << 8 | (arg3b1 & 0xFF);
+		u16 arg4  = arg4b2 << 8 | (arg4b1 & 0xFF);
 
 		u16 xSize = arg3 - arg1;
 		u16 ySize = arg4 - arg2;
+
+		//std::cout << arg4 << " " << arg2 << std::endl;
 
 		u16 cXPos, cYPos;
 
@@ -268,8 +269,8 @@ void GPU::executeThread() {
 		byte arg4 = vRam.memory[functionCounter + 6];
 		byte arg5 = vRam.memory[functionCounter + 7];
 
-		u16 arg1 = arg1b1 + (arg1b2 * 256);
-		u16 arg2 = arg2b1 + (arg2b2 * 256);	
+		u16 arg1  = arg1b2 << 8 | (arg1b1 & 0xFF);
+		u16 arg2  = arg2b2 << 8 | (arg2b1 & 0xFF);
 
 		byte r = arg3 * 4;
 		byte g = arg4 * 4;

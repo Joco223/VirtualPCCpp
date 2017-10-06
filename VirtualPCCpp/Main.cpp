@@ -56,6 +56,8 @@ int main(int argc, char* argv[]) {
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
+	int count = 0;
+
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -112,6 +114,7 @@ int main(int argc, char* argv[]) {
 		gpu1.tick();
 		NSSDL::updateSDL(pc1.screen);
 	}
+
 
 	NSSDL::cleanSDL(pc1.screen);
 

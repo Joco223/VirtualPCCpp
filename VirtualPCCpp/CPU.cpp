@@ -193,12 +193,12 @@ void CPU::execute(u16 register) {
 		byte arg1p1 = cache.memory[programCounter + 3];
 		byte arg1p2 = cache.memory[programCounter + 4];
 		u16 memPos = arg1p2 << 8 | (arg1p1 & 0xFF);
-		if (register0 == cache.memory[condition]) {
+		if (register0 == condition) {
 			programCounter = memPos;
-		}else if(register0 != cache.memory[condition]){	
+		}else if(register0 != condition){
 			programCounter += 4;
+			programCounter++;
 		}
-		programCounter++;
 		break; }
 
 	case 32: { //Wait a number of cycles
@@ -302,24 +302,24 @@ void CPU::execute(u16 register) {
 		break; }
 
 	case 52: { //Draw recrtangle
-		byte arg1p1 = cache.memory[programCounter +   1];
-		byte arg1p2 = cache.memory[programCounter +   2];
-		byte arg2p1 = cache.memory[programCounter +   3];
-		byte arg2p2 = cache.memory[programCounter +   4];
-		byte arg3p1 = cache.memory[programCounter +   5];
-		byte arg3p2 = cache.memory[programCounter +   6];
-		byte arg4p1 = cache.memory[programCounter +   7];
-		byte arg4p2 = cache.memory[programCounter +   8];
-		byte arg5p1 = cache.memory[programCounter +   9];
-		byte arg5p2 = cache.memory[programCounter +  10];
-		byte arg6p1 = cache.memory[programCounter +  11];
-		byte arg6p2 = cache.memory[programCounter +  12];
-		byte arg7p1 = cache.memory[programCounter +  13];
-		byte arg7p2 = cache.memory[programCounter +  14];
-		byte arg8p1 = cache.memory[programCounter +  15];
-		byte arg8p2 = cache.memory[programCounter +  16];
-		byte arg9p1 = cache.memory[programCounter +  17];
-		byte arg9p2 = cache.memory[programCounter +  18];
+		byte arg1p1 = cache.memory[programCounter +    1];
+		byte arg1p2 = cache.memory[programCounter +    2];
+		byte arg2p1 = cache.memory[programCounter +    3];
+		byte arg2p2 = cache.memory[programCounter +    4];
+		byte arg3p1 = cache.memory[programCounter +    5];
+		byte arg3p2 = cache.memory[programCounter +    6];
+		byte arg4p1 = cache.memory[programCounter +    7];
+		byte arg4p2 = cache.memory[programCounter +    8];
+		byte arg5p1 = cache.memory[programCounter +    9];
+		byte arg5p2 = cache.memory[programCounter +   10];
+		byte arg6p1 = cache.memory[programCounter +   11];
+		byte arg6p2 = cache.memory[programCounter +   12];
+		byte arg7p1 = cache.memory[programCounter +   13];
+		byte arg7p2 = cache.memory[programCounter +   14];
+		byte arg8p1 = cache.memory[programCounter +   15];
+		byte arg8p2 = cache.memory[programCounter +   16];
+		byte arg9p1 = cache.memory[programCounter +   17];
+		byte arg9p2 = cache.memory[programCounter +   18];
 		byte arg10p1 = cache.memory[programCounter +  19];
 		byte arg10p2 = cache.memory[programCounter +  20];
 		byte arg11p1 = cache.memory[programCounter +  21];
@@ -403,10 +403,10 @@ void CPU::execute(u16 register) {
 	}
 }
 
+
 void CPU::tick() {
 	if (halt == false) {
 		registerOP1 = cache.memory[programCounter];
 		execute(register1);
-		
 	}
 }
