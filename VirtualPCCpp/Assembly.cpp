@@ -47,6 +47,7 @@ namespace Assembly {
 						std::stringstream ss(line);
 
 						while (ss >> buf) {
+							if (equal(prefix.begin(), prefix.end(), buf.begin())) {break;}
 							code.push_back(buf);
 						}
 					}		
@@ -350,7 +351,10 @@ namespace Assembly {
 
 				if(checkArgSize(Arg1, 1, instruction, i, 1) == true) { break; }
 
-				cpu.cache.memory[currentPos++] = Arg1;
+				byte b1, b2;
+				convertByte(Arg1, b1, b2);
+				cpu.cache.memory[currentPos++] = b1;
+				cpu.cache.memory[currentPos++] = b2;
 
 				int Arg2;
 				checkArgType(Arg2, arg2, cpu);
@@ -358,10 +362,10 @@ namespace Assembly {
 
 				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
-				byte b1, b2;
-				convertByte(pos, b1, b2);
-				cpu.cache.memory[currentPos++] = b1;
-				cpu.cache.memory[currentPos++] = b2;
+				byte b3, b4;
+				convertByte(pos, b3, b4);
+				cpu.cache.memory[currentPos++] = b3;
+				cpu.cache.memory[currentPos++] = b4;
 
 				i += 2;
 				line++;
@@ -510,21 +514,30 @@ namespace Assembly {
 
 				if(checkArgSize(Arg5, 5, instruction, i, 63) == true) { break; }
 
-				cpu.cache.memory[currentPos++] = Arg5;
+				byte b9, b10;
+				convertByte(Arg5, b9, b10);
+				cpu.cache.memory[currentPos++] = b9;
+				cpu.cache.memory[currentPos++] = b10;
 
 				int Arg6;
 				checkArgType(Arg6, arg6, cpu);
 
 				if(checkArgSize(Arg6, 6, instruction, i, 63) == true) { break; }
 
-				cpu.cache.memory[currentPos++] = Arg6;
+				byte b11, b12;
+				convertByte(Arg6, b11, b12);
+				cpu.cache.memory[currentPos++] = b11;
+				cpu.cache.memory[currentPos++] = b12;
 
 				int Arg7;
 				checkArgType(Arg7, arg7, cpu);
 
 				if(checkArgSize(Arg7, 7, instruction, i, 63) == true) { break; }
 
-				cpu.cache.memory[currentPos++] = Arg7;
+				byte b13, b14;
+				convertByte(Arg7, b13, b14);
+				cpu.cache.memory[currentPos++] = b13;
+				cpu.cache.memory[currentPos++] = b14;
 
 				i += 7;
 				line++;
@@ -547,38 +560,57 @@ namespace Assembly {
 				int Arg2;
 				checkArgType(Arg2, arg2, cpu);
 
-				if(checkArgSize(Arg2, 2, instruction, i, 56) == true) { break; }
+				if(checkArgSize(Arg2, 2, instruction, i, 65535) == true) { break; }
 
 				int Arg3;
 				checkArgType(Arg3, arg3, cpu);
 
-				if(checkArgSize(Arg3, 3, instruction, i, 26) == true) { break; }
+				if(checkArgSize(Arg3, 3, instruction, i, 65535) == true) { break; }
 
 				int Arg4;
 				checkArgType(Arg4, arg4, cpu);
 
-				if(checkArgSize(Arg4, 4, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg4, 4, instruction, i, 65535) == true) { break; }
 
 				int Arg5;
 				checkArgType(Arg5, arg5, cpu);
 
-				if(checkArgSize(Arg5, 1, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg5, 1, instruction, i, 65535) == true) { break; }
 
 				int Arg6;
 				checkArgType(Arg6, arg6, cpu);
 
-				if(checkArgSize(Arg6, 1, instruction, i, 63) == true) { break; }
+				if(checkArgSize(Arg6, 1, instruction, i, 65535) == true) { break; }
 
 				byte b1, b2;
 				convertByte(Arg1, b1, b2);
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
 
-				cpu.cache.memory[currentPos++] = Arg2;
-				cpu.cache.memory[currentPos++] = Arg3;
-				cpu.cache.memory[currentPos++] = Arg4;
-				cpu.cache.memory[currentPos++] = Arg5;
-				cpu.cache.memory[currentPos++] = Arg6;
+				byte b3, b4;
+				convertByte(Arg2, b3, b4);
+				cpu.cache.memory[currentPos++] = b3;
+				cpu.cache.memory[currentPos++] = b4;
+
+				byte b5, b6;
+				convertByte(Arg3, b5, b6);
+				cpu.cache.memory[currentPos++] = b5;
+				cpu.cache.memory[currentPos++] = b6;
+
+				byte b7, b8;
+				convertByte(Arg4, b7, b8);
+				cpu.cache.memory[currentPos++] = b7;
+				cpu.cache.memory[currentPos++] = b8;
+
+				byte b9, b10;
+				convertByte(Arg5, b9, b10);
+				cpu.cache.memory[currentPos++] = b9;
+				cpu.cache.memory[currentPos++] = b10;
+
+				byte b11, b12;
+				convertByte(Arg6, b11, b12);
+				cpu.cache.memory[currentPos++] = b11;
+				cpu.cache.memory[currentPos++] = b12;
 
 				i += 6;
 				line++;
@@ -603,7 +635,10 @@ namespace Assembly {
 
 				if(checkArgSize(Arg1, 1, instruction, i, 255) == true) { break; }
 
-				cpu.cache.memory[currentPos++] = Arg1;
+				byte b1, b2;
+				convertByte(Arg1, b1, b2);
+				cpu.cache.memory[currentPos++] = b1;
+				cpu.cache.memory[currentPos++] = b2;
 
 				i++;
 				line++;
@@ -622,6 +657,7 @@ namespace Assembly {
 				convertByte(Arg1, b1, b2);
 				cpu.cache.memory[currentPos++] = b1;
 				cpu.cache.memory[currentPos++] = b2;
+
 				i++;
 				line++;
 			}else if (instruction == "SET") {

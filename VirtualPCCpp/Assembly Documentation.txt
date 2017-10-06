@@ -1,5 +1,5 @@
 General info:
-You can use REG0 and REG1 to use the values from registers as arguments for instructions
+Arguments are used as positions in cpu cache, not values (Except for JMP, the argument is used as instruction count, CMP uses memory position as first argument, instruction count as second)
 You explicitly need 1 space between instructions and arguments (or a new line)
 RGB values are limited from 0 to 63
 Character space is limited X: 0 - 56, Y: 0 - 26 (For the resolution of 320x240)
@@ -57,10 +57,12 @@ SET      - Set a value to a place in cache/ram,                  3 arguments (C/
 Examples:
 1. Print pressed keyboard character to PC screen
 ---
-CHK_K 220                //Gets current key pressed and stores it at the position 220 in cache
-PRINT 220 1 1 60 60 60   //Prints character at position 220 in cache at position X: 1, Y: 1 and color values R: 60, G: 60, B: 60
-CLR_COMM CLR_VRAM        //Clears GPU command buffer and vRam after printing the character to prevent memory leaks
-JMP 0                    //Jumps to instuction 0 (in this case CHK_K)
+SET C 201 1                     //Sets value 1 at position 201 in cpu cache
+SET C 202 60                    //Sets value 60 at position 202 in cpu cache
+CHK_K 220                       //Gets current key pressed and stores it at the position 220 in cache
+PRINT 220 201 201 202 202 202   //Prints character at position 220 in cache at position X: 1, Y: 1 and color values R: 60, G: 60, B: 60
+CLR_COMM CLR_VRAM               //Clears GPU command buffer and vRam after printing the character to prevent memory leaks
+JMP 0                           //Jumps to instuction 0 (in this case CHK_K)
 ---
 
 2.Arithmetic operations
@@ -87,23 +89,24 @@ COT0          //Prints the result (0 for false, 1 for true) to console
 ---
 SET C 200 5   //Sets value 5 at position 200 in cpu cache
 SET C 201 10  //Sets value 10 at position 201 in cpu cache
+SET C 202 0   //Sets value 0 at position 202 in cache
 LOAD0_C 200   //Loads value from position 200 in cpu cache to register 0
 LOAD1_C 201   //Loads value from position 201 in cpu cache to register 1
 REG0_BE       //Checks if register 0 holds a greater value than register 1, the result is stored in register 0
-CMP 0 10      //Check if register 0 value is equal to 0 (false), if it is, jump to the end of the if statement (The trick is to CMP to the opposite of what you are checking for, since if you check for 1 and the condition is true, its going to jump over your if statement)
+CMP 202 10    //Check if register 0 value is equal to 0 (false), if it is, jump to the end of the if statement (The trick is to CMP to the opposite of what you are checking for, since if you check for 1 and the condition is true, its going to jump over your if statement)
 ---
 
 5.For loop
 ---
-SET C 200 0   //Sets value 0 to position 200 in cpu cache
-SET C 201 1   //Sets value 1 to position 201 in cpu cache
-SET C 202 10  //Sets value 10 to position 202 in cpu cache
-LOAD0_C 200   //Loads value from position 200 in cpu cache to register 0
-LOAD1_C 201   //Loads value from position 201 in cpu cache to register 1
-SUM           //Adds values from register 0 and register 1 and puts the result in register 0
-LOAD1_C 202   //Loads value from position 202 in cpu cache to register 1
-REG1_B        //Checks if register 1 holds a greater value than register 0 and stores the result in register 0
-CMP 1 0       //Checks if register 0 is equal to 1 (true), if yes, jump to start of the code at position 0, if not, continue with the code
+SET C 200 0    //Sets value 0 to position 200 in cpu cache
+SET C 201 1    //Sets value 1 to position 201 in cpu cache
+SET C 202 10   //Sets value 10 to position 202 in cpu cache
+LOAD0_C 200    //Loads value from position 200 in cpu cache to register 0
+LOAD1_C 201    //Loads value from position 201 in cpu cache to register 1
+SUM            //Adds values from register 0 and register 1 and puts the result in register 0
+LOAD1_C 202    //Loads value from position 202 in cpu cache to register 1
+REG1_B         //Checks if register 1 holds a greater value than register 0 and stores the result in register 0
+CMP 201 0      //Checks if register 0 is equal to 1 (true), if yes, jump to start of the code at position 0, if not, continue with the code
 ---
 
 Character codes:
