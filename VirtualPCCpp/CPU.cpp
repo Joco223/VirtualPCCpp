@@ -301,7 +301,7 @@ void CPU::execute(u16 register) {
 		programCounter++;
 		break; }
 
-	case 52: { //Draw recrtangle
+	case 52: { //Draw rectangle
 		byte arg1p1 = cache.memory[programCounter +    1];
 		byte arg1p2 = cache.memory[programCounter +    2];
 		byte arg2p1 = cache.memory[programCounter +    3];

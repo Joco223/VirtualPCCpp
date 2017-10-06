@@ -115,7 +115,6 @@ int main(int argc, char* argv[]) {
 		NSSDL::updateSDL(pc1.screen);
 	}
 
-
 	NSSDL::cleanSDL(pc1.screen);
 
 	SDL_Quit();
