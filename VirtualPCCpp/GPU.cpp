@@ -144,8 +144,6 @@ void GPU::executeCommand() {
 		u16 xSize = arg3 - arg1;
 		u16 ySize = arg4 - arg2;
 
-		//std::cout << arg4 << " " << arg2 << std::endl;
-
 		u16 cXPos, cYPos;
 
 		for (int y = 0; y < ySize; y++) {
@@ -272,9 +270,9 @@ void GPU::executeThread() {
 		u16 arg1  = arg1b2 << 8 | (arg1b1 & 0xFF);
 		u16 arg2  = arg2b2 << 8 | (arg2b1 & 0xFF);
 
-		byte r = arg3 * 4;
-		byte g = arg4 * 4;
-		byte b = arg5 * 4;
+		byte r = arg3 * 2;
+		byte g = arg4 * 2;
+		byte b = arg5 * 2;
 
 		screen->pixels[arg2 * 320 + arg1] = int(b << 16) | int(g << 8) | int(r);
 		functionCounter += 8;

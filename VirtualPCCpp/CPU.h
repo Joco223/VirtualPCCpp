@@ -15,9 +15,9 @@ public:
 	Memory& ram;
 	u16 registerOP1;
 	u16 registerOP2;
-	u16 register0;
-	u16 register1;
-	u16 programCounter;
+	int register0;
+	int register1;
+	int programCounter;
 	u16 keyboardRegister;
 	u16 inputCount;
 	u16 firstAvailable;

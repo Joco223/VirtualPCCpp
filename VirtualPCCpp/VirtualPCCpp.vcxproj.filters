@@ -39,6 +39,9 @@
     <ClCompile Include="GPU.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Next.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NSSDL.h">
@@ -62,6 +65,9 @@
     <ClInclude Include="GPU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Next.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="fontBasic.txt">
@@ -71,6 +77,9 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="Assembly Documentation.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="SquareDrawing.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

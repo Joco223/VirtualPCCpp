@@ -24,6 +24,7 @@
     <ClCompile Include="GPU.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="Next.cpp" />
     <ClCompile Include="NSSDL.cpp" />
     <ClCompile Include="PC.cpp" />
     <ClCompile Include="SDLWindow.cpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="CPU.h" />
     <ClInclude Include="GPU.h" />
     <ClInclude Include="Memory.h" />
+    <ClInclude Include="Next.h" />
     <ClInclude Include="NSSDL.h" />
     <ClInclude Include="PC.h" />
     <ClInclude Include="SDLWindow.h" />
@@ -41,6 +43,7 @@
     <Text Include="Assembly Documentation.txt" />
     <Text Include="fontBasic.txt" />
     <Text Include="Program.txt" />
+    <Text Include="SquareDrawing.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
