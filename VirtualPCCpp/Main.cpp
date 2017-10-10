@@ -2,8 +2,8 @@
 #include <SDL.h>
 #endif
 
-#ifdef _LINUX
-#include <SDL/SDL.h>
+#ifdef __linux
+#include <SDL2/SDL.h>
 #endif
 
 #include <vector>
