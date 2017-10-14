@@ -21,17 +21,18 @@ class GPU {
 public:
 	Memory commandBuffer;
 	Memory commandArgBuffer;
+	std::vector<int> stack;
 	Memory vRam;
-	Memory* ram;
+	Memory& ram;
 	SDLWindow* screen;
-	u16 functionCounter;
-	u16 commandCounter;
-	u16 commandArgCounter;
-	u16 firstAvailableByte;
+	int functionCounter;
+	int commandCounter;
+	int commandArgCounter;
+	int firstAvailableByte;
 	u16 coreCount;
 	std::vector<character> characters;
 
-	GPU(int, int, int, int, SDLWindow*, Memory*);
+	GPU(int, int, int, int, SDLWindow*, Memory&);
 	void executeCommand();
 	void executeThread();
 	void tick();

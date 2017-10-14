@@ -37,14 +37,14 @@ int main(int argc, char* argv[]) {
 
 	SDLWindow pc1W(window2, surface2, pixelSpace2, renderer2, texture2, pixels2);
 
-	Memory ram1(4096);
+	Memory ram1(131072);
 	Memory hdd1(2048);
 
-	GPU gpu1(8192, 524288, 64, 16384, &pc1W, &ram1);
+	GPU gpu1(8192, 524288, 64, 16384, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
-	CPU cpu1(8192, ram1, gpu1);
+	CPU cpu1(32768, ram1, gpu1);
 
 	std::vector<std::string> code;
 

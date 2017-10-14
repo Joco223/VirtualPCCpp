@@ -82,5 +82,8 @@
     <Text Include="SquareDrawing.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="CPU Specification.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

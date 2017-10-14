@@ -18,18 +18,18 @@ JMP 0 -> it will jump to LOAD0_C rather than SET
 ---
 
 Instruction set:
-LOAD0_C24 - Load to register0 from cache, 3 bytes                 1 argument  (index of origin memory in cache)
-LOAD1_C24 - Load to register1 from cache, 3 bytes                 1 argument  (index of origin memory in cache)
-LOAD0_R24 - Load to register0 from ram, 3 bytes                   1 argument  (index of origin memory in ram)
-LOAD1_R24 - Load to register1 from ram, 3 bytes                   1 argument  (index of origin memory in ram)
-LOAD0_C16 - Load to register0 from cache, 2 bytes                 1 argument  (index of origin memory in cache)
-LOAD1_C16 - Load to register1 from cache, 2 bytes                 1 argument  (index of origin memory in cache)
-LOAD0_R16 - Load to register0 from ram, 2 bytes                   1 argument  (index of origin memory in ram)
-LOAD1_R16 - Load to register1 from ram, 2 bytes                   1 argument  (index of origin memory in ram)
-LOAD0_C8  - Load to register0 from cache, 1 byte                  1 argument  (index of origin memory in cache)
-LOAD1_C8  - Load to register1 from cache, 1 byte                  1 argument  (index of origin memory in cache)
-LOAD0_R8  - Load to register0 from ram, 1 byte                    1 argument  (index of origin memory in ram)
-LOAD1_R8  - Load to register1 from ram, 1 byte                    1 argument  (index of origin memory in ram)
+LOAD0_C24 - Load to register0 from cache, 3 bytes                1 argument  (index of origin memory in cache)
+LOAD1_C24 - Load to register1 from cache, 3 bytes                1 argument  (index of origin memory in cache)
+LOAD0_R24 - Load to register0 from ram, 3 bytes                  1 argument  (index of origin memory in ram)
+LOAD1_R24 - Load to register1 from ram, 3 bytes                  1 argument  (index of origin memory in ram)
+LOAD0_C16 - Load to register0 from cache, 2 bytes                1 argument  (index of origin memory in cache)
+LOAD1_C16 - Load to register1 from cache, 2 bytes                1 argument  (index of origin memory in cache)
+LOAD0_R16 - Load to register0 from ram, 2 bytes                  1 argument  (index of origin memory in ram)
+LOAD1_R16 - Load to register1 from ram, 2 bytes                  1 argument  (index of origin memory in ram)
+LOAD0_C8  - Load to register0 from cache, 1 byte                 1 argument  (index of origin memory in cache)
+LOAD1_C8  - Load to register1 from cache, 1 byte                 1 argument  (index of origin memory in cache)
+LOAD0_R8  - Load to register0 from ram, 1 byte                   1 argument  (index of origin memory in ram)
+LOAD1_R8  - Load to register1 from ram, 1 byte                   1 argument  (index of origin memory in ram)
 CLR0     - Clear register0,                                      0 arguments
 CLR1     - Clear register1,                                      0 arguments
 WRT0_C24 - Write from register0 to cache, 3 bytes                1 argument  (index of target memory in cache)
