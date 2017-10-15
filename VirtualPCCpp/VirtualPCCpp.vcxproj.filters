@@ -85,5 +85,11 @@
     <Text Include="CPU Specification.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="DrawLine.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="HDD.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

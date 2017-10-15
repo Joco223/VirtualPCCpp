@@ -289,7 +289,15 @@ void CPU::execute(u16 registerIns) {
 		break; }
 
 	case 53: { //Draw a character
-		
+		int position = register0;
+
+		gpu.commandBuffer.memory[gpu.commandCounter] = 4;
+
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 0] = (position & 0xff);
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 1] = (byte)(position >> 8);
+		gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = (byte)(position >> 16);
+
+		programCounter++;
 		break; }
 
 	case 55: { //Clear GPU commandBuffer

@@ -378,7 +378,9 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = 52;
 				line++;
 			}else if (instruction == "PRINT") {
-				//TODO
+				jumpPositions.push_back(currentPos);
+				cpu.cache.memory[currentPos++] = 53;
+				line++;
 			}else if (instruction == "CLR_COMM") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 55;

@@ -94,7 +94,51 @@ void GPU::executeCommand() {
 		break; }
 
 	case 4: {
-		//TODO
+		byte arg1p1 = commandArgBuffer.memory[commandArgCounter + 0];
+		byte arg1p2 = commandArgBuffer.memory[commandArgCounter + 1];
+		byte arg1p3 = commandArgBuffer.memory[commandArgCounter + 2];
+
+		int arg1 = arg1p3 << 16 | arg1p2 << 8 | (arg1p1 & 0xFF);
+
+		character cc = characters[ram.memory[arg1]];
+
+		for (int i = 0; i < 7; i++) {
+			std::string cr = cc.rows[i];
+			for (int j = 0; j < 5; j++) {
+				int xPos = (ram.memory[arg1 + 1] * 5) + j + 1;
+				byte b1, b2, b3;
+				convertByte(xPos, b1, b2, b3);
+				int yPos = (ram.memory[arg1 + 3] * 7) + i + 1;
+				byte b4, b5, b6;
+				convertByte(yPos, b4, b5, b6);
+				if (cr[j] == '0') {
+					vRam.memory[firstAvailableByte + 0] = 3;
+					vRam.memory[firstAvailableByte + 1] = b1;
+					vRam.memory[firstAvailableByte + 2] = b2;
+					vRam.memory[firstAvailableByte + 3] = b4;
+					vRam.memory[firstAvailableByte + 4] = b5;
+					vRam.memory[firstAvailableByte + 5] = ram.memory[arg1 + 10];
+					vRam.memory[firstAvailableByte + 6] = ram.memory[arg1 +  9];
+					vRam.memory[firstAvailableByte + 7] = ram.memory[arg1 +  8];
+
+					firstAvailableByte += 8;
+				}else if (cr[j] = '1') {
+					vRam.memory[firstAvailableByte + 0] = 3;
+					vRam.memory[firstAvailableByte + 1] = b1;
+					vRam.memory[firstAvailableByte + 2] = b2;
+					vRam.memory[firstAvailableByte + 3] = b4;
+					vRam.memory[firstAvailableByte + 4] = b5;
+					vRam.memory[firstAvailableByte + 5] = ram.memory[arg1 + 7];
+					vRam.memory[firstAvailableByte + 6] = ram.memory[arg1 + 6];
+					vRam.memory[firstAvailableByte + 7] = ram.memory[arg1 + 5];
+
+					firstAvailableByte += 8;
+				}
+			}
+		}
+
+		commandArgCounter += 6;
+		commandCounter++;
 		break; }
 
 	case 5: {
