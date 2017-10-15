@@ -41,8 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assembly Documentation.txt" />
-    <Text Include="CPU Specification.txt" />
-    <Text Include="DrawLine.txt" />
     <Text Include="fontBasic.txt" />
     <Text Include="HDD.txt" />
     <Text Include="Program.txt" />

@@ -10,42 +10,37 @@ SET instruction is not counted when using JMP or CMP, so:
 ---
 SET8 C 200 5
 SET8 C 201 5
-LOAD0_C8 200
-LOAD1_C8 201
+SET8 C 202 0
+LOAD0_8 200
+LOAD1_8 201
 SUM
 COT0
-JMP 0 -> it will jump to LOAD0_C rather than SET
+LOAD0_8 202
+JMP -> it will jump to LOAD0_C rather than SET
 ---
 
+Arguments are loaded into registers first, so you need to load them into registers
+Except for CMP where jump location is in register1 and condition you write next to it so -> CMP 1
+
 Instruction set:
-LOAD0_C24 - Load to register0 from cache, 3 bytes                1 argument  (index of origin memory in cache)
-LOAD1_C24 - Load to register1 from cache, 3 bytes                1 argument  (index of origin memory in cache)
-LOAD0_R24 - Load to register0 from ram, 3 bytes                  1 argument  (index of origin memory in ram)
-LOAD1_R24 - Load to register1 from ram, 3 bytes                  1 argument  (index of origin memory in ram)
-LOAD0_C16 - Load to register0 from cache, 2 bytes                1 argument  (index of origin memory in cache)
-LOAD1_C16 - Load to register1 from cache, 2 bytes                1 argument  (index of origin memory in cache)
-LOAD0_R16 - Load to register0 from ram, 2 bytes                  1 argument  (index of origin memory in ram)
-LOAD1_R16 - Load to register1 from ram, 2 bytes                  1 argument  (index of origin memory in ram)
-LOAD0_C8  - Load to register0 from cache, 1 byte                 1 argument  (index of origin memory in cache)
-LOAD1_C8  - Load to register1 from cache, 1 byte                 1 argument  (index of origin memory in cache)
-LOAD0_R8  - Load to register0 from ram, 1 byte                   1 argument  (index of origin memory in ram)
-LOAD1_R8  - Load to register1 from ram, 1 byte                   1 argument  (index of origin memory in ram)
+LOAD0_24 - Load to register0 from cache, 3 bytes                 1 argument  (index of origin memory in cache)
+LOAD1_24 - Load to register1 from cache, 3 bytes                 1 argument  (index of origin memory in cache)
+LOAD0_16 - Load to register0 from cache, 2 bytes                 1 argument  (index of origin memory in cache)
+LOAD1_16 - Load to register1 from cache, 2 bytes                 1 argument  (index of origin memory in cache)
+LOAD0_8  - Load to register0 from cache, 1 byte                  1 argument  (index of origin memory in cache)
+LOAD1_8  - Load to register1 from cache, 1 byte                  1 argument  (index of origin memory in cache)
 CLR0     - Clear register0,                                      0 arguments
 CLR1     - Clear register1,                                      0 arguments
-WRT0_C24 - Write from register0 to cache, 3 bytes                1 argument  (index of target memory in cache)
-WRT1_C24 - Write from register1 to cache, 3 bytes                1 argument  (index of target memory in cache)
-WRT0_R24 - Write from register0 to ram, 3 bytes                  1 argument  (index of target memory in ram)
-WRT1_R24 - Write from register1 to ram, 3 bytes                  1 argument  (index of target memory in ram)
-WRT0_C16 - Write from register0 to cache, 2 bytes                1 argument  (index of target memory in cache)
-WRT1_C16 - Write from register1 to cache, 2 bytes                1 argument  (index of target memory in cache)
-WRT0_R16 - Write from register0 to ram, 2 bytes                  1 argument  (index of target memory in ram)
-WRT1_R16 - Write from register1 to ram, 2 bytes                  1 argument  (index of target memory in ram)
-WRT0_C8  - Write from register0 to cache, 1 byte                 1 argument  (index of target memory in cache)
-WRT1_C8  - Write from register1 to cache, 1 byte                 1 argument  (index of target memory in cache)
-WRT0_R8  - Write from register0 to ram, 1 byte                   1 argument  (index of target memory in ram)
-WRT1_R8  - Write from register1 to ram, 1 byte                   1 argument  (index of target memory in ram)
+WRT0_24  - Write from register0 to cache, 3 bytes                1 argument  (index of target memory in cache)
+WRT1_24  - Write from register1 to cache, 3 bytes                1 argument  (index of target memory in cache)
+WRT0_16  - Write from register0 to cache, 2 bytes                1 argument  (index of target memory in cache)
+WRT1_16  - Write from register1 to cache, 2 bytes                1 argument  (index of target memory in cache)
+WRT0_8   - Write from register0 to cache, 1 byte                 1 argument  (index of target memory in cache)
+WRT1_8   - Write from register1 to cache, 1 byte                 1 argument  (index of target memory in cache)
 WRTC_R   - Write from cache to ram,                              2 arguments (index of origin memory in cache, index of target memory in ram)
 WRTR_C   - Write from ram to cache,                              2 arguments (index of origin memory in ram, index of target memory in cache)
+WRTR_H   - Write from ram to hdd,                                2 arguments (index of origin memory in ram, index of target memory in hdd)
+WRTH_R   - Write from hdd to ram,                                2 arguments (index of origin memory in hdd, index of target memory in ram)
 SUM      - Adds register0 and register1,                         0 arguments
 SUB      - Subtracts register0 and register1,                    0 arguments
 MLT      - Multiplies register0 and register1,                   0 arguments
@@ -60,72 +55,16 @@ JMP      - Sets program counter to target position,              1 argument  (ta
 CMP      - Compares register0 to a condition,                    2 arguments (0 or 1 for the condition (false or true), jump position if condition is met)
 COT0     - Print to console contents of register0,               0 arguments
 COT1     - Print to console contents of register1,               0 arguments
-WRT_R_VR - Write from RAM to vRAM,                               3 arguments (start position of memory in ram, end position of memory in ram, start position in memory of vram)
-WRT_VR_R - Write from vRAM to RAM,                               3 arguments (start position of memory in vram, end position of memory in vram, start position in memory of ram)
-DRAWP    - Draw rectangle on screen,                             7 arguments (start x position, start y position, end x position, end y position, r value, g value, b value)
-PRINT    - Print character to screen,                            6 arguments (character position in cpu cache, x position in character space, y position in character space, r value, g value, b value)
+DRAWP    - Draw rectangle on screen,                             2 arguments (start of data in ram, number of pixels)
+PRINT    - Print character to screen,                            1 argument  (start of data in ram)
 CHK_K    - Put current keyboard input value into cache,          1 argument  (place in cache)
 WAIT     - CPU waits a number of cycles,                         1 argument  (waiting time)
 CLR_COMM - Clears GPU command bufer,                             0 arguments
 CLR_VRAM - Clears GPU vRam,                                      0 arguments
-SET24   - Set a value to a place in cache/ram, 3 bytes           3 arguments (C/R depending where you want to set the value, position in memory, value)
-SET16   - Set a value to a place in cache/ram, 3 bytes           3 arguments (C/R depending where you want to set the value, position in memory, value)
-SET8    - Set a value to a place in cache/ram, 3 bytes           3 arguments (C/R depending where you want to set the value, position in memory, value)
-
-Examples:
-1. Print pressed keyboard character to PC screen
----
-SET8 C 201 1                    //Sets value 1 at position 201 in cpu cache
-SET8 C 202 60                   //Sets value 60 at position 202 in cpu cache
-CHK_K 220                       //Gets current key pressed and stores it at the position 220 in cache
-PRINT 220 201 201 202 202 202   //Prints character at position 220 in cache at position X: 1, Y: 1 and color values R: 60, G: 60, B: 60
-CLR_COMM CLR_VRAM               //Clears GPU command buffer and vRam after printing the character to prevent memory leaks
-JMP 0                           //Jumps to instuction 0 (in this case CHK_K)
----
-
-2.Arithmetic operations
----
-SET8 C 200 1  //Sets value 1 at position 200 in cpu cache
-SET8 C 201 5  //Sets value 5 at position 201 in cpu cache
-LOAD0_C8 200  //Loads value from position 200 in cpu cache to register 0
-LOAD1_C8 201  //Loads value from position 201 in cpu cache to register 1
-SUM           //Adds values from register 0 and register 1 and puts the result in register 0
-COT0          //Prints value of register 0 to console
----
-
-3.Logic operations
----
-SET8 C 200 5  //Sets value 5 at position 200 in cpu cache
-SET8 C 201 10 //Sets value 10 at position 201 in cpu cache
-LOAD0_C8 200  //Loads value from position 200 in cpu cache to register 0
-LOAD1_C8 201  //Loads value from position 201 in cpu cache to register 1
-REG0_BE       //Checks if register 0 holds a greater value than register 1, the result is stored in register 0
-COT0          //Prints the result (0 for false, 1 for true) to console
----
-
-4.If statement
----
-SET8 C 200 5  //Sets value 5 at position 200 in cpu cache
-SET8 C 201 10 //Sets value 10 at position 201 in cpu cache
-SET8 C 202 0  //Sets value 0 at position 202 in cache
-LOAD0_C8 200  //Loads value from position 200 in cpu cache to register 0
-LOAD1_C8 201  //Loads value from position 201 in cpu cache to register 1
-REG0_BE       //Checks if register 0 holds a greater value than register 1, the result is stored in register 0
-CMP 202 10    //Check if register 0 value is equal to 0 (false), if it is, jump to the end of the if statement (The trick is to CMP to the opposite of what you are checking for, since if you check for 1 and the condition is true, its going to jump over your if statement)
----
-
-5.For loop
----
-SET8 C 200 0   //Sets value 0 to position 200 in cpu cache
-SET8 C 201 1   //Sets value 1 to position 201 in cpu cache
-SET8 C 202 10  //Sets value 10 to position 202 in cpu cache
-LOAD0_C8 200   //Loads value from position 200 in cpu cache to register 0
-LOAD1_C8 201   //Loads value from position 201 in cpu cache to register 1
-SUM            //Adds values from register 0 and register 1 and puts the result in register 0
-LOAD1_C8 202   //Loads value from position 202 in cpu cache to register 1
-REG1_B         //Checks if register 1 holds a greater value than register 0 and stores the result in register 0
-CMP 201 0      //Checks if register 0 is equal to 1 (true), if yes, jump to start of the code at position 0, if not, continue with the code
----
+SET24    - Set a value to a place in cache/ram, 3 bytes          3 arguments (C/R depending where you want to set the value, position in memory, value)
+SET16    - Set a value to a place in cache/ram, 3 bytes          3 arguments (C/R depending where you want to set the value, position in memory, value)
+SET8     - Set a value to a place in cache/ram, 3 bytes          3 arguments (C/R depending where you want to set the value, position in memory, value)
+STOP     - Stops the PC (this one is always needed in the end of the program)
 
 Character codes:
 0:  0, -: 21, C: 42, X: 63, p: 84

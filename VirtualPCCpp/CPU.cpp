@@ -1,6 +1,6 @@
 #include "CPU.h"
 
-CPU::CPU(int cacheSize_, Memory& ram_, GPU& gpu_)
+CPU::CPU(int cacheSize_, int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_)
 	:
 	registerOP(0),
 	register0(0),
@@ -13,8 +13,36 @@ CPU::CPU(int cacheSize_, Memory& ram_, GPU& gpu_)
 	halt(false),
 	cache(Memory(cacheSize_)),
 	cacheSize(cacheSize_),
-	gpu(gpu_){
-	stack.resize(255);
+	sectorSize(sectorSize_),
+	numSectors(numSectors_),
+	hdd(hdd_),
+	gpu(gpu_)
+{
+
+	std::ifstream HDD;
+	HDD.open("HDD.txt");
+	std::string line;
+
+	int j = 0;
+	int i = 0;
+
+	if (HDD.is_open()){
+		while (getline (HDD,line)) {
+			std::string buf; 
+			std::stringstream ss(line);
+
+			while (ss >> buf) {
+				hdd.memory[j * sectorSize + i] = std::stoi(buf);
+				i++;
+			}
+			i = 0;
+			j++;
+		}
+	}
+
+	HDD.close();
+	HDD.open("HDD.txt", std::ios::out | std::ios::trunc);
+	HDD.close();
 }
 
 int CPU::checkArgument(int source, int size) {
@@ -28,6 +56,8 @@ int CPU::checkArgument(int source, int size) {
 		return register1;
 	}
 }
+
+extern bool quit;
 
 void CPU::execute(u16 registerIns) {
 	u16 opCode = registerIns;
@@ -148,24 +178,48 @@ void CPU::execute(u16 registerIns) {
 
 		int position2 = register1;
 
-		ram.memory[position2] = value;
+		ram.memory[position2] = cache.memory[value];
 		programCounter++;
 		break; }
 
 	case 15: { //Write from ram to cache
-		int memPos = register0;
-		int position = checkArgument(memPos, 3);
+		int position = register0;
 
-		int memPos2 = register1;
-		int position2 = checkArgument(memPos2, 3);
+		int position2 = register1;
 
 		cache.memory[position2] = ram.memory[position];
 		programCounter++;
 		break; }
 
-	case 16: { //Clear stack
-		stack.clear();
+	case 16: { //Write from ram to hdd
+		int position = register0;
+
+		int position2 = register1;
+
+		hdd.memory[position2] = ram.memory[position];
 		programCounter++;
+		break; }
+
+	case 17: { //Write from hdd to ram
+		int position = register0;
+
+		int position2 = register1;
+
+		ram.memory[position2] = hdd.memory[position];
+		programCounter++;
+		break; }
+
+	case 18: { //Shutdown the pc
+		std::ofstream file;
+		file.open("HDD.txt");
+		for (int i = 0; i < numSectors; i++) {
+			for (int j = 0; j < sectorSize; j++) {
+				file << (int)hdd.memory[i * sectorSize + j] << " ";
+			}
+			file << '\n';
+		}
+		file.close();
+		quit = true;
 		break; }
 
 	case 20: { //Add register0 and register1

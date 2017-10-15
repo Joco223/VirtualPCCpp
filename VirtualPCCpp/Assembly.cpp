@@ -36,18 +36,18 @@ namespace Assembly {
 
 		if (myfile.is_open()){
 			while (getline (myfile,line)) {
-				//if (!equal(prefix.begin(), prefix.end(), line.begin())) {
+				if (!equal(prefix.begin(), prefix.end(), line.begin())) {
 					if (line != "") {
 						lines.push_back(line);
 						std::string buf;
 						std::stringstream ss(line);
 
 						while (ss >> buf) {
-							//if (equal(prefix.begin(), prefix.end(), buf.begin())) {break;}
+							if (equal(prefix.begin(), prefix.end(), buf.begin())) {break;}
 							code.push_back(buf);
 						}
 					}		
-				//}
+				}
 			}
 		}
 	}
@@ -298,6 +298,14 @@ namespace Assembly {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 15;
 				line++;
+			}else if (instruction == "WRTR_H") {
+				jumpPositions.push_back(currentPos);
+				cpu.cache.memory[currentPos++] = 16;
+				line++;
+			}else if (instruction == "WRTH_R") {
+				jumpPositions.push_back(currentPos);
+				cpu.cache.memory[currentPos++] = 17;
+				line++;
 			}else if(instruction == "CLR_S") {
 				jumpPositions.push_back(currentPos);
 				cpu.cache.memory[currentPos++] = 16;
@@ -418,6 +426,10 @@ namespace Assembly {
 				cpu.cache.memory[currentPos++] = Arg1;
 
 				i++;
+				line++;
+			}else if(instruction == "STOP") {
+				jumpPositions.push_back(currentPos);
+				cpu.cache.memory[currentPos++] = 18;
 				line++;
 			}else if (instruction == "SET8") {
 				std::string arg1 = code[i + 1];
