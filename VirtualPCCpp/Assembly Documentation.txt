@@ -1,44 +1,29 @@
 General info:
-Arguments are used as positions in cpu cache, not values (Except for JMP, the argument is used as instruction count, CMP uses memory position as first argument, instruction count as second)
+Arguments are used as positions in cpu ram, not values (Except for JMP, the argument is used as instruction count, CMP uses memory position as first argument, instruction count as second)
 You explicitly need 1 space between instructions and arguments (or a new line)
 RGB values are limited from 0 to 127
 Character space is limited X: 0 - 56, Y: 0 - 26 (For the resolution of 320x240)
 Comments can be written with //, that line is ignored
 Each instruction needs to be in its own seperate line or error checking may be wrong
-
-SET instruction is not counted when using JMP or CMP, so:
----
-SET8 C 200 5
-SET8 C 201 5
-SET8 C 202 0
-LOAD0_8 200
-LOAD1_8 201
-SUM
-COT0
-LOAD0_8 202
-JMP -> it will jump to LOAD0_C rather than SET
----
-
+SET instruction is not counted when using JMP or CMP
 Arguments are loaded into registers first, so you need to load them into registers
 Except for CMP where jump location is in register1 and condition you write next to it so -> CMP 1
 
 Instruction set:
-LOAD0_24 - Load to register0 from cache, 3 bytes                 1 argument  (index of origin memory in cache)
-LOAD1_24 - Load to register1 from cache, 3 bytes                 1 argument  (index of origin memory in cache)
-LOAD0_16 - Load to register0 from cache, 2 bytes                 1 argument  (index of origin memory in cache)
-LOAD1_16 - Load to register1 from cache, 2 bytes                 1 argument  (index of origin memory in cache)
-LOAD0_8  - Load to register0 from cache, 1 byte                  1 argument  (index of origin memory in cache)
-LOAD1_8  - Load to register1 from cache, 1 byte                  1 argument  (index of origin memory in cache)
+LOAD0_24 - Load to register0 from ram, 3 bytes                   1 argument  (index of origin memory in ram)
+LOAD1_24 - Load to register1 from ram, 3 bytes                   1 argument  (index of origin memory in ram)
+LOAD0_16 - Load to register0 from ram, 2 bytes                   1 argument  (index of origin memory in ram)
+LOAD1_16 - Load to register1 from ram, 2 bytes                   1 argument  (index of origin memory in ram)
+LOAD0_8  - Load to register0 from ram, 1 byte                    1 argument  (index of origin memory in ram)
+LOAD1_8  - Load to register1 from ram, 1 byte                    1 argument  (index of origin memory in ram)
 CLR0     - Clear register0,                                      0 arguments
 CLR1     - Clear register1,                                      0 arguments
-WRT0_24  - Write from register0 to cache, 3 bytes                1 argument  (index of target memory in cache)
-WRT1_24  - Write from register1 to cache, 3 bytes                1 argument  (index of target memory in cache)
-WRT0_16  - Write from register0 to cache, 2 bytes                1 argument  (index of target memory in cache)
-WRT1_16  - Write from register1 to cache, 2 bytes                1 argument  (index of target memory in cache)
-WRT0_8   - Write from register0 to cache, 1 byte                 1 argument  (index of target memory in cache)
-WRT1_8   - Write from register1 to cache, 1 byte                 1 argument  (index of target memory in cache)
-WRTC_R   - Write from cache to ram,                              2 arguments (index of origin memory in cache, index of target memory in ram)
-WRTR_C   - Write from ram to cache,                              2 arguments (index of origin memory in ram, index of target memory in cache)
+WRT0_24  - Write from register0 to ram, 3 bytes                  1 argument  (index of target memory in ram)
+WRT1_24  - Write from register1 to ram, 3 bytes                  1 argument  (index of target memory in ram)
+WRT0_16  - Write from register0 to ram, 2 bytes                  1 argument  (index of target memory in ram)
+WRT1_16  - Write from register1 to ram, 2 bytes                  1 argument  (index of target memory in ram)
+WRT0_8   - Write from register0 to ram, 1 byte                   1 argument  (index of target memory in ram)
+WRT1_8   - Write from register1 to ram, 1 byte                   1 argument  (index of target memory in ram)
 WRTR_H   - Write from ram to hdd,                                2 arguments (index of origin memory in ram, index of target memory in hdd)
 WRTH_R   - Write from hdd to ram,                                2 arguments (index of origin memory in hdd, index of target memory in ram)
 SUM      - Adds register0 and register1,                         0 arguments
@@ -61,9 +46,9 @@ CHK_K    - Put current keyboard input value into cache,          1 argument  (pl
 WAIT     - CPU waits a number of cycles,                         1 argument  (waiting time)
 CLR_COMM - Clears GPU command bufer,                             0 arguments
 CLR_VRAM - Clears GPU vRam,                                      0 arguments
-SET24    - Set a value to a place in cache/ram, 3 bytes          3 arguments (C/R depending where you want to set the value, position in memory, value)
-SET16    - Set a value to a place in cache/ram, 3 bytes          3 arguments (C/R depending where you want to set the value, position in memory, value)
-SET8     - Set a value to a place in cache/ram, 3 bytes          3 arguments (C/R depending where you want to set the value, position in memory, value)
+SET24    - Set a value to a place in ram, 3 bytes                2 arguments (position in memory, value)
+SET16    - Set a value to a place in ram, 3 bytes                2 arguments (position in memory, value)
+SET8     - Set a value to a place in ram, 3 bytes                2 arguments (position in memory, value)
 STOP     - Stops the PC (this one is always needed in the end of the program)
 
 Character codes:

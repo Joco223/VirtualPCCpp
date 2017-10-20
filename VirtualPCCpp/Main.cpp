@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
-	CPU cpu1(32768, 128, 128, ram1, hdd1, gpu1);
+	CPU cpu1(128, 128, ram1, hdd1, gpu1);
 
 	std::vector<std::string> code;
 

@@ -14,14 +14,12 @@ typedef uint16_t u16;
 
 class CPU {
 public:
-	Memory cache;
 	Memory& ram;
 	Memory& hdd;
 	int registerOP;
 	int register0;
 	int register1;
 	int programCounter;
-	int cacheSize;
 	int firstAvailableS;
 	int sectorSize;
 	int numSectors;
@@ -31,7 +29,7 @@ public:
 	GPU& gpu;
 	bool halt;
 
-	CPU(int, int, int, Memory&, Memory&, GPU&);
+	CPU(int, int, Memory&, Memory&, GPU&);
 	int checkArgument(int, int);
 	void execute(u16);
 	void tick();

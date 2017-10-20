@@ -1,6 +1,6 @@
 #include "CPU.h"
 
-CPU::CPU(int cacheSize_, int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_)
+CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_)
 	:
 	registerOP(0),
 	register0(0),
@@ -11,8 +11,6 @@ CPU::CPU(int cacheSize_, int sectorSize_, int numSectors_, Memory& ram_, Memory&
 	firstAvailableS(0),
 	ram(ram_),
 	halt(false),
-	cache(Memory(cacheSize_)),
-	cacheSize(cacheSize_),
 	sectorSize(sectorSize_),
 	numSectors(numSectors_),
 	hdd(hdd_),
@@ -41,18 +39,16 @@ CPU::CPU(int cacheSize_, int sectorSize_, int numSectors_, Memory& ram_, Memory&
 	}
 
 	HDD.close();
-	HDD.open("HDD.txt", std::ios::out | std::ios::trunc);
-	HDD.close();
 }
 
 int CPU::checkArgument(int source, int size) {
-	if (source <= cacheSize) {
-		if(size == 1) { return cache.memory[source] & 0xFF; }
-		if(size == 2) { return cache.memory[source + 1] <<  8 | (cache.memory[source] & 0xFF); }
-		if(size == 3) { return cache.memory[source + 2] << 16 | cache.memory[source + 1] << 8 | (cache.memory[source] & 0xFF); }
-	}else if (source == cacheSize + 1) {
+	if (source <= ram.memory.size()) {
+		if(size == 1) { return ram.memory[source] & 0xFF; }
+		if(size == 2) { return ram.memory[source + 1] <<  8 | (ram.memory[source] & 0xFF); }
+		if(size == 3) { return ram.memory[source + 2] << 16 | (ram.memory[source + 1] << 8) | (ram.memory[source] & 0xFF); }
+	}else if (source == ram.memory.size() + 1) {
 		return register0;
-	}else if (source == cacheSize + 2) {
+	}else if (source == ram.memory.size() + 2) {
 		return register1;
 	}
 }
@@ -67,127 +63,107 @@ void CPU::execute(u16 registerIns) {
 		halt = true;
 		break; }
 
-	case 1: { //Load to register0 from cache, 3 bytes
-		byte arg1 = cache.memory[programCounter + 1];
-		int memPos = cache.memory[programCounter + 2] << 8 | arg1;
+	case 1: { //Load to register0 from ram, 3 bytes
+		byte arg1 = ram.memory[programCounter + 1];
+		int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 		register0 = checkArgument(memPos, 3);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 2: { //Load to register1 from cache, 3 bytes
-		byte arg1 = cache.memory[programCounter + 1];
-		int memPos = cache.memory[programCounter + 2] << 8 | arg1;
+	case 2: { //Load to register1 from ram, 3 bytes
+		byte arg1 = ram.memory[programCounter + 1];
+		int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 		register1 = checkArgument(memPos, 3);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 4: { //Load to register0 from cache, 2 bytes
-		byte arg1 = cache.memory[programCounter + 1];
-		int memPos = cache.memory[programCounter + 2] << 8 | arg1;
+	case 4: { //Load to register0 from ram, 2 bytes
+		byte arg1 = ram.memory[programCounter + 1];
+		int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 		register0 = checkArgument(memPos, 2);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 5: { //Load to register1 from cache, 2 bytes
-		byte arg1 = cache.memory[programCounter + 1];
-		int memPos = cache.memory[programCounter + 2] << 8 | arg1;
+	case 5: { //Load to register1 from ram, 2 bytes
+		byte arg1 = ram.memory[programCounter + 1];
+		int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 		register1 = checkArgument(memPos, 2);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 6: { //Load to register0 from cache, 1 byte
-		byte arg1 = cache.memory[programCounter + 1];
-		int memPos = cache.memory[programCounter + 2] << 8 | arg1;
+	case 6: { //Load to register0 from ram, 1 byte
+		byte arg1 = ram.memory[programCounter + 1];
+		int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 		register0 = checkArgument(memPos, 1);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 7: { //Load to register1 from cache, 1 byte
-		byte arg1 = cache.memory[programCounter + 1];
-		int memPos = cache.memory[programCounter + 2] << 8 | arg1;
+	case 7: { //Load to register1 from ram, 1 byte
+		byte arg1 = ram.memory[programCounter + 1];
+		int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 		register1 = checkArgument(memPos, 1);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 8: { //Write from register0 to cache 3 bytes
-		byte arg1 = cache.memory[programCounter + 1];
-		int memPos = cache.memory[programCounter + 2] << 8 | arg1;
+	case 8: { //Write from register0 to ram 3 bytes
+		byte arg1 = ram.memory[programCounter + 1];
+		int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 		int position = checkArgument(memPos, 3);
-		cache.memory[position] = register0 & 0xFF;
-		cache.memory[position + 1] = (byte)(register0 >> 8);
-		cache.memory[position + 2] = (byte)(register0 >> 16);
+		ram.memory[position] = register0 & 0xFF;
+		ram.memory[position + 1] = (byte)(register0 >> 8);
+		ram.memory[position + 2] = (byte)(register0 >> 16);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 9: { //Write from register1 to cache 3 bytes
-		byte arg1 = cache.memory[programCounter + 1];
-		int memPos = cache.memory[programCounter + 2] << 8 | arg1;
+	case 9: { //Write from register1 to ram 3 bytes
+		byte arg1 = ram.memory[programCounter + 1];
+		int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 		int position = checkArgument(memPos, 3);
-		cache.memory[position] = register1 & 0xFF;
-		cache.memory[position + 1] = (byte)(register1 >> 8);
-		cache.memory[position + 2] = (byte)(register1 >> 16);
+		ram.memory[position] = register1 & 0xFF;
+		ram.memory[position + 1] = (byte)(register1 >> 8);
+		ram.memory[position + 2] = (byte)(register1 >> 16);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 10: { //Write from register0 to cache 2 bytes
-		byte arg1 = cache.memory[programCounter + 1];
-		int position = cache.memory[programCounter + 2] << 8 | arg1;
-		//int position = checkArgument(memPos, 2);
-		cache.memory[position] = (register0 & 0xFF);
-		cache.memory[position + 1] = (byte)(register0 >> 8);
+	case 10: { //Write from register0 to ram 2 bytes
+		byte arg1 = ram.memory[programCounter + 1];
+		int position = ram.memory[programCounter + 2] << 8 | arg1;
+		ram.memory[position] = (register0 & 0xFF);
+		ram.memory[position + 1] = (byte)(register0 >> 8);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 11: { //Write from register1 to cache 2 bytes
-		byte arg1 = cache.memory[programCounter + 1];
-		int position = cache.memory[programCounter + 2] << 8 | arg1;
-		//int position = checkArgument(memPos, 2);
-		cache.memory[position] = (register1 & 0xFF);
-		cache.memory[position + 1] = (byte)(register1 >> 8);
+	case 11: { //Write from register1 to ram 2 bytes
+		byte arg1 = ram.memory[programCounter + 1];
+		int position = ram.memory[programCounter + 2] << 8 | arg1;
+		ram.memory[position] = (register1 & 0xFF);
+		ram.memory[position + 1] = (byte)(register1 >> 8);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 12: { //Write from register0 to cache 1 byte
-		byte arg1 = cache.memory[programCounter + 1];
-		int position = cache.memory[programCounter + 2] << 8 | arg1;
-		cache.memory[position] = (register0 & 0xFF);
+	case 12: { //Write from register0 to ram 1 byte
+		byte arg1 = ram.memory[programCounter + 1];
+		int position = ram.memory[programCounter + 2] << 8 | arg1;
+		ram.memory[position] = (register0 & 0xFF);
 		programCounter += 2;
 		programCounter++;
 		break; }
 
-	case 13: { //Write from register1 to cache 1 byte
-		byte arg1 = cache.memory[programCounter + 1];
-		int position = cache.memory[programCounter + 2] << 8 | arg1;
-		cache.memory[position] = (register1 & 0xFF);
+	case 13: { //Write from register1 to ram 1 byte
+		byte arg1 = ram.memory[programCounter + 1];
+		int position = ram.memory[programCounter + 2] << 8 | arg1;
+		ram.memory[position] = (register1 & 0xFF);
 		programCounter += 2;
-		programCounter++;
-		break; }
-
-	case 14: { //Write from cache to ram
-		int value = register0;
-
-		int position2 = register1;
-
-		ram.memory[position2] = cache.memory[value];
-		programCounter++;
-		break; }
-
-	case 15: { //Write from ram to cache
-		int position = register0;
-
-		int position2 = register1;
-
-		cache.memory[position2] = ram.memory[position];
 		programCounter++;
 		break; }
 
@@ -210,7 +186,12 @@ void CPU::execute(u16 registerIns) {
 		break; }
 
 	case 18: { //Shutdown the pc
+
 		std::ofstream file;
+
+		file.open("HDD.txt", std::ios::out | std::ios::trunc);
+		file.close();
+
 		file.open("HDD.txt");
 		for (int i = 0; i < numSectors; i++) {
 			for (int j = 0; j < sectorSize; j++) {
@@ -219,7 +200,9 @@ void CPU::execute(u16 registerIns) {
 			file << '\n';
 		}
 		file.close();
-		quit = true;
+		std::cout << '\n';
+		std::cout << "The PC has shut down" << '\n';
+		programCounter++;
 		break; }
 
 	case 20: { //Add register0 and register1
@@ -279,7 +262,7 @@ void CPU::execute(u16 registerIns) {
 		break; }
 
 	case 31: { //Compare to true/false
-		byte condition = cache.memory[programCounter + 1];
+		byte condition = ram.memory[programCounter + 1];
 		int position = register1;
 		if (register0 == condition) {
 			programCounter = position;
@@ -313,7 +296,7 @@ void CPU::execute(u16 registerIns) {
 	case 42: { //Write from keyboard input register to place in cache
 		int memPos = register0;
 		int position = checkArgument(memPos, 3);
-		cache.memory[position] = keyboardRegister;
+		ram.memory[position] = keyboardRegister;
 		programCounter++;
 		break; }
 
@@ -372,7 +355,7 @@ void CPU::execute(u16 registerIns) {
 
 void CPU::tick() {
 	if (halt == false) {
-		registerOP = cache.memory[programCounter];
+		registerOP = ram.memory[programCounter];
 		execute(registerOP);
 	}
 }
