@@ -24,7 +24,6 @@
     <ClCompile Include="GPU.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory.cpp" />
-    <ClCompile Include="Next.cpp" />
     <ClCompile Include="NSSDL.cpp" />
     <ClCompile Include="PC.cpp" />
     <ClCompile Include="SDLWindow.cpp" />
@@ -34,7 +33,6 @@
     <ClInclude Include="CPU.h" />
     <ClInclude Include="GPU.h" />
     <ClInclude Include="Memory.h" />
-    <ClInclude Include="Next.h" />
     <ClInclude Include="NSSDL.h" />
     <ClInclude Include="PC.h" />
     <ClInclude Include="SDLWindow.h" />
@@ -116,7 +114,7 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\jovanipavle\Documents\Visual Studio 2017\Libraries\SDL2-2.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -142,7 +140,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>

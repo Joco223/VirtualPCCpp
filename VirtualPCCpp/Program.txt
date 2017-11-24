@@ -1,9 +1,14 @@
-SET8 200 5
-SET8 201 5
+data_s
+u8 x 5
+u8 y 10
+u16 z 2
+data_e
 
-LOAD0_8 200
-LOAD1_8 201
-SUM
-COT0
+inter_s
+load0_8 y
+cot0
+inter_e
 
-STOP
+jmp z
+
+stop

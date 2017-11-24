@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 	Memory ram1(131072);
 	Memory hdd1(128 * 128);
 
-	GPU gpu1(8192, 524288, 64, 16384, &pc1W, ram1);
+	GPU gpu1(4096, 524288, 64, 16384, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
@@ -66,44 +66,7 @@ int main(int argc, char* argv[]) {
 				break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym) {
-					case SDLK_0: pc1.cpu.keyboardRegister = 0; break;
-					case SDLK_1: pc1.cpu.keyboardRegister = 1; break;
-					case SDLK_2: pc1.cpu.keyboardRegister = 2; break;
-					case SDLK_3: pc1.cpu.keyboardRegister = 3; break;
-					case SDLK_4: pc1.cpu.keyboardRegister = 4; break;
-					case SDLK_5: pc1.cpu.keyboardRegister = 5; break;
-					case SDLK_6: pc1.cpu.keyboardRegister = 6; break;
-					case SDLK_7: pc1.cpu.keyboardRegister = 7; break;
-					case SDLK_8: pc1.cpu.keyboardRegister = 8; break;
-					case SDLK_9: pc1.cpu.keyboardRegister = 9; break;
-					case SDLK_a: pc1.cpu.keyboardRegister = 40; break;
-					case SDLK_b: pc1.cpu.keyboardRegister = 41; break;
-					case SDLK_c: pc1.cpu.keyboardRegister = 42; break;
-					case SDLK_d: pc1.cpu.keyboardRegister = 43; break;
-					case SDLK_e: pc1.cpu.keyboardRegister = 44; break;
-					case SDLK_f: pc1.cpu.keyboardRegister = 45; break;
-					case SDLK_g: pc1.cpu.keyboardRegister = 46; break;
-					case SDLK_h: pc1.cpu.keyboardRegister = 47; break;
-					case SDLK_i: pc1.cpu.keyboardRegister = 48; break;
-					case SDLK_j: pc1.cpu.keyboardRegister = 49; break;
-					case SDLK_k: pc1.cpu.keyboardRegister = 50; break;
-					case SDLK_l: pc1.cpu.keyboardRegister = 51; break;
-					case SDLK_m: pc1.cpu.keyboardRegister = 52; break;
-					case SDLK_n: pc1.cpu.keyboardRegister = 53; break;
-					case SDLK_o: pc1.cpu.keyboardRegister = 54; break;
-					case SDLK_p: pc1.cpu.keyboardRegister = 55; break;
-					case SDLK_q: pc1.cpu.keyboardRegister = 56; break;
-					case SDLK_r: pc1.cpu.keyboardRegister = 57; break;
-					case SDLK_s: pc1.cpu.keyboardRegister = 58; break;
-					case SDLK_t: pc1.cpu.keyboardRegister = 59; break;
-					case SDLK_u: pc1.cpu.keyboardRegister = 60; break;
-					case SDLK_v: pc1.cpu.keyboardRegister = 61; break;
-					case SDLK_w: pc1.cpu.keyboardRegister = 62; break;
-					case SDLK_x: pc1.cpu.keyboardRegister = 63; break;
-					case SDLK_y: pc1.cpu.keyboardRegister = 64; break;
-					case SDLK_z: pc1.cpu.keyboardRegister = 65; break;
-					case SDLK_SPACE: pc1.cpu.keyboardRegister = 67; break;
-					case SDLK_BACKSPACE: pc1.cpu.keyboardRegister = 63000; break;
+					case SDLK_5: pc1.cpu.interrupted = true; break;
 				}
 				break;
 			}

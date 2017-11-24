@@ -94,21 +94,19 @@ void GPU::executeCommand() {
 		break; }
 
 	case 4: {
-		byte arg1p1 = commandArgBuffer.memory[commandArgCounter + 0];
-		byte arg1p2 = commandArgBuffer.memory[commandArgCounter + 1];
-		byte arg1p3 = commandArgBuffer.memory[commandArgCounter + 2];
+		byte arg1 = commandArgBuffer.memory[commandArgCounter + 0];
+		byte arg2 = commandArgBuffer.memory[commandArgCounter + 1];
+		byte arg3 = commandArgBuffer.memory[commandArgCounter + 2];
 
-		int arg1 = arg1p3 << 16 | arg1p2 << 8 | (arg1p1 & 0xFF);
-
-		character cc = characters[ram.memory[arg1]];
+		character cc = characters[arg1];
 
 		for (int i = 0; i < 7; i++) {
 			std::string cr = cc.rows[i];
-			for (int j = 0; j < 5; j++) {
-				int xPos = (ram.memory[arg1 + 1] * 5) + j + 1;
+			for (int j = 0; j < 6; j++) {
+				int xPos = (arg2 * 6) + j + 1;
 				byte b1, b2, b3;
 				convertByte(xPos, b1, b2, b3);
-				int yPos = (ram.memory[arg1 + 3] * 7) + i + 1;
+				int yPos = (arg3 * 7) + i + 1;
 				byte b4, b5, b6;
 				convertByte(yPos, b4, b5, b6);
 				if (cr[j] == '0') {
@@ -117,9 +115,9 @@ void GPU::executeCommand() {
 					vRam.memory[firstAvailableByte + 2] = b2;
 					vRam.memory[firstAvailableByte + 3] = b4;
 					vRam.memory[firstAvailableByte + 4] = b5;
-					vRam.memory[firstAvailableByte + 5] = ram.memory[arg1 + 10];
-					vRam.memory[firstAvailableByte + 6] = ram.memory[arg1 +  9];
-					vRam.memory[firstAvailableByte + 7] = ram.memory[arg1 +  8];
+					vRam.memory[firstAvailableByte + 5] = 0;
+					vRam.memory[firstAvailableByte + 6] = 0;
+					vRam.memory[firstAvailableByte + 7] = 0;
 
 					firstAvailableByte += 8;
 				}else if (cr[j] = '1') {
@@ -128,16 +126,16 @@ void GPU::executeCommand() {
 					vRam.memory[firstAvailableByte + 2] = b2;
 					vRam.memory[firstAvailableByte + 3] = b4;
 					vRam.memory[firstAvailableByte + 4] = b5;
-					vRam.memory[firstAvailableByte + 5] = ram.memory[arg1 + 7];
-					vRam.memory[firstAvailableByte + 6] = ram.memory[arg1 + 6];
-					vRam.memory[firstAvailableByte + 7] = ram.memory[arg1 + 5];
+					vRam.memory[firstAvailableByte + 5] = 255;
+					vRam.memory[firstAvailableByte + 6] = 255;
+					vRam.memory[firstAvailableByte + 7] = 255;
 
 					firstAvailableByte += 8;
 				}
 			}
 		}
 
-		commandArgCounter += 6;
+		commandArgCounter += 3;
 		commandCounter++;
 		break; }
 

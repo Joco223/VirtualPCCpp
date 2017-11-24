@@ -23,8 +23,12 @@ public:
 	int firstAvailableS;
 	int sectorSize;
 	int numSectors;
-	std::vector<int> stack;
-	u16 keyboardRegister;
+	int interruptRegister;
+	int interPos;
+	int interTartgetPos;
+	int currentIntPos;
+	bool interrupted;
+	std::vector<int> interruptBuffer;
 	u16 currentTime;
 	GPU& gpu;
 	bool halt;
@@ -32,5 +36,6 @@ public:
 	CPU(int, int, Memory&, Memory&, GPU&);
 	int checkArgument(int, int);
 	void execute(u16);
+	void interrupt();
 	void tick();
 };
