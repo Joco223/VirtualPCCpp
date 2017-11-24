@@ -267,11 +267,12 @@ void CPU::execute(u16 registerIns) {
 
 		case 31: { //Compare to true/false
 			byte condition = ram.memory[programCounter + 1];
-			int position = register1;
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
 			if (register0 == condition) {
 				programCounter = position;
 			}else if(register0 != condition){
-				programCounter++;
+				programCounter += 3;
 				programCounter++;
 			}
 			break; }
@@ -386,7 +387,7 @@ void CPU::interrupt(){
 
 void CPU::tick() {
 	if (halt == false) {
-		registerOP = ram.memory[programCounter];			
+		registerOP = ram.memory[programCounter];		
 		execute(registerOP);
 		interrupt();
 	}

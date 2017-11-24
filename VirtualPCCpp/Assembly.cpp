@@ -35,10 +35,12 @@ namespace Assembly {
 			arg = varValues[id];
 		}else if (varExists == false) {
 			if (argument == "REG0") {
-				arg = cpu.register0;
+				arg = cpu.ram.memory.size() + 1;
 			}else if (argument == "REG1") {
-				arg = cpu.register1;
-			}else{
+				arg = cpu.ram.memory.size() + 2;
+			}else if (argument == "REG_INT") {
+				arg = cpu.ram.memory.size() + 3;
+			}else {
 				arg = std::stoi(argument);
 			}
 		}	
@@ -459,6 +461,7 @@ namespace Assembly {
 					line++;
 				}else if (instruction == "cmp") {
 					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
 
 					jumpPositions.push_back(currentPos);
 					cpu.ram.memory[currentPos++] = 31;
@@ -466,11 +469,18 @@ namespace Assembly {
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
 
-					if(checkArgSize(Arg1, 1, instruction, i, 1) == true) { break; }
+					int Arg2;
+					checkArgType(Arg2, arg2, cpu, vars, varValues);
+
+					int pos = (cpu.ram.memory[Arg2 + 1] << 8 | cpu.ram.memory[Arg2]);
 
 					cpu.ram.memory[currentPos++] = (byte)Arg1;
+					byte b1, b2, b3;
+					convertByte(jumpPositions[pos], b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
 
-					i++;
+					i += 2;
 					line++;
 				}else if (instruction == "cot0") {
 					jumpPositions.push_back(currentPos);

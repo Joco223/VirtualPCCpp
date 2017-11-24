@@ -1,14 +1,31 @@
 data_s
-u8 x 5
-u8 y 10
-u16 z 2
+u8 x 0
+u8 x2 0
+u8 down 66
+u8 y 0
+u8 one 1
+u16 z 10
+u8 char 0
+u8 enter 95
 data_e
 
 inter_s
-load0_8 y
-cot0
+load0_8 REG_INT
+cs_out0 x y
+load0_8 x
+load1_8 one
+sum
+wrt0_8 x
+load0_8 x2
+load1_8 one
+sum
+wrt0_8 x2
 inter_e
 
+load0_8 down
+cs_out0 x2 y
+clr_comm
+clr_vram
 jmp z
 
 stop
