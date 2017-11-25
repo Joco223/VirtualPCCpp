@@ -298,14 +298,121 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 42: { //Write from keyboard input register to place in cache
-			int memPos = register0;
-			int position = checkArgument(memPos, 3);
-			//ram.memory[position] = (byte)keyboardRegister;
+		case 42: { //Load 3 bytes into register0 with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			register0 = checkArgument(memPos + offset * 3, 3);
+			programCounter += 4;
 			programCounter++;
 			break; }
 
-		case 50: { //Copy from RAM to VRAM
+		case 43: { //Load 3 bytes into register1 with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			register1 = checkArgument(memPos + offset * 3, 3);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 44: { //Load 2 bytes into register0 with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			register0 = checkArgument(memPos + offset * 2, 2);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 45: { //Load 2 bytes into register1 with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			register1 = checkArgument(memPos + offset * 2, 2);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 46: { //Load 1 byte into register0 with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			register0 = checkArgument(memPos + offset, 1);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 47: { //Load 1 byte into register1 with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			register1 = checkArgument(memPos + offset, 1);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 48: { //Write from register0 to ram 3 bytes with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			ram.memory[position + offset] = register0 & 0xFF;
+			ram.memory[position + 1 + offset] = (byte)(register0 >> 8);
+			ram.memory[position + 2 + offset] = (byte)(register0 >> 16);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 49: { //Write from register1 to ram 3 bytes with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			ram.memory[position + offset] = register1 & 0xFF;
+			ram.memory[position + 1 + offset] = (byte)(register1 >> 8);
+			ram.memory[position + 2 + offset] = (byte)(register1 >> 16);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 50: { //Write from register0 to ram 2 bytes with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			ram.memory[position + offset] = (register0 & 0xFF);
+			ram.memory[position + 1 + offset] = (byte)(register0 >> 8);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 51: { //Write from register1 to ram 2 bytes with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			ram.memory[position + offset] = (register1 & 0xFF);
+			ram.memory[position + 1 + offset] = (byte)(register1 >> 8);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 52: { //Write from register0 to ram 1 byte with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			ram.memory[position + offset] = (register0 & 0xFF);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 53: { //Write from register1 to ram 1 byte with offset
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
+			ram.memory[position + offset] = (register1 & 0xFF);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 60: { //Copy from RAM to VRAM
 			int position = register0;
 
 			int position2 = register1;
@@ -314,7 +421,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 51: { //Copy from VRAM to RAM
+		case 61: { //Copy from VRAM to RAM
 			int position = register0;
 
 			int position2 = register1;
@@ -323,7 +430,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 52: { //Draw a character
+		case 62: { //Draw a character from register0
 			byte arg1 = register0;
 			byte arg2 = ram.memory[ram.memory[programCounter + 1]];
 			byte arg3 = ram.memory[ram.memory[programCounter + 2]];
@@ -338,7 +445,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 53: { //Draw a character
+		case 63: { //Draw a character from reggister1
 			byte arg1 = register1;
 			byte arg2 = ram.memory[ram.memory[programCounter + 1]];
 			byte arg3 = ram.memory[ram.memory[programCounter + 2]];
@@ -353,12 +460,12 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 55: { //Clear GPU commandBuffer
+		case 65: { //Clear GPU commandBuffer
 			gpu.commandBuffer.memory[gpu.commandCounter] = 5;
 			programCounter++;
 			break; }
 
-		case 56: { //Clear GPU VRAM
+		case 66: { //Clear GPU VRAM
 			if (gpu.functionCounter == gpu.firstAvailableByte) {
 				gpu.commandBuffer.memory[gpu.commandCounter] = 6;
 				programCounter++;
