@@ -165,9 +165,10 @@ namespace Assembly {
 					int Arg2 = std::stoi(arg2);
 					varValues.push_back(additionalMemory);
 
-
 					for (int j = 0; j < Arg2; j++) {
-						cpu.ram.memory[additionalMemory++] = (byte)std::stoi(code[i + 3 + j]);
+						int element;
+						checkArgType(element, code[i + 3 + j], cpu, vars, varValues);
+						cpu.ram.memory[additionalMemory++] = (byte)element;
 					}
 
 					i += (2 + Arg2);
@@ -180,9 +181,10 @@ namespace Assembly {
 					varValues.push_back(additionalMemory);
 
 					for (int j = 0; j < Arg2; j++) {
-						int Arg3 = std::stoi(code[i + 3 + j]);
+						int element;
+						checkArgType(element, code[i + 3 + j], cpu, vars, varValues);
 						byte b1, b2, b3;
-						convertByte(Arg3, b1, b2, b3);
+						convertByte(element, b1, b2, b3);
 						cpu.ram.memory[additionalMemory++] = b1;
 						cpu.ram.memory[additionalMemory++] = b2;
 					}
@@ -197,9 +199,10 @@ namespace Assembly {
 					varValues.push_back(additionalMemory);
 
 					for (int j = 0; j < Arg2; j++) {
-						int Arg3 = std::stoi(code[i + 3 + j]);
+						int element;
+						checkArgType(element, code[i + 3 + j], cpu, vars, varValues);
 						byte b1, b2, b3;
-						convertByte(Arg3, b1, b2, b3);
+						convertByte(element, b1, b2, b3);
 						cpu.ram.memory[additionalMemory++] = b1;
 						cpu.ram.memory[additionalMemory++] = b2;
 						cpu.ram.memory[additionalMemory++] = b3;

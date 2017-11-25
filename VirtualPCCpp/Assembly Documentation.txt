@@ -10,7 +10,7 @@ Except for >cmp< where jump location is in register1 and condition you write nex
 You have data sections so you can do:
 data_s         //Start of data section
 u8 x 5         //Variable x with type of 1 byte and stored value 5
-u16a y 3 1 2 3 //Array y with type of 2 byte elements with values 1 2 and 3
+u16a y 3 1 2 3 //Array y with type of 2 byte elements (3 of them) with values 1 2 and 3
 data_e         //End of data section
 
 You have interrupt part of the code which allows you to do:
