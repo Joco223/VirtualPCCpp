@@ -41,8 +41,8 @@
     <Text Include="Assembly Documentation.txt" />
     <Text Include="fontBasic.txt" />
     <Text Include="HDD.txt" />
+    <Text Include="KeyboardInputExample.txt" />
     <Text Include="Program.txt" />
-    <Text Include="SquareDrawing.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

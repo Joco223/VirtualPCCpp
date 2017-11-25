@@ -73,10 +73,10 @@
     <Text Include="Assembly Documentation.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="SquareDrawing.txt">
+    <Text Include="HDD.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="HDD.txt">
+    <Text Include="KeyboardInputExample.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
