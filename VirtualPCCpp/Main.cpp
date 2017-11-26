@@ -112,8 +112,9 @@ int main(int argc, char* argv[]) {
 					case SDLK_z: pc1.cpu.interrupted = true; if(caps_lock == true) { pc1.cpu.interruptRegister = 65; } else { pc1.cpu.interruptRegister = 94; } break;
 					case SDLK_MINUS: pc1.cpu.interrupted = true; if(shift == true) { pc1.cpu.interruptRegister = 66; } else { pc1.cpu.interruptRegister = 21; } break;
 					case SDLK_PLUS: pc1.cpu.interrupted = true; if(shift == true) { pc1.cpu.interruptRegister = 30; } else { pc1.cpu.interruptRegister = 20; } break;
+					case SDLK_BACKSPACE: pc1.cpu.interrupted = true; pc1.cpu.interruptRegister = 96; break;
 					case SDLK_SPACE: pc1.cpu.interrupted = true; pc1.cpu.interruptRegister = 67; break;
-					case SDLK_KP_ENTER: pc1.cpu.interrupted = true; pc1.cpu.interruptRegister = 95; break;
+					case SDLK_RETURN: pc1.cpu.interrupted = true; pc1.cpu.interruptRegister = 95; break;
 				}
 				break;
 			}

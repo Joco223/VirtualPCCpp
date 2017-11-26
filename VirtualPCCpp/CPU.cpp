@@ -267,13 +267,13 @@ void CPU::execute(u16 registerIns) {
 
 		case 31: { //Compare to true/false
 			byte condition = ram.memory[programCounter + 1];
-			byte arg1 = ram.memory[programCounter + 1];
-			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			byte arg1 = ram.memory[programCounter + 2];
+			int position = ram.memory[programCounter + 3] << 8 | arg1;
 			if (register0 == condition) {
-				programCounter = position;
-			}else if(register0 != condition){
 				programCounter += 3;
 				programCounter++;
+			}else if(register0 != condition){
+				programCounter = position;	
 			}
 			break; }
 
@@ -408,6 +408,27 @@ void CPU::execute(u16 registerIns) {
 			int position = ram.memory[programCounter + 2] << 8 | arg1;
 			int offset = checkArgument(ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3], 1);
 			ram.memory[position + offset] = (register1 & 0xFF);
+			programCounter += 4;
+			programCounter++;
+			break; }
+
+		case 54: { //Compare two arrays of 8bit elements if they are the same (Up to 8 elements length)
+			int size = register0;
+			int pos1 = ram.memory[programCounter + 2] << 8 | ram.memory[programCounter + 1];
+			int pos2 = ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3];
+
+			bool same = true;
+			
+			for (int i = 0; i < size; i++) {
+				int left = checkArgument(pos1 + i, 1);
+				int right = checkArgument(pos2 + i, 1);
+				if (left != right) {
+					same = false;
+					break;
+				}
+			}
+
+			register0 = same;
 			programCounter += 4;
 			programCounter++;
 			break; }
