@@ -16,7 +16,7 @@ data_e         //End of data section
 You have interrupt part of the code which allows you to do:
 inter_s //Start of interrupt code
 //Any instruction can go here
-inter_e //End of interrupt code
+inter_e //End of interrupt code (Keep in mind that this counts as an instruction for jmp and cmp, so don't miss it when counting)
 
 Interrupt code executes on an interrupt, current ones are only keyboard input
 
