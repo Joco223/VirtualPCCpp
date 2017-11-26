@@ -62,7 +62,8 @@ reg1_be   - Check if register1 is greater or equal to register0,  0 arguments
 reg_eql   - Check if register0 and register1 are the same size,   0 arguments
 reg_dif   - Check if register0 and register1 are different size,  0 arguments
 jmp       - Sets program counter to target position,              1 argument  (target assembly instruction)
-cmp       - Compares register0 to a condition,                    2 arguments (0 or 1 for the condition (false or true), jump position if condition is met)
+cmp       - Compares register0 to a condition,                    2 arguments (0 or 1 for the condition (false or true), jump position if condition is not met)
+cmp_a     - Compares if two arrays contain same elements          2 arguments (size needs of arrays (they need to be same) needs to be loaded into register0, first array, second array)
 cot0      - Print to console contents of register0,               0 arguments
 cot1      - Print to console contents of register1,               0 arguments
 chk_k     - Put current keyboard input value into cache,          1 argument  (place in cache)
