@@ -19,6 +19,23 @@ namespace Assembly {
 		}
 	}
 
+	void checkJmpPos(int& arg, std::string argument, std::vector<std::string>& jumpNames, std::vector<int> jumpPos) {
+		bool varExists = false;
+		int id = 0;
+
+		for (unsigned int i = 0; i < jumpNames.size(); i++) {
+			if (argument == jumpNames[i]) {
+				varExists = true;
+				id = i;
+				break;
+			}
+		}
+
+		if (varExists == true) {
+			arg = jumpPos[id];
+		}
+	}
+
 	void checkArgType(int& arg, std::string& argument, CPU& cpu, std::vector<std::string>& vars, std::vector<int>& varValues) {
 		bool varExists = false;
 		int id = 0;
@@ -77,6 +94,7 @@ namespace Assembly {
 		int line = 0;
 		std::vector<int> jumpPositions;
 		std::vector<std::string> vars;
+		std::vector<std::string> jumpNames;
 		std::vector<int> varValues;
 
 		bool dataM = false;
@@ -108,6 +126,7 @@ namespace Assembly {
 
 			if (instruction == "inter_e") {
 				interM = false;
+				currentPos += 3;
 				i++;
 				instruction = code[i];
 			}
@@ -164,241 +183,201 @@ namespace Assembly {
 				}
 			}else if (dataM == false) {
 				if (instruction == "load0_8") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "load1_8") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "load0_16") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "load1_16") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "load0_24") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "load1_24") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "load0_8a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "load1_8a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "load0_16a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "load1_16a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "load0_24a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "load1_24a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "clr0") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "clr1") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "wrt0_24") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "wrt1_24") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "wrt0_16") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "wrt1_16") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "wrt0_8") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "wrt1_8") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "wrt0_24a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "wrt1_24a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "wrt0_16a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "wrt1_16a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "wrt0_8a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "wrt1_8a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "wrtR_H") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "wrtH_R") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "sum") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "sub") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "mlt") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "div") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "reg0_b") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "reg0_be") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "reg1_b") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "reg1_be") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "reg_eql") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "reg_dif") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "jmp") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i++;
 					line++;
 				}else if (instruction == "cmp") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 4;
 					i += 2;
 					line++;
 				}else if (instruction == "cmp_a") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 5;
 					i += 2;
 					line++;
 				}else if (instruction == "cot0") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "cot1") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "cs_out0") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i += 2;
 					line++;
 				}else if (instruction == "cs_out1") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 3;
 					i += 2;
 					line++;
 				}else if (instruction == "clr_comm") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "clr_vram") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else if (instruction == "wait") {
-					jumpPositions.push_back(currentPos);
 					currentPos += 2;
 					i++;
 					line++;
 				}else if(instruction == "stop") {
-					jumpPositions.push_back(currentPos);
 					currentPos++;
 					line++;
 				}else{
-					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
-					std::cout << '\n';
-					std::cout << lines[line] << '\n';
-					std::cout << "^" << '\n';
-					std::cout << '\n';
-					std::cout << "Compilation terminated." << '\n';
-					cpu.ram.Clear();
-					break;
+					if (instruction.back() == ':') {
+						std::string tmp = instruction;
+						tmp.erase(tmp.end() - 1);
+						jumpNames.push_back(tmp);
+						jumpPositions.push_back(currentPos);
+						line++;
+					}else{
+						std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
+						std::cout << '\n';
+						std::cout << lines[line] << '\n';
+						std::cout << "^" << '\n';
+						std::cout << '\n';
+						std::cout << "Compilation terminated." << '\n';
+						cpu.ram.Clear();
+						break;
+					}	
 				}
+
 			}
 
 		}
@@ -413,6 +392,7 @@ namespace Assembly {
 			if(instruction == "data_s") {
 				dataM = true;
 				i++;
+				line++;
 				instruction = code[i];
 			}
 
@@ -421,6 +401,7 @@ namespace Assembly {
 				currentPos += additionalMemory;
 				cpu.programCounter = currentPos;
 				i++;
+				line++;
 				instruction = code[i];
 			}
 
@@ -428,6 +409,7 @@ namespace Assembly {
 				interM = true;
 				cpu.interPos = currentPos;
 				i++;
+				line++;
 				instruction = code[i];
 			}
 
@@ -439,6 +421,7 @@ namespace Assembly {
 				cpu.ram.memory[currentPos++] = 0;
 				cpu.programCounter = currentPos;
 				i++;
+				line++;
 				instruction = code[i];
 			}
 
@@ -453,6 +436,7 @@ namespace Assembly {
 
 					cpu.ram.memory[additionalMemory++] = (byte)Arg2;
 					i += 2;
+					line++;
 				}else if (instruction == "u16") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -466,6 +450,7 @@ namespace Assembly {
 					cpu.ram.memory[additionalMemory++] = b1;
 					cpu.ram.memory[additionalMemory++] = b2;
 					i += 2;
+					line++;
 				}else if (instruction == "u24") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -480,6 +465,7 @@ namespace Assembly {
 					cpu.ram.memory[additionalMemory++] = b2;
 					cpu.ram.memory[additionalMemory++] = b3;
 					i += 2;
+					line++;
 				}else if(instruction == "u8a") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -495,6 +481,7 @@ namespace Assembly {
 					}
 
 					i += (2 + Arg2);
+					line++;
 				}else if(instruction == "u16a") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -513,6 +500,7 @@ namespace Assembly {
 					}
 
 					i += 2 + Arg2;
+					line++;
 				}else if(instruction == "u24a") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -532,6 +520,7 @@ namespace Assembly {
 					}
 
 					i += 2 + Arg2;
+					line++;
 				}else {
 					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
 					std::cout << '\n';
@@ -1103,15 +1092,14 @@ namespace Assembly {
 					line++;
 				}else if (instruction == "jmp") {
 					std::string arg1 = code[i + 1];
-					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					int pos;
 					
 					cpu.ram.memory[currentPos++] = 30;
 
-					int pos = (cpu.ram.memory[Arg1 + 1] << 8 | cpu.ram.memory[Arg1]);
+					checkJmpPos(pos, arg1, jumpNames, jumpPositions);
 
 					byte b1, b2, b3;
-					convertByte(jumpPositions[pos], b1, b2, b3);
+					convertByte(pos, b1, b2, b3);
 					cpu.ram.memory[currentPos++] = b1;
 					cpu.ram.memory[currentPos++] = b2;
 
@@ -1126,14 +1114,13 @@ namespace Assembly {
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
 
-					int Arg2;
-					checkArgType(Arg2, arg2, cpu, vars, varValues);
-					
-					int pos = (cpu.ram.memory[Arg2 + 1] << 8 | cpu.ram.memory[Arg2]);
+					int pos;
+
+					checkJmpPos(pos, arg2, jumpNames, jumpPositions);
 
 					cpu.ram.memory[currentPos++] = (byte)Arg1;
 					byte b1, b2, b3;
-					convertByte(jumpPositions[pos], b1, b2, b3);
+					convertByte(pos, b1, b2, b3);
 					cpu.ram.memory[currentPos++] = b1;
 					cpu.ram.memory[currentPos++] = b2;
 
@@ -1228,15 +1215,20 @@ namespace Assembly {
 					hasStop = true;
 					line++;
 				}else{
-					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
-					std::cout << '\n';
-					std::cout << lines[line] << '\n';
-					std::cout << "^" << '\n';
-					std::cout << '\n';
-					std::cout << "Compilation terminated." << '\n';
-					cpu.ram.Clear();
-					break;
+					if (instruction.back() == ':') {
+						line++;
+					}else{
+						std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
+						std::cout << '\n';
+						std::cout << lines[line] << '\n';
+						std::cout << "^" << '\n';
+						std::cout << '\n';
+						std::cout << "Compilation terminated." << '\n';
+						cpu.ram.Clear();
+						break;
+					}	
 				}
+
 			}
 
 		}

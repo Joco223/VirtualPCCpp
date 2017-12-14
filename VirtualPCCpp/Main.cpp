@@ -120,13 +120,12 @@ int main(int argc, char* argv[]) {
 			}
 	
 		}
+
 		pc1.cpu.tick();
 		gpu1.executeCommand();
 		gpu1.tick();
 		NSSDL::updateSDL(pc1.screen);
 	}
-
-	NSSDL::cleanSDL(pc1.screen);
 
 	SDL_Quit();
 

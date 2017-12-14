@@ -1,11 +1,9 @@
 General info:
-Arguments are used as positions in cpu ram, not values (Except for >jmp<, the argument is used as instruction count, >cmp< uses memory position as first argument, instruction count as second)
 You explicitly need 1 space between instructions and arguments (or a new line)
 RGB values are limited from 0 to 127
 Character space is limited X: 0 - 56, Y: 0 - 26 (For the resolution of 320x240)
 Comments can be written with //, that line is ignored
 Each instruction needs to be in its own seperate line or error checking may be wrong
-Except for >cmp< where jump location is in register1 and condition you write next to it so -> cmp 1
 
 You have data sections so you can do:
 data_s         //Start of data section
@@ -16,7 +14,13 @@ data_e         //End of data section
 You have interrupt part of the code which allows you to do:
 inter_s //Start of interrupt code
 //Any instruction can go here
-inter_e //End of interrupt code (Keep in mind that this counts as an instruction for jmp and cmp, so don't miss it when counting)
+inter_e //End of interrupt code 
+
+You can set jump postions for jmp and cmp instructions
+
+forward:
+
+You define jump positions by typing the name of it and putting a colon at the end of it
 
 Interrupt code executes on an interrupt, current ones are only keyboard input
 
@@ -61,7 +65,7 @@ reg1_b    - Check if register1 is greater than register0,         0 arguments
 reg1_be   - Check if register1 is greater or equal to register0,  0 arguments
 reg_eql   - Check if register0 and register1 are the same size,   0 arguments
 reg_dif   - Check if register0 and register1 are different size,  0 arguments
-jmp       - Sets program counter to target position,              1 argument  (target assembly instruction)
+jmp       - Sets program counter to target position,              1 argument  (target jump position)
 cmp       - Compares register0 to a condition,                    2 arguments (0 or 1 for the condition (false or true), jump position if condition is not met)
 cmp_a     - Compares if two arrays contain same elements          2 arguments (size needs of arrays (they need to be same) needs to be loaded into register0, first array, second array)
 cot0      - Print to console contents of register0,               0 arguments
@@ -94,4 +98,9 @@ $: 13,  {: 34,  P: 55,  h: 76,
 ): 18,  ~: 39,  U: 60,  m: 81,
 *: 19,  A: 40,  V: 61,  n: 82,
 +: 20,  B: 41,  W: 62,  o: 83,
+
+Keyboard character codes:
+Backspace: 96,
+Space:     67,
+Return:    95
 

@@ -272,7 +272,7 @@ void CPU::execute(u16 registerIns) {
 			if (register0 == condition) {
 				programCounter += 3;
 				programCounter++;
-			}else if(register0 != condition){
+			}else if(register0 != condition){		
 				programCounter = position;	
 			}
 			break; }
@@ -515,7 +515,7 @@ void CPU::interrupt(){
 
 void CPU::tick() {
 	if (halt == false) {
-		registerOP = ram.memory[programCounter];		
+		registerOP = ram.memory[programCounter];
 		execute(registerOP);
 		interrupt();
 	}

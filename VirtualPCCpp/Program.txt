@@ -7,14 +7,10 @@ u8a target 11 84 80 73 69 87 73 67 91 83 86 79 //Little easter egg here :)
 u8a current 11 0 0 0 0 0 0 0 0 0 0 0
 u8 y 0
 u8 one 1
-u16 return 71
 u8 char 0
 u8 enter 95
 u8 back 96
 u8 zero 0
-u16 forward 17
-u16 forward2 58
-u16 forward3 48
 u8 three 11
 u8 n 82
 u8 o 83
@@ -40,6 +36,7 @@ sub
 wrt0_8 x2
 jmp return
 
+forward:
 load0_8 REG_INT
 load1_8 enter
 reg_eql
@@ -73,6 +70,7 @@ wrt0_8 x
 wrt0_8 x2
 jmp return
 
+forward3:
 load0_8 space
 cs_out0 x2 y 
 load0_8 zero
@@ -84,6 +82,7 @@ sum
 wrt0_8 y
 jmp return
 
+forward2:
 load0_8 REG_INT
 wrt0_8a current x
 load0_8 REG_INT
@@ -98,6 +97,7 @@ sum
 wrt0_8 x2
 inter_e
 
+return:
 load0_8 down
 cs_out0 x2 y
 clr_comm

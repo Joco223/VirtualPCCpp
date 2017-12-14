@@ -79,8 +79,5 @@
     <Text Include="KeyboardInputExample.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="AdvancedKeyboardInputExample.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>
