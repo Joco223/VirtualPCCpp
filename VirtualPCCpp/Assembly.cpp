@@ -535,7 +535,7 @@ namespace Assembly {
 				if (instruction == "load0_8") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 6;
+					cpu.ram.memory[currentPos++] = 5;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -552,7 +552,7 @@ namespace Assembly {
 				}else if (instruction == "load1_8") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 7;
+					cpu.ram.memory[currentPos++] = 6;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -569,7 +569,7 @@ namespace Assembly {
 				}else if (instruction == "load0_16") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 4;
+					cpu.ram.memory[currentPos++] = 3;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -586,7 +586,7 @@ namespace Assembly {
 				}else if (instruction == "load1_16") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 5;
+					cpu.ram.memory[currentPos++] = 4;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -799,7 +799,7 @@ namespace Assembly {
 				}else if (instruction == "wrt0_24") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 8;
+					cpu.ram.memory[currentPos++] = 7;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -816,7 +816,7 @@ namespace Assembly {
 				}else if (instruction == "wrt1_24") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 9;
+					cpu.ram.memory[currentPos++] = 8;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -833,7 +833,7 @@ namespace Assembly {
 				}else if (instruction == "wrt0_16") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 10;
+					cpu.ram.memory[currentPos++] = 9;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -850,7 +850,7 @@ namespace Assembly {
 				}else if (instruction == "wrt1_16") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 11;
+					cpu.ram.memory[currentPos++] = 10;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -867,7 +867,7 @@ namespace Assembly {
 				}else if (instruction == "wrt0_8") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 12;
+					cpu.ram.memory[currentPos++] = 11;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -884,7 +884,7 @@ namespace Assembly {
 				}else if (instruction == "wrt1_8") {
 					std::string arg1 = code[i + 1];
 
-					cpu.ram.memory[currentPos++] = 13;
+					cpu.ram.memory[currentPos++] = 12;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, cpu, vars, varValues);
@@ -1055,10 +1055,10 @@ namespace Assembly {
 					i += 2;
 					line++;
 				}else if (instruction == "wrtR_H") {
-					cpu.ram.memory[currentPos++] = 16;
+					cpu.ram.memory[currentPos++] = 15;
 					line++;
 				}else if (instruction == "wrtH_R") {
-					cpu.ram.memory[currentPos++] = 17;
+					cpu.ram.memory[currentPos++] = 16;
 					line++;
 				}else if (instruction == "sum") {
 					cpu.ram.memory[currentPos++] = 20;
@@ -1211,7 +1211,7 @@ namespace Assembly {
 					i++;
 					line++;
 				}else if(instruction == "stop") {
-					cpu.ram.memory[currentPos++] = 18;
+					cpu.ram.memory[currentPos++] = 17;
 					hasStop = true;
 					line++;
 				}else{

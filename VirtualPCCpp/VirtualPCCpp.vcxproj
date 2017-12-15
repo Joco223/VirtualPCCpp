@@ -38,6 +38,7 @@
     <ClInclude Include="SDLWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="CPU Documentation.txt" />
     <Text Include="KeyboardInputExample.txt" />
     <Text Include="Assembly Documentation.txt" />
     <Text Include="fontBasic.txt" />

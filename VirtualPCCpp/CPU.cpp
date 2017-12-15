@@ -8,7 +8,6 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 	programCounter(0),
 	interruptRegister(0),
 	currentTime(0),
-	firstAvailableS(0),
 	ram(ram_),
 	halt(false),
 	interrupted(false),
@@ -84,7 +83,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 4: { //Load to register0 from ram, 2 bytes
+		case 3: { //Load to register0 from ram, 2 bytes
 			byte arg1 = ram.memory[programCounter + 1];
 			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 			register0 = checkArgument(memPos, 2);
@@ -92,7 +91,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 5: { //Load to register1 from ram, 2 bytes
+		case 4: { //Load to register1 from ram, 2 bytes
 			byte arg1 = ram.memory[programCounter + 1];
 			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 			register1 = checkArgument(memPos, 2);
@@ -100,7 +99,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 6: { //Load to register0 from ram, 1 byte
+		case 5: { //Load to register0 from ram, 1 byte
 			byte arg1 = ram.memory[programCounter + 1];
 			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 			register0 = checkArgument(memPos, 1);
@@ -108,7 +107,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 7: { //Load to register1 from ram, 1 byte
+		case 6: { //Load to register1 from ram, 1 byte
 			byte arg1 = ram.memory[programCounter + 1];
 			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
 			register1 = checkArgument(memPos, 1);
@@ -116,7 +115,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 8: { //Write from register0 to ram 3 bytes
+		case 7: { //Write from register0 to ram 3 bytes
 			byte arg1 = ram.memory[programCounter + 1];
 			int position = ram.memory[programCounter + 2] << 8 | arg1;
 			ram.memory[position] = register0 & 0xFF;
@@ -126,7 +125,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 9: { //Write from register1 to ram 3 bytes
+		case 8: { //Write from register1 to ram 3 bytes
 			byte arg1 = ram.memory[programCounter + 1];
 			int position = ram.memory[programCounter + 2] << 8 | arg1;
 			ram.memory[position] = register1 & 0xFF;
@@ -136,7 +135,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 10: { //Write from register0 to ram 2 bytes
+		case 9: { //Write from register0 to ram 2 bytes
 			byte arg1 = ram.memory[programCounter + 1];
 			int position = ram.memory[programCounter + 2] << 8 | arg1;
 			ram.memory[position] = (register0 & 0xFF);
@@ -145,7 +144,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 11: { //Write from register1 to ram 2 bytes
+		case 10: { //Write from register1 to ram 2 bytes
 			byte arg1 = ram.memory[programCounter + 1];
 			int position = ram.memory[programCounter + 2] << 8 | arg1;
 			ram.memory[position] = (register1 & 0xFF);
@@ -154,7 +153,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 12: { //Write from register0 to ram 1 byte
+		case 11: { //Write from register0 to ram 1 byte
 			byte arg1 = ram.memory[programCounter + 1];
 			int position = ram.memory[programCounter + 2] << 8 | arg1;
 			ram.memory[position] = (register0 & 0xFF);
@@ -162,7 +161,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 13: { //Write from register1 to ram 1 byte
+		case 12: { //Write from register1 to ram 1 byte
 			byte arg1 = ram.memory[programCounter + 1];
 			int position = ram.memory[programCounter + 2] << 8 | arg1;
 			ram.memory[position] = (register1 & 0xFF);
@@ -170,7 +169,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 16: { //Write from ram to hdd
+		case 15: { //Write from ram to hdd
 			int position = register0;
 
 			int position2 = register1;
@@ -179,7 +178,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 17: { //Write from hdd to ram
+		case 16: { //Write from hdd to ram
 			int position = register0;
 
 			int position2 = register1;
@@ -188,7 +187,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 18: { //Shutdown the pc
+		case 17: { //Shutdown the pc
 			std::ofstream file;
 
 			file.open("HDD.txt", std::ios::out | std::ios::trunc);
@@ -433,7 +432,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 60: { //Copy from RAM to VRAM
+		/*case 60: { //Copy from RAM to VRAM
 			int position = register0;
 
 			int position2 = register1;
@@ -449,7 +448,7 @@ void CPU::execute(u16 registerIns) {
 
 			ram.memory[position2] = gpu.vRam.memory[position];
 			programCounter++;
-			break; }
+			break; }*/
 
 		case 62: { //Draw a character from register0
 			byte arg1 = register0;
@@ -466,7 +465,7 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		case 63: { //Draw a character from reggister1
+		case 63: { //Draw a character from register1
 			byte arg1 = register1;
 			byte arg2 = ram.memory[ram.memory[programCounter + 1]];
 			byte arg3 = ram.memory[ram.memory[programCounter + 2]];

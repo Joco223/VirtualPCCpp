@@ -20,7 +20,6 @@ public:
 	int register0;
 	int register1;
 	int programCounter;
-	int firstAvailableS;
 	int sectorSize;
 	int numSectors;
 	int interruptRegister;
@@ -28,7 +27,6 @@ public:
 	int interTartgetPos;
 	int currentIntPos;
 	bool interrupted;
-	std::vector<int> interruptBuffer;
 	u16 currentTime;
 	GPU& gpu;
 	bool halt;

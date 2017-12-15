@@ -1,0 +1,129 @@
+--By Joco223--
+
+This is the documentation of the vCPU (v standing for virtual) of the vPC project i am working on. Started working on it 17-09-2017.
+Link to the GitHub repostory: https://github.com/Joco223/VirtualPCCpp
+Last time updated: 15-12-2017.
+
+--I will be calling the cpu vCPU throughout the documentation since i don't have a proper name for it yet (Open for suggestions)--
+
+vCPU has following specifications:
+-Direct access to RAM (Which it uses as its main memory)
+
+-Direct access to HDD (used for permanent data storage)
+	-There is a sector size and number of sectors variable when creating the vCPU for making the HDD, it is only used for writing it to a 
+	 file, doesn't affect writing and reading from the HDD,
+
+-One register for loading instructions into and executing them from it, registerOP.
+
+-Two registers for doing operations on, register0 and register1.
+
+-An instruction counter used for keeping track of the current instruction.
+
+-One register for storing the current interrupt value. (Values such as key code of the key pressed)
+
+-3 variables used for handling interrupts
+	-It handles interrupts such as that, when Assembler compiles the program, it inserts the start of the interrupt code into one variable,
+	 inserts a >jmp< instruction at the end of the interrupt code. When an interrupt happens, the vCPU stores the current position where it
+	 left off and injects it into the built in >jmp< instruction at the end of interrupt code so it returns where it left off and continues
+	 on executing the program.
+
+-Current time variable that is used for counting number of operations to skip which is given by the wait isntruction.
+
+-A halt boolean which turns on when the vCPU tries to execute a command with value of 0 (no command), and it stops running.
+
+-Direct access to the vGPU. (Which is used for displaying characters (And soon more advanced stuff) onto the virtual screen)
+
+-Default RAM size is 64,000 bytes.
+
+-No signed number support or numbers with decimals yet.
+
+-Last byte in multy-byte numbers is the most significant one.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+The vCPU works on a cycle called each update, on each cycle it:
+1. Loads the current instruction into registerOP.
+2. Executes the loaded instruction.
+3. Checks if an interrupt happened in that cycle.
+
+List of available instructions currently:
+ 0. Halts the vCPU.
+ 1. Loads a number of 3 bytes into register0 from the given memory adress from RAM.
+ 2. Loads a number of 3 bytes into register1 from the given memory adress from RAM.
+ 3. Loads a number of 2 bytes into register0 from the given memory adress from RAM.
+ 4. Loads a number of 2 bytes into register1 from the given memory adress from RAM.
+ 5. Loads a number of a single byte into register0 from the given memory adress from RAM.
+ 6. Loads a number of a single byte into register1 from the given memory adress from RAM.
+ 7. Writes a number of 3 bytes from register0 to the given memory adress in RAM.
+ 8. Writes a number of 3 bytes from register1 to the given memory adress in RAM.
+ 9. Writes a number of 2 bytes from register0 to the given memory adress in RAM.
+10. Writes a number of 2 bytes from register1 to the given memory adress in RAM.
+11. Writes a number of a single byte from register0 to the given memory adress in RAM.
+12. Writes a number of a single byte from register1 to the given memory adress in RAM.
+
+15. Copy a single byte from RAM to HDD from the given memory adress to the given memory adress.
+16. Copy a single byte from HDD to RAM from the given memory adress to the given memory adress.
+	^ I am working on these and add more advanced ones later on.
+17. Shuts-down the vPC and saves the HDD to the HDD.txt file.
+
+20. Sums values stored in register0 and register 1 and stores the result in register0.
+21. Subtracts values stored in register0 and register1 and stores the result in register0.
+22. Multiplies value stored in register0 by the value in register1 and stores the result in register0.
+23. Divides value stored in register0 by the value in register1 and stores the result in register0. (Integer division)
+24. Checks if the value stored in register0 is greater than the value stored in register1 and stores the result in register0.
+25. Checks if the value stored in register0 is greater or equal to the value stored in register1 and stores the result in register0.
+26. Checks if the value stored in register0 is smaller than the value stored in register1 and stores the result in register0.
+27. Checks if the value stored in tegister0 is smaller or equal to the value stored in register1 and stores the result in register0.
+28. Checks if register0 and register1 store the same value.
+29. Checks if register0 and register1 store different values.
+30. Sets program counter to the given value.
+31. Compares value in register0 to the given value and continues if result is true, sets program counter to the given value if result is false.
+32. Pauses the vCPU from incrementing program counter by the given time. (Number of cycles)
+
+40. Prints to console (CMD) current value stored in register0.
+41. Prints to console (CMD) current value stored in register1.
+
+42. Loads a number of 3 bytes into regiser0 from the given memory adress from RAM with a given offset.
+43. Loads a number of 3 bytes into regiser1 from the given memory adress from RAM with a given offset.
+44. Loads a number of 2 bytes into regiser0 from the given memory adress from RAM with a given offset.
+45. Loads a number of 2 bytes into regiser1 from the given memory adress from RAM with a given offset.
+46. Loads a number of a single byte into regiser0 from the given memory adress from RAM with a given offset.
+47. Loads a number of a single byte into regiser1 from the given memory adress from RAM with a given offset.
+48. Writes a number of 3 bytes from register0 to the given memory adress in RAM with a given offset.
+49. Writes a number of 3 bytes from register1 to the given memory adress in RAM with a given offset.
+50. Writes a number of 2 bytes from register0 to the given memory adress in RAM with a given offset.
+51. Writes a number of 2 bytes from register1 to the given memory adress in RAM with a given offset.
+52. Writes a number of a single byte from register0 to the given memory adress in RAM with a given offset.
+53. Writes a number of a single byte from register1 to the given memory adress in RAM with a given offset.
+54. Compares if two sets of values are the same. Both sets memory adress is given and their size. Result is stored in register0.
+
+62. Displays a character at the given X and Y coordinates on the vScreen. Character displayed is used as character code value stored in register0.
+63. Displays a character at the given X and Y coordinates on the vScreen. Character displayed is used as character code value stored in register1.
+
+65. Clears GPU command buffer.
+66. Clears GPU VRAM.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+Character codes:
+0:  0,  -: 21,  C: 42,  X: 63,  p: 84
+1:  1,  ,: 22,  D: 43,  Y: 64,  q: 85
+2:  2,  .: 23,  E: 44,  Z: 65,  r: 86
+3:  3,  /: 24,  F: 45,  _: 66,  s: 87
+4:  4,  \: 25,  G: 46,   : 67,  t: 88
+5:  5,  :: 26,  H: 47,  @: 68,  u: 89
+6:  6,  ;: 27,  I: 48,  a: 69,  v: 90
+7:  7,  <: 28,  J: 49,  b: 70,  w: 91
+8:  8,  >: 29,  K: 50,  c: 71,  x: 92
+9:  9,  =: 30,  L: 51,  d: 72,  y: 93
+!: 10,  ?: 31,  M: 52,  e: 73,  z: 94
+": 11,  [: 32,  N: 53,  f: 74,
+#: 12,  ]: 33,  O: 54,  g: 75,
+$: 13,  {: 34,  P: 55,  h: 76,
+%: 14,  }: 35,  Q: 56,  i: 77,
+&: 15,  `: 36,  R: 57,  j: 78,
+': 16,  ^: 37,  S: 58,  k: 79,
+(: 17,  |: 38,  T: 59,  l: 80,
+): 18,  ~: 39,  U: 60,  m: 81,
+*: 19,  A: 40,  V: 61,  n: 82,
++: 20,  B: 41,  W: 62,  o: 83,
