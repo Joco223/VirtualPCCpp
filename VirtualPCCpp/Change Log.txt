@@ -1,0 +1,4 @@
+64th commit - 28/12/2017
+-GPU is fully programable now, basic instructions available, write your gpu programs in GPU_Program.txt
+-When creating GPU in Main.cpp, 3rd and 4th argument is number of X cores and number of Y cores respectively
+-cs_out commands, clr_comm and clr_vram have been removed from the cpu

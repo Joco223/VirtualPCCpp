@@ -17,6 +17,7 @@
 #include "PC.h"
 #include "GPU.h"
 #include "Assembly.h"
+#include "GPUAssembly.h"
 
 int width = 320;
 int height = 240;
@@ -40,19 +41,22 @@ int main(int argc, char* argv[]) {
 	Memory ram1(64000);
 	Memory hdd1(128 * 128);
 
-	GPU gpu1(4096, 524288, 64, 16384, &pc1W, ram1);
+	GPU gpu1(4096, 64000, 64, 64, 16384, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
 	CPU cpu1(128, 128, ram1, hdd1, gpu1);
 
 	std::vector<std::string> code;
+	std::vector<std::string> gpu_code;
 
 	Assembly::readFile("Program.txt", code);
 
 	Assembly::Compile(code, cpu1);
 
-	gpu1.functionCounter = 0;
+	GPUAssembly::readFile("GPU_Program.txt", gpu_code);
+
+	GPUAssembly::Compile(gpu_code, gpu1);
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
@@ -60,6 +64,7 @@ int main(int argc, char* argv[]) {
 
 	bool shift = false;
 	bool caps_lock = false;
+	bool space = false;
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -113,7 +118,7 @@ int main(int argc, char* argv[]) {
 					case SDLK_MINUS: pc1.cpu.interrupted = true; if(shift == true) { pc1.cpu.interruptRegister = 66; } else { pc1.cpu.interruptRegister = 21; } break;
 					case SDLK_PLUS: pc1.cpu.interrupted = true; if(shift == true) { pc1.cpu.interruptRegister = 30; } else { pc1.cpu.interruptRegister = 20; } break;
 					case SDLK_BACKSPACE: pc1.cpu.interrupted = true; pc1.cpu.interruptRegister = 96; break;
-					case SDLK_SPACE: pc1.cpu.interrupted = true; pc1.cpu.interruptRegister = 67; break;
+					case SDLK_SPACE: pc1.cpu.interrupted = true; pc1.cpu.interruptRegister = 67; space = !space; break;
 					case SDLK_RETURN: pc1.cpu.interrupted = true; pc1.cpu.interruptRegister = 95; break;
 				}
 				break;
@@ -122,8 +127,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		pc1.cpu.tick();
-		gpu1.executeCommand();
-		gpu1.tick();
+		gpu1.tick();	
 		NSSDL::updateSDL(pc1.screen);
 	}
 

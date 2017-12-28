@@ -33,6 +33,7 @@ public:
 
 	CPU(int, int, Memory&, Memory&, GPU&);
 	int checkArgument(int, int);
+	int checkArgumentG(int, int);
 	void execute(u16);
 	void interrupt();
 	void tick();

@@ -57,6 +57,22 @@ int CPU::checkArgument(int source, int size) {
 	}
 }
 
+int CPU::checkArgumentG(int source, int size) {
+	if ((unsigned int)source <= gpu.vRam.memory.size()) {
+		if(size == 1) { return gpu.vRam.memory[source] & 0xFF; } else {return 0;}
+		if(size == 2) { return gpu.vRam.memory[source + 1] <<  8 | (gpu.vRam.memory[source] & 0xFF); } else {return 0;}
+		if(size == 3) { return gpu.vRam.memory[source + 2] << 16 | (gpu.vRam.memory[source + 1] << 8) | (gpu.vRam.memory[source] & 0xFF); } else {return 0;}
+	}else if (source == gpu.vRam.memory.size() + 1) {
+		return register0;
+	}else if (source == gpu.vRam.memory.size() + 2) {
+		return register1;
+	}else if (source == gpu.vRam.memory.size() + 3){
+		return interruptRegister;
+	}else {
+		return 0;
+	}
+}
+
 extern bool quit;
 
 void CPU::execute(u16 registerIns) {
@@ -432,26 +448,8 @@ void CPU::execute(u16 registerIns) {
 			programCounter++;
 			break; }
 
-		/*case 60: { //Copy from RAM to VRAM
-			int position = register0;
-
-			int position2 = register1;
-
-			gpu.vRam.memory[position2] = ram.memory[position];
-			programCounter++;
-			break; }
-
-		case 61: { //Copy from VRAM to RAM
-			int position = register0;
-
-			int position2 = register1;
-
-			ram.memory[position2] = gpu.vRam.memory[position];
-			programCounter++;
-			break; }*/
-
-		case 62: { //Draw a character from register0
-			byte arg1 = register0;
+		case 80: { //Draw a character from register0
+			/*byte arg1 = register0;
 			byte arg2 = ram.memory[ram.memory[programCounter + 1]];
 			byte arg3 = ram.memory[ram.memory[programCounter + 2]];
 
@@ -462,11 +460,11 @@ void CPU::execute(u16 registerIns) {
 			gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = arg3;
 
 			programCounter += 2;
-			programCounter++;
+			programCounter++;*/
 			break; }
 
-		case 63: { //Draw a character from register1
-			byte arg1 = register1;
+		case 81: { //Draw a character from register1
+			/*byte arg1 = register1;
 			byte arg2 = ram.memory[ram.memory[programCounter + 1]];
 			byte arg3 = ram.memory[ram.memory[programCounter + 2]];
 
@@ -477,19 +475,90 @@ void CPU::execute(u16 registerIns) {
 			gpu.commandArgBuffer.memory[gpu.commandArgCounter + 2] = arg3;
 
 			programCounter += 2;
-			programCounter++;
+			programCounter++;*/
 			break; }
 
-		case 65: { //Clear GPU commandBuffer
-			gpu.commandBuffer.memory[gpu.commandCounter] = 5;
-			programCounter++;
+		case 82: { //Clear GPU commandBuffer
+			/*gpu.commandBuffer.memory[gpu.commandCounter] = 5;
+			programCounter++;*/
 			break; }
 
-		case 66: { //Clear GPU VRAM
-			if (gpu.functionCounter == gpu.firstAvailableByte) {
+		case 83: { //Clear GPU VRAM
+			/*if (gpu.functionCounter == gpu.firstAvailableByte) {
 				gpu.commandBuffer.memory[gpu.commandCounter] = 6;
 				programCounter++;
-			}
+			}*/
+			break; }
+
+		case 84: {
+			gpu.startCores();
+			programCounter++;
+			break; }
+
+		case 85: { //Load to register0 from ram, 2 bytes
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			register0 = checkArgumentG(memPos, 2);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 86: { //Load to register1 from ram, 2 bytes
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			register1 = checkArgumentG(memPos, 2);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 87: { //Load to register0 from ram, 1 byte
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			register0 = checkArgumentG(memPos, 1);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 88: { //Load to register1 from ram, 1 byte
+			byte arg1 = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 2] << 8 | arg1;
+			register1 = checkArgumentG(memPos, 1);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 89: { //Write from register0 to ram 2 bytes
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			gpu.vRam.memory[position] = (register0 & 0xFF);
+			gpu.vRam.memory[position + 1] = (byte)(register0 >> 8);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 90: { //Write from register1 to ram 2 bytes
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			gpu.vRam.memory[position] = (register1 & 0xFF);
+			gpu.vRam.memory[position + 1] = (byte)(register1 >> 8);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 91: { //Write from register0 to ram 1 byte
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			gpu.vRam.memory[position] = (register0 & 0xFF);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 92: { //Write from register1 to ram 1 byte
+			byte arg1 = ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 2] << 8 | arg1;
+			gpu.vRam.memory[position] = (register1 & 0xFF);
+			programCounter += 2;
+			programCounter++;
 			break; }
 	}
 }

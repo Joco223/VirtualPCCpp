@@ -97,11 +97,11 @@ List of available instructions currently:
 53. Writes a number of a single byte from register1 to the given memory adress in RAM with a given offset.
 54. Compares if two sets of values are the same. Both sets memory adress is given and their size. Result is stored in register0.
 
-62. Displays a character at the given X and Y coordinates on the vScreen. Character displayed is used as character code value stored in register0.
-63. Displays a character at the given X and Y coordinates on the vScreen. Character displayed is used as character code value stored in register1.
+80. Displays a character at the given X and Y coordinates on the vScreen. Character displayed is used as character code value stored in register0.
+81. Displays a character at the given X and Y coordinates on the vScreen. Character displayed is used as character code value stored in register1.
 
-65. Clears GPU command buffer.
-66. Clears GPU VRAM.
+82. Clears GPU command buffer.
+83. Clears GPU VRAM.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 

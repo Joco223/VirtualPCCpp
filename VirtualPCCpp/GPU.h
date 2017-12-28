@@ -8,6 +8,7 @@
 
 #include "Memory.h"
 #include "SDLWindow.h"
+#include "GPUCore.h"
 
 typedef unsigned char byte;
 typedef uint16_t u16;
@@ -15,7 +16,6 @@ typedef uint16_t u16;
 struct character {
 	std::vector<std::string> rows;
 };
-
 
 class GPU {
 public:
@@ -25,15 +25,13 @@ public:
 	Memory vRam;
 	Memory& ram;
 	SDLWindow* screen;
-	int functionCounter;
-	int commandCounter;
-	int commandArgCounter;
-	int firstAvailableByte;
-	u16 coreCount;
+	int programCounter;
 	std::vector<character> characters;
+	std::vector<GPUCore> cores;
 
-	GPU(int, int, int, int, SDLWindow*, Memory&);
+	GPU(int, int, int, int, int, SDLWindow*, Memory&);
 	void executeCommand();
 	void executeThread();
+	void startCores();
 	void tick();
 };

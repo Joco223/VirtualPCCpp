@@ -22,6 +22,8 @@
     <ClCompile Include="Assembly.cpp" />
     <ClCompile Include="CPU.cpp" />
     <ClCompile Include="GPU.cpp" />
+    <ClCompile Include="GPUAssembly.cpp" />
+    <ClCompile Include="GPUCore.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="NSSDL.cpp" />
@@ -32,13 +34,17 @@
     <ClInclude Include="Assembly.h" />
     <ClInclude Include="CPU.h" />
     <ClInclude Include="GPU.h" />
+    <ClInclude Include="GPUAssembly.h" />
+    <ClInclude Include="GPUCore.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="NSSDL.h" />
     <ClInclude Include="PC.h" />
     <ClInclude Include="SDLWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="Change Log.txt" />
     <Text Include="CPU Documentation.txt" />
+    <Text Include="GPU_Program.txt" />
     <Text Include="KeyboardInputExample.txt" />
     <Text Include="Assembly Documentation.txt" />
     <Text Include="fontBasic.txt" />

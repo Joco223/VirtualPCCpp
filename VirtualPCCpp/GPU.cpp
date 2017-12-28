@@ -1,20 +1,19 @@
 #include "GPU.h"
 
 
-GPU::GPU(int commandBufferSize, int vRamSize, int coreCount_, int commandArgBufferSize, SDLWindow* screen_, Memory& ram_)
+GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coreCountY, int commandArgBufferSize, SDLWindow* screen_, Memory& ram_)
 	:
 	commandBuffer(Memory(commandBufferSize)),
 	commandArgBuffer(Memory(commandArgBufferSize)),
 	vRam(Memory(vRamSize)),
 	ram(ram_),
-	screen(screen_),
-	functionCounter(0),
-	commandCounter(0),
-	commandArgCounter(0),
-	firstAvailableByte(0),
-	coreCount(coreCount_) 
+	screen(screen_)
 {
-	stack.resize(255);
+	for (int y = 0; y < coreCountY; y++) {
+		for (int x = 0; x < coreCountX; x++) {
+			cores.emplace_back(vRam, screen_, x, y);
+		}
+	}
 	
 	int countR = 0;
 	int characterCount = 0;
@@ -47,7 +46,7 @@ void convertByte(int number, byte& b1, byte& b2, byte& b3) {
 }
 
 void GPU::executeCommand() {
-	byte instruction = commandBuffer.memory[commandCounter];
+	/*byte instruction = commandBuffer.memory[commandCounter];
 
 	switch (instruction) {
 
@@ -58,7 +57,7 @@ void GPU::executeCommand() {
 		break; }
 
 	case 1: {
-		//TODO
+		for(int i = 0;)
 	break; }
 
 	case 2: {
@@ -152,11 +151,11 @@ void GPU::executeCommand() {
 		firstAvailableByte = 0;
 
 		break; }
-	}
+	}*/
 }
 
 void GPU::executeThread() {
-	byte instruction = vRam.memory[functionCounter];
+	/*byte instruction = vRam.memory[functionCounter];
 
 	switch (instruction) {
 
@@ -187,11 +186,18 @@ void GPU::executeThread() {
 		functionCounter += 7;
 		functionCounter++;
 		break; }	
+	}*/
+}
+
+void GPU::startCores() {
+	for (int i = 0; i < cores.size(); i++) {
+		cores[i].programCounter = programCounter;
+		cores[i].halt = false;
 	}
 }
 
 void GPU::tick() {
-	for (int i = 0; i < coreCount; i++) {
-		executeThread();
+	for (int i = 0; i < cores.size(); i++) {
+		cores[i].tick();
 	}
 }

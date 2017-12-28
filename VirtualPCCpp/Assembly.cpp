@@ -91,13 +91,17 @@ namespace Assembly {
 
 		int currentPos = 0;
 		int additionalMemory = 0;
+		int GadditionalMemory = 0;
 		int line = 0;
-		std::vector<int> jumpPositions;
-		std::vector<std::string> vars;
+		std::vector<int> jumpPositions;	
 		std::vector<std::string> jumpNames;
 		std::vector<int> varValues;
+		std::vector<std::string> vars;
+		std::vector<int> GvarValues;
+		std::vector<std::string> Gvars;
 
 		bool dataM = false;
+		bool GdataM = false;
 		bool interM = false;
 		bool hasStop = false;
 
@@ -171,6 +175,10 @@ namespace Assembly {
 					}
 
 					i += 2 + Arg2;
+				}if (instruction == "g8") {
+					i += 2;
+				}else if (instruction == "g16") {
+					i += 2;
 				}else {
 					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
 					std::cout << '\n';
@@ -338,7 +346,7 @@ namespace Assembly {
 				}else if (instruction == "cot1") {
 					currentPos++;
 					line++;
-				}else if (instruction == "cs_out0") {
+				}/*else if (instruction == "cs_out0") {
 					currentPos += 3;
 					i += 2;
 					line++;
@@ -351,6 +359,41 @@ namespace Assembly {
 					line++;
 				}else if (instruction == "clr_vram") {
 					currentPos++;
+					line++;
+				}*/else if (instruction == "gpu_str") {
+					currentPos++;
+					line++;
+				}else if (instruction == "load0_8g") {
+					currentPos += 3;
+					i++;
+					line++;
+				}else if (instruction == "load1_8g") {
+					currentPos += 3;
+					i++;
+					line++;
+				}else if (instruction == "load0_16g") {
+					currentPos += 3;
+					i++;
+					line++;
+				}else if (instruction == "load1_16g") {
+					currentPos += 3;
+					i++;
+					line++;
+				}else if (instruction == "wrt0_16g") {
+					currentPos += 3;
+					i++;
+					line++;
+				}else if (instruction == "wrt1_16g") {
+					currentPos += 3;
+					i++;
+					line++;
+				}else if (instruction == "wrt0_8g") {
+					currentPos += 3;
+					i++;
+					line++;
+				}else if (instruction == "wrt1_8g") {
+					currentPos += 3;
+					i++;
 					line++;
 				}else if (instruction == "wait") {
 					currentPos += 2;
@@ -521,6 +564,31 @@ namespace Assembly {
 
 					i += 2 + Arg2;
 					line++;
+				}if (instruction == "g8") {
+					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
+
+					vars.push_back(arg1);
+					int Arg2 = std::stoi(arg2);
+					varValues.push_back(GadditionalMemory);
+
+					cpu.gpu.vRam.memory[GadditionalMemory++] = (byte)Arg2;
+					i += 2;
+					line++;
+				}else if (instruction == "g16") {
+					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
+
+					vars.push_back(arg1);
+					int Arg2 = std::stoi(arg2);
+					varValues.push_back(GadditionalMemory);
+
+					byte b1, b2, b3;
+					convertByte(Arg2, b1, b2, b3);
+					cpu.gpu.vRam.memory[GadditionalMemory++] = b1;
+					cpu.gpu.vRam.memory[GadditionalMemory++] = b2;
+					i += 2;
+					line++;
 				}else {
 					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
 					std::cout << '\n';
@@ -529,6 +597,7 @@ namespace Assembly {
 					std::cout << '\n';
 					std::cout << "Compilation terminated." << '\n';
 					cpu.ram.Clear();
+					cpu.gpu.vRam.Clear();
 					break;
 				}
 			}else if (dataM == false) {
@@ -1157,7 +1226,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 41;
 					line++;
 				}else if (instruction == "cs_out0") {
-					cpu.ram.memory[currentPos++] = 62;
+					cpu.ram.memory[currentPos++] = 80;
 
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -1174,7 +1243,7 @@ namespace Assembly {
 					i += 2;
 					line++;
 				}else if (instruction == "cs_out1") {
-					cpu.ram.memory[currentPos++] = 63;
+					cpu.ram.memory[currentPos++] = 81;
 
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -1191,10 +1260,149 @@ namespace Assembly {
 					i += 2;
 					line++;
 				}else if (instruction == "clr_comm") {
-					cpu.ram.memory[currentPos++] = 65;
+					cpu.ram.memory[currentPos++] = 82;
 					line++;
 				}else if (instruction == "clr_vram") {
-					cpu.ram.memory[currentPos++] = 66;
+					cpu.ram.memory[currentPos++] = 83;
+					line++;
+				}if (instruction == "load0_8g") {
+					std::string arg1 = code[i + 1];
+
+					cpu.ram.memory[currentPos++] = 87;
+
+					int Arg1;
+					checkArgType(Arg1, arg1, cpu, vars, varValues);
+
+					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+					byte b1, b2, b3;
+					convertByte(Arg1, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+
+					i++;
+					line++;
+				}else if (instruction == "load1_8g") {
+					std::string arg1 = code[i + 1];
+
+					cpu.ram.memory[currentPos++] = 88;
+
+					int Arg1;
+					checkArgType(Arg1, arg1, cpu, vars, varValues);
+
+					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+					byte b1, b2, b3;
+					convertByte(Arg1, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+
+					i++;
+					line++;
+				}else if (instruction == "load0_16g") {
+					std::string arg1 = code[i + 1];
+
+					cpu.ram.memory[currentPos++] = 85;
+
+					int Arg1;
+					checkArgType(Arg1, arg1, cpu, vars, varValues);
+
+					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+					byte b1, b2, b3;
+					convertByte(Arg1, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+
+					i++;
+					line++;
+				}else if (instruction == "load1_16g") {
+					std::string arg1 = code[i + 1];
+
+					cpu.ram.memory[currentPos++] = 86;
+
+					int Arg1;
+					checkArgType(Arg1, arg1, cpu, vars, varValues);
+
+					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+					byte b1, b2, b3;
+					convertByte(Arg1, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+
+					i++;
+					line++;
+				}else if (instruction == "wrt0_16g") {
+					std::string arg1 = code[i + 1];
+
+					cpu.ram.memory[currentPos++] = 89;
+
+					int Arg1;
+					checkArgType(Arg1, arg1, cpu, vars, varValues);
+
+					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+					byte b1, b2, b3;
+					convertByte(Arg1, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+
+					i++;
+					line++;
+				}else if (instruction == "wrt1_16g") {
+					std::string arg1 = code[i + 1];
+
+					cpu.ram.memory[currentPos++] = 90;
+
+					int Arg1;
+					checkArgType(Arg1, arg1, cpu, vars, varValues);
+
+					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+					byte b1, b2, b3;
+					convertByte(Arg1, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+
+					i++;
+					line++;
+				}else if (instruction == "wrt0_8g") {
+					std::string arg1 = code[i + 1];
+
+					cpu.ram.memory[currentPos++] = 91;
+
+					int Arg1;
+					checkArgType(Arg1, arg1, cpu, vars, varValues);
+
+					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+					byte b1, b2, b3;
+					convertByte(Arg1, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+
+					i++;
+					line++;
+				}else if (instruction == "wrt1_8g") {
+					std::string arg1 = code[i + 1];
+
+					cpu.ram.memory[currentPos++] = 92;
+
+					int Arg1;
+					checkArgType(Arg1, arg1, cpu, vars, varValues);
+
+					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
+
+					byte b1, b2, b3;
+					convertByte(Arg1, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+
+					i++;
+					line++;
+				}else if (instruction == "gpu_str") {
+					cpu.ram.memory[currentPos++] = 84;
 					line++;
 				}else if (instruction == "wait") {
 					cpu.ram.memory[currentPos++] = 32;

@@ -39,6 +39,12 @@
     <ClCompile Include="GPU.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GPUCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GPUAssembly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NSSDL.h">
@@ -62,6 +68,12 @@
     <ClInclude Include="GPU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GPUCore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUAssembly.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="fontBasic.txt">
@@ -80,6 +92,12 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="CPU Documentation.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="GPU_Program.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Change Log.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

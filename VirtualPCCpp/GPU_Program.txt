@@ -1,0 +1,15 @@
+data_s
+u8 x 20
+u8 y 20
+u8 f 4
+u8 c 100
+data_e
+
+get_idx
+get_idy
+
+loadR c
+loadG idy
+loadB idx
+
+p_out
