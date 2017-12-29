@@ -3,8 +3,8 @@
 -When creating GPU in Main.cpp, 3rd and 4th argument is number of X cores and number of Y cores respectively
 -cs_out commands, clr_comm and clr_vram have been removed from the cpu
 
-65th commit - 30/12/2017
+65-66th commit - 30/12/2017
 -Changed how GPU cores work, now each one has its own local memory of 256 bytes and it can read/write to it. Support for read only VRAM from the cores is coming soon
 -Added task queue to the gpu so you can create as big of a task list which the gpu cores will execute
 -You set the task size by using command >kernel_size< in GPU Assembly followed by 2 numbers for x and y size respectively.
--GPU Assembly coming soon
+-GPU Assembly documentation coming soon
