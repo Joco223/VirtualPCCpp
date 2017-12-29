@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 	Memory ram1(64000);
 	Memory hdd1(128 * 128);
 
-	GPU gpu1(4096, 64000, 64, 64, 16384, &pc1W, ram1);
+	GPU gpu1(4096, 64000, 64, 16384, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
@@ -126,8 +126,10 @@ int main(int argc, char* argv[]) {
 	
 		}
 
-		pc1.cpu.tick();
-		gpu1.tick();	
+		//if (space) {
+			pc1.cpu.tick();
+			gpu1.tick();
+		//}		
 		NSSDL::updateSDL(pc1.screen);
 	}
 

@@ -5,6 +5,8 @@ u8 f 4
 u8 c 100
 data_e
 
+kernel_size 250 250
+
 get_idx
 get_idy
 

@@ -1,11 +1,12 @@
 #include "GPUCore.h"
 
-GPUCore::GPUCore(Memory& vRam_, SDLWindow* screen_, int idX_, int idY_) 
+GPUCore::GPUCore(Memory& vRam_, SDLWindow* screen_, int intMemSize, int idX_, int idY_) 
 	:
 	vRam(vRam_),
 	screen(screen_),
 	halt(true),
 	idX(idX_),
+	intMem(Memory(intMemSize)),
 	idY(idY_)
 	{}
 
@@ -16,17 +17,26 @@ void GPUCore::tick() {
 	}
 }
 
-int GPUCore::checkArgument(int source, int size) {
+int GPUCore::checkArgumentV(int source, int size) {
 	if ((unsigned int)source <= vRam.memory.size()) {
 		if(size == 1) { return vRam.memory[source] & 0xFF; } else {return 0;}
 		if(size == 2) { return vRam.memory[source + 1] <<  8 | (vRam.memory[source] & 0xFF); } else {return 0;}
-	}else if (source == vRam.memory.size() + 1) {
+	}else {
+		return 0;
+	}
+}
+
+int GPUCore::checkArgumentInt(int source, int size) {
+	if ((unsigned int)source <= intMem.memory.size()) {
+		if(size == 1) { return intMem.memory[source] & 0xFF; } else {return 0;}
+		if(size == 2) { return intMem.memory[source + 1] <<  8 | (intMem.memory[source] & 0xFF); } else {return 0;}
+	}else if (source == intMem.memory.size() + 1) {
 		return register0;
-	}else if (source == vRam.memory.size() + 2) {
+	}else if (source == intMem.memory.size() + 2) {
 		return register1;
-	}else if (source == vRam.memory.size() + 3) {
+	}else if (source == intMem.memory.size() + 3) {
 		return idX;
-	}else if (source == vRam.memory.size() + 4) {
+	}else if (source == intMem.memory.size() + 4) {
 		return idY;
 	}else {
 		return 0;
@@ -44,7 +54,7 @@ void GPUCore::execute(int registerOP) {
 		case 1: { //Load to register0 from ram, 2 bytes
 			byte arg1 = vRam.memory[programCounter + 1];
 			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register0 = checkArgument(memPos, 2);
+			register0 = checkArgumentInt(memPos, 2);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -52,7 +62,7 @@ void GPUCore::execute(int registerOP) {
 		case 2: { //Load to register1 from ram, 2 bytes
 			byte arg1 = vRam.memory[programCounter + 1];
 			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register1 = checkArgument(memPos, 2);
+			register1 = checkArgumentInt(memPos, 2);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -60,7 +70,7 @@ void GPUCore::execute(int registerOP) {
 		case 3: { //Load to register0 from ram, 1 byte
 			byte arg1 = vRam.memory[programCounter + 1];
 			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register0 = checkArgument(memPos, 1);
+			register0 = checkArgumentInt(memPos, 1);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -68,7 +78,7 @@ void GPUCore::execute(int registerOP) {
 		case 4: { //Load to register1 from ram, 1 byte
 			byte arg1 = vRam.memory[programCounter + 1];
 			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register1 = checkArgument(memPos, 1);
+			register1 = checkArgumentInt(memPos, 1);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -76,8 +86,8 @@ void GPUCore::execute(int registerOP) {
 		case 5: { //Write from register0 to ram 2 bytes
 			byte arg1 = vRam.memory[programCounter + 1];
 			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			vRam.memory[position] = (register0 & 0xFF);
-			vRam.memory[position + 1] = (byte)(register0 >> 8);
+			intMem.memory[position] = (register0 & 0xFF);
+			intMem.memory[position + 1] = (byte)(register0 >> 8);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -85,8 +95,8 @@ void GPUCore::execute(int registerOP) {
 		case 6: { //Write from register1 to ram 2 bytes
 			byte arg1 = vRam.memory[programCounter + 1];
 			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			vRam.memory[position] = (register1 & 0xFF);
-			vRam.memory[position + 1] = (byte)(register1 >> 8);
+			intMem.memory[position] = (register1 & 0xFF);
+			intMem.memory[position + 1] = (byte)(register1 >> 8);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -94,7 +104,7 @@ void GPUCore::execute(int registerOP) {
 		case 7: { //Write from register0 to ram 1 byte
 			byte arg1 = vRam.memory[programCounter + 1];
 			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			vRam.memory[position] = (register0 & 0xFF);
+			intMem.memory[position] = (register0 & 0xFF);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -102,7 +112,7 @@ void GPUCore::execute(int registerOP) {
 		case 8: { //Write from register1 to ram 1 byte
 			byte arg1 = vRam.memory[programCounter + 1];
 			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			vRam.memory[position] = (register1 & 0xFF);
+			intMem.memory[position] = (register1 & 0xFF);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -176,20 +186,18 @@ void GPUCore::execute(int registerOP) {
 			}
 			break; }
 
-		case 31: { //Get core id
-			register0 = idX;
-			programCounter++;
-			break; }
-
-		case 32: { //Get core id
-			register1 = idY;
-			programCounter++;
-			break; }
-
-		case 23: { //Load to register0 from ram, 1 byte
+		case 22: { //Load to register0 from ram, 2 bytes
 			byte arg1 = vRam.memory[programCounter + 1];
 			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			regR = checkArgument(memPos, 1);
+			register0 = checkArgumentV(memPos, 2);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 23: { //Load to register1 from ram, 2 bytes
+			byte arg1 = vRam.memory[programCounter + 1];
+			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
+			register1 = checkArgumentV(memPos, 2);
 			programCounter += 2;
 			programCounter++;
 			break; }
@@ -197,16 +205,50 @@ void GPUCore::execute(int registerOP) {
 		case 24: { //Load to register0 from ram, 1 byte
 			byte arg1 = vRam.memory[programCounter + 1];
 			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			regG = checkArgument(memPos, 1);
+			register0 = checkArgumentV(memPos, 1);
 			programCounter += 2;
 			programCounter++;
 			break; }
 
-		case 25: { //Load to register0 from ram, 1 byte
+		case 25: { //Load to register1 from ram, 1 byte
 			byte arg1 = vRam.memory[programCounter + 1];
 			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			regB = checkArgument(memPos, 1);
+			register1 = checkArgumentV(memPos, 1);
 			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 26: { //Load to register1 from ram, 1 byte
+			byte arg1 = vRam.memory[programCounter + 1];
+			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
+			regR = checkArgumentInt(memPos, 1);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 27: { //Load to register1 from ram, 1 byte
+			byte arg1 = vRam.memory[programCounter + 1];
+			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
+			regG = checkArgumentInt(memPos, 1);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 28: { //Load to register1 from ram, 1 byte
+			byte arg1 = vRam.memory[programCounter + 1];
+			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
+			regB = checkArgumentInt(memPos, 1);
+			programCounter += 2;
+			programCounter++;
+			break; }
+
+		case 31: { //Get core id
+			register0 = idX;
+			programCounter++;
+			break; }
+
+		case 32: { //Get core id
+			register1 = idY;
 			programCounter++;
 			break; }
 

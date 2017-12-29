@@ -1,7 +1,7 @@
 #include "GPU.h"
 
 
-GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coreCountY, int commandArgBufferSize, SDLWindow* screen_, Memory& ram_)
+GPU::GPU(int commandBufferSize, int vRamSize, int coreCount, int commandArgBufferSize, SDLWindow* screen_, Memory& ram_)
 	:
 	commandBuffer(Memory(commandBufferSize)),
 	commandArgBuffer(Memory(commandArgBufferSize)),
@@ -9,10 +9,8 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coreCountY, in
 	ram(ram_),
 	screen(screen_)
 {
-	for (int y = 0; y < coreCountY; y++) {
-		for (int x = 0; x < coreCountX; x++) {
-			cores.emplace_back(vRam, screen_, x, y);
-		}
+	for (int x = 0; x < coreCount; x++) {
+		cores.emplace_back(vRam, screen_, 256, x, 0);
 	}
 	
 	int countR = 0;
@@ -192,12 +190,25 @@ void GPU::executeThread() {
 void GPU::startCores() {
 	for (int i = 0; i < cores.size(); i++) {
 		cores[i].programCounter = programCounter;
+		cores[i].idX = tasks[i].x;
+		cores[i].idY = tasks[i].y;
+		tasks.erase(tasks.begin() + i);
 		cores[i].halt = false;
 	}
 }
 
 void GPU::tick() {
 	for (int i = 0; i < cores.size(); i++) {
-		cores[i].tick();
+		if (tasks.size() > 0) {
+			if (cores[i].halt == true) {
+				cores[i].programCounter = programCounter;
+				cores[i].idX = tasks[0].x;
+				cores[i].idY = tasks[0].y;
+				tasks.erase(tasks.begin());
+				cores[i].halt = false;
+			}else{
+				cores[i].tick();
+			}	
+		}
 	}
 }

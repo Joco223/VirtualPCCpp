@@ -52,13 +52,13 @@ namespace GPUAssembly {
 			arg = varValues[id];
 		}else if (varExists == false) {
 			if (argument == "reg0") {
-				arg = gpu.vRam.memory.size() + 1;
+				arg = 256 + 1;
 			}else if (argument == "reg1") {
-				arg = gpu.vRam.memory.size() + 2;
+				arg = 256 + 2;
 			}else if (argument == "idx") {
-				arg = gpu.vRam.memory.size() + 3;
+				arg = 256 + 3;
 			}else if (argument == "idy") {
-				arg = gpu.vRam.memory.size() + 4;
+				arg = 256 + 4;
 			}else {
 				arg = std::stoi(argument);
 			}
@@ -228,6 +228,9 @@ namespace GPUAssembly {
 					currentPos += 3;
 					i++;
 					line++;
+				}else if (instruction == "kernel_size") {
+					i += 2;
+					line++;
 				}else{
 					if (instruction.back() == ':') {
 						std::string tmp = instruction;
@@ -283,7 +286,11 @@ namespace GPUAssembly {
 					int Arg2 = std::stoi(arg2);
 					varValues.push_back(additionalMemory);
 
-					gpu.vRam.memory[additionalMemory++] = (byte)Arg2;
+					for (int k = 0; k < gpu.cores.size(); k++) {
+						gpu.cores[k].intMem.memory[additionalMemory] = (byte)Arg2;
+					}
+
+					additionalMemory++;
 					i += 2;
 					line++;
 				}else if (instruction == "u16") {
@@ -296,8 +303,13 @@ namespace GPUAssembly {
 
 					byte b1, b2, b3;
 					convertByte(Arg2, b1, b2, b3);
-					gpu.vRam.memory[additionalMemory++] = b1;
-					gpu.vRam.memory[additionalMemory++] = b2;
+
+					for (int k = 0; k < gpu.cores.size(); k++) {
+						gpu.cores[k].intMem.memory[additionalMemory] = b1;
+						gpu.cores[k].intMem.memory[additionalMemory] = b2;
+					}
+
+					additionalMemory += 2;
 					i += 2;
 					line++;
 				}else{
@@ -525,7 +537,7 @@ namespace GPUAssembly {
 				}else if (instruction == "loadR") {
 					std::string arg1 = code[i + 1];
 
-					gpu.vRam.memory[currentPos++] = 23;
+					gpu.vRam.memory[currentPos++] = 26;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, gpu, vars, varValues);
@@ -542,7 +554,7 @@ namespace GPUAssembly {
 				}else if (instruction == "loadG") {
 					std::string arg1 = code[i + 1];
 
-					gpu.vRam.memory[currentPos++] = 24;
+					gpu.vRam.memory[currentPos++] = 27;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, gpu, vars, varValues);
@@ -559,7 +571,7 @@ namespace GPUAssembly {
 				}else if (instruction == "loadB") {
 					std::string arg1 = code[i + 1];
 
-					gpu.vRam.memory[currentPos++] = 25;
+					gpu.vRam.memory[currentPos++] = 28;
 
 					int Arg1;
 					checkArgType(Arg1, arg1, gpu, vars, varValues);
@@ -572,6 +584,24 @@ namespace GPUAssembly {
 					gpu.vRam.memory[currentPos++] = b2;
 
 					i++;
+					line++;
+				}else if (instruction == "kernel_size") {
+					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
+					
+					int xSize = std::stoi(arg1);
+					int ySize = std::stoi(arg2);
+
+					for (int y = 0; y < ySize; y++) {
+						for (int x = 0; x < xSize; x++) {
+							task_id tmp;
+							tmp.x = x;
+							tmp.y = y;
+							gpu.tasks.push_back(tmp);
+						}
+					}
+
+					i += 2;
 					line++;
 				}else{
 					if (instruction.back() == ':') {

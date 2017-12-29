@@ -17,6 +17,11 @@ struct character {
 	std::vector<std::string> rows;
 };
 
+struct task_id {
+	int x;
+	int y;
+};
+
 class GPU {
 public:
 	Memory commandBuffer;
@@ -26,10 +31,11 @@ public:
 	Memory& ram;
 	SDLWindow* screen;
 	int programCounter;
+	std::vector<task_id> tasks;
 	std::vector<character> characters;
 	std::vector<GPUCore> cores;
 
-	GPU(int, int, int, int, int, SDLWindow*, Memory&);
+	GPU(int, int, int, int, SDLWindow*, Memory&);
 	void executeCommand();
 	void executeThread();
 	void startCores();
