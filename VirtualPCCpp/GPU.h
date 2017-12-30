@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
+#include <time.h> 
 
 #include "Memory.h"
 #include "SDLWindow.h"

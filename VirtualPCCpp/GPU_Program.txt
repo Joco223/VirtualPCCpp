@@ -1,17 +1,232 @@
 data_s
-u8 x 20
-u8 y 20
-u8 f 4
-u8 c 100
+u16 minX 0
+u16 maxX 0
+u16 minY 0
+u16 maxY 0
+
+u8 two 2
+u8 one 1
+u8 zero 0
+
+u8 white 255
+
+u16 posX 0
+u16 posY 0
+
+u16 w0 0
+u16 w1 0
+u16 w2 0
+
+u16 x1f 0
+u16 y1f 0
+u16 x2f 0
+u16 y2f 0
+u16 x3f 0
+u16 y3f 0
+
+u16 a 0
+u16 b 0
+u16 c 0
+u16 d 0
+u16 e 0
+u16 f 0
 data_e
 
-kernel_size 250 250
+kernel_size 201 201
+
+
+load0_16g x1
+wrt0_16 x1f
+
+load0_16g x2
+wrt0_16 x2f
+
+load0_16g x3
+wrt0_16 x3f
+
+
+load0_16g y1
+wrt0_16 y1f
+
+load0_16g y2
+wrt0_16 y2f
+
+load0_16g y3
+wrt0_16 y3f
+
+
+
+max x1f x2f x3f
+wrt0_16 maxX
+
+min x1f x2f x3f
+wrt0_16 minX
+
+
+max y1f y2f y3f
+wrt0_16 maxY
+
+min y1f y2f y3f
+wrt0_16 minY
+
 
 get_idx
-get_idy
+wrt0_16 posX
 
-loadR c
-loadG idy
-loadB idx
+get_idy
+wrt0_16 posY
+
+
+
+
+load0_16 x3f
+load1_16 x2f
+sub
+wrt0_16 a
+
+load0_16 posY
+load1_16 y2f
+sub
+wrt0_16 b
+
+
+load0_16 y3f
+load1_16 y2f
+sub
+wrt0_16 c
+
+load0_16 posX
+load1_16 x2f
+sub
+wrt0_16 d
+
+
+load0_16 a
+load1_16 b
+mlt
+wrt0_16 e
+
+load0_16 c
+load1_16 d
+mlt
+wrt0_16 f
+
+
+load0_16 e
+load1_16 f
+sub
+wrt0_16 w0
+
+
+
+
+load0_16 x1f
+load1_16 x3f
+sub
+wrt0_16 a
+
+load0_16 posY
+load1_16 y3f
+sub
+wrt0_16 b
+
+
+load0_16 y1f
+load1_16 y3f
+sub
+wrt0_16 c
+
+load0_16 posX
+load1_16 x3f
+sub
+wrt0_16 d
+
+
+load0_16 a
+load1_16 b
+mlt
+wrt0_16 e
+
+load0_16 c
+load1_16 d
+mlt
+wrt0_16 f
+
+
+load0_16 e
+load1_16 f
+sub
+wrt0_16 w1
+
+
+
+
+load0_16 x2f
+load1_16 x1f
+sub
+wrt0_16 a
+
+load0_16 posY
+load1_16 y1f
+sub
+wrt0_16 b
+
+
+load0_16 y2f
+load1_16 y1f
+sub
+wrt0_16 c
+
+load0_16 posX
+load1_16 x1f
+sub
+wrt0_16 d
+
+
+load0_16 a
+load1_16 b
+mlt
+wrt0_16 e
+
+load0_16 c
+load1_16 d
+mlt
+wrt0_16 f
+
+
+load0_16 e
+load1_16 f
+sub
+wrt0_16 w2
+
+
+
+load0_16 w0
+load1_8 zero
+reg0_be_s
+cmp 1 part1
+
+load0_16 w1
+load1_8 zero
+reg0_be_s
+cmp 1 part2
+
+load0_16 w2
+load1_8 zero
+reg0_be_s
+cmp 1 part3
+
+loadR posX
+loadG zero
+loadB posY
+
+get_idx
+load1_16 posY
 
 p_out
+
+part3:
+
+part2:
+
+part1:

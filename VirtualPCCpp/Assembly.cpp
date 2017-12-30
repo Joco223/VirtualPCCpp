@@ -86,7 +86,7 @@ namespace Assembly {
 		}
 	}
 
-	void Compile(std::vector<std::string>& code, CPU& cpu) {
+	void Compile(std::vector<std::string>& code, CPU& cpu, std::vector<int>& vValues, std::vector<std::string>& vNames, int& finalCP) {
 		std::vector<char> charactersA = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', '-', ',', '.', '/', '\\', ':', ';', '<', '>', '=', '?', '[', ']', '{', '}', '`', '^', '|', '~', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', ' ', '@', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
 		int currentPos = 0;
@@ -97,8 +97,6 @@ namespace Assembly {
 		std::vector<std::string> jumpNames;
 		std::vector<int> varValues;
 		std::vector<std::string> vars;
-		std::vector<int> GvarValues;
-		std::vector<std::string> Gvars;
 
 		bool dataM = false;
 		bool GdataM = false;
@@ -180,7 +178,7 @@ namespace Assembly {
 				}else if (instruction == "g16") {
 					i += 2;
 				}else {
-					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
+					std::cout << "Unknown instruction >" << instruction << "< at line" << line << '\n';
 					std::cout << '\n';
 					std::cout << lines[line] << '\n';
 					std::cout << "^" << '\n';
@@ -564,13 +562,13 @@ namespace Assembly {
 
 					i += 2 + Arg2;
 					line++;
-				}if (instruction == "g8") {
+				}else if (instruction == "g8") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
-					vars.push_back(arg1);
+					vNames.push_back(arg1);
 					int Arg2 = std::stoi(arg2);
-					varValues.push_back(GadditionalMemory);
+					vValues.push_back(GadditionalMemory);
 
 					cpu.gpu.vRam.memory[GadditionalMemory++] = (byte)Arg2;
 					i += 2;
@@ -579,9 +577,9 @@ namespace Assembly {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
-					vars.push_back(arg1);
+					vNames.push_back(arg1);
 					int Arg2 = std::stoi(arg2);
-					varValues.push_back(GadditionalMemory);
+					vValues.push_back(GadditionalMemory);
 
 					byte b1, b2, b3;
 					convertByte(Arg2, b1, b2, b3);
@@ -1271,7 +1269,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 87;
 
 					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					checkArgType(Arg1, arg1, cpu, vNames, vValues);
 
 					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -1288,7 +1286,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 88;
 
 					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					checkArgType(Arg1, arg1, cpu, vNames, vValues);
 
 					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -1305,7 +1303,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 85;
 
 					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					checkArgType(Arg1, arg1, cpu, vNames, vValues);
 
 					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -1322,7 +1320,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 86;
 
 					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					checkArgType(Arg1, arg1, cpu, vNames, vValues);
 
 					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -1339,7 +1337,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 89;
 
 					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					checkArgType(Arg1, arg1, cpu, vNames, vValues);
 
 					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -1356,7 +1354,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 90;
 
 					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					checkArgType(Arg1, arg1, cpu, vNames, vValues);
 
 					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -1373,7 +1371,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 91;
 
 					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					checkArgType(Arg1, arg1, cpu, vNames, vValues);
 
 					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -1390,7 +1388,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = 92;
 
 					int Arg1;
-					checkArgType(Arg1, arg1, cpu, vars, varValues);
+					checkArgType(Arg1, arg1, cpu, vNames, vValues);
 
 					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
 
@@ -1446,6 +1444,7 @@ namespace Assembly {
 			cpu.ram.Clear();
 		}
 
+		finalCP = GadditionalMemory;
 
 		std::cout << "Program size is: " << currentPos << " bytes" << '\n';
 		std::cout << '\n';

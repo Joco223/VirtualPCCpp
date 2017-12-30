@@ -11,6 +11,6 @@
 typedef unsigned char byte;
 
 namespace Assembly {
-	void Compile(std::vector<std::string>& code, CPU& cpu);
+	void Compile(std::vector<std::string>& code, CPU& cpu, std::vector<int>& vValues, std::vector<std::string>& vNames, int& finalCP);
 	void readFile(std::string path, std::vector<std::string>& code);
 }

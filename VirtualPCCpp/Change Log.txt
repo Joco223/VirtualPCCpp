@@ -8,3 +8,9 @@
 -Added task queue to the gpu so you can create as big of a task list which the gpu cores will execute
 -You set the task size by using command >kernel_size< in GPU Assembly followed by 2 numbers for x and y size respectively.
 -GPU Assembly documentation coming soon
+
+67th committ - 31/12/2017
+-Added instructions to CPU and GPU Cores to access VRam, CPU can read/write to it while GPU cores can only read from it
+-Added min and max instructions to the GPU Cores and they take 3 arguments, its meant to be used for triangle drawing
+-Added a signed register 0 bigger or equal to register 1 instruction to GPU Cores, written as reg0_be_s, other ones coming soon
+-Made a very basic GPU program to draw a triangle to the screen

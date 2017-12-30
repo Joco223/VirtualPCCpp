@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 	Memory ram1(64000);
 	Memory hdd1(128 * 128);
 
-	GPU gpu1(4096, 64000, 64, 16384, &pc1W, ram1);
+	GPU gpu1(4096, 64000, 256, 16384, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
@@ -50,13 +50,19 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> code;
 	std::vector<std::string> gpu_code;
 
+	std::vector<int> vValues;
+	std::vector<std::string> vNames;
+	int addMem = 0;
+
 	Assembly::readFile("Program.txt", code);
 
-	Assembly::Compile(code, cpu1);
+	Assembly::Compile(code, cpu1, vValues, vNames, addMem);
 
 	GPUAssembly::readFile("GPU_Program.txt", gpu_code);
 
-	GPUAssembly::Compile(gpu_code, gpu1);
+	GPUAssembly::Compile(gpu_code, gpu1, vValues, vNames, addMem);
+
+	//std::cout << (int)gpu1.vRam.memory[0] << " " << (int)gpu1.vRam.memory[1] << '\n';
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
@@ -126,10 +132,10 @@ int main(int argc, char* argv[]) {
 	
 		}
 
-		//if (space) {
+		if (space) {
 			pc1.cpu.tick();
 			gpu1.tick();
-		//}		
+		}		
 		NSSDL::updateSDL(pc1.screen);
 	}
 

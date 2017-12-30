@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "Memory.h"
 #include "SDLWindow.h"

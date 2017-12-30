@@ -12,6 +12,8 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCount, int commandArgBuffe
 	for (int x = 0; x < coreCount; x++) {
 		cores.emplace_back(vRam, screen_, 256, x, 0);
 	}
+
+	//srand(time(NULL));
 	
 	int countR = 0;
 	int characterCount = 0;
@@ -189,26 +191,32 @@ void GPU::executeThread() {
 
 void GPU::startCores() {
 	for (int i = 0; i < cores.size(); i++) {
-		cores[i].programCounter = programCounter;
-		cores[i].idX = tasks[i].x;
-		cores[i].idY = tasks[i].y;
-		tasks.erase(tasks.begin() + i);
-		cores[i].halt = false;
+		//int numb = rand() % tasks.size();
+		if (tasks.size() > 0) {
+			cores[i].programCounter = programCounter;
+			cores[i].idX = tasks[0].x;
+			cores[i].idY = tasks[0].y;
+			tasks.erase(tasks.begin());
+			cores[i].halt = false;
+		}else{
+			cores[i].idX = 0;
+			cores[i].idY = 0;
+		}
 	}
 }
 
 void GPU::tick() {
 	for (int i = 0; i < cores.size(); i++) {
-		if (tasks.size() > 0) {
-			if (cores[i].halt == true) {
+		if (cores[i].halt == true) {
+			if (tasks.size() > 0) {
 				cores[i].programCounter = programCounter;
 				cores[i].idX = tasks[0].x;
 				cores[i].idY = tasks[0].y;
 				tasks.erase(tasks.begin());
 				cores[i].halt = false;
-			}else{
-				cores[i].tick();
-			}	
-		}
+			}
+		}else{
+			cores[i].tick();
+		}		
 	}
 }
