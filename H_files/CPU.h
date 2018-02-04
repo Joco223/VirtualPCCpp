@@ -10,31 +10,33 @@
 #include "GPU.h"
 
 typedef unsigned char byte;
-typedef uint16_t u16;
 
 class CPU {
 public:
 	Memory& ram;
 	Memory& hdd;
+
 	int registerOP;
-	int register0;
-	int register1;
+	int interruptRegister;
+
+	std::vector<unsigned int> registers;
+
 	int programCounter;
 	int sectorSize;
 	int numSectors;
-	int interruptRegister;
 	int interPos;
 	int interTartgetPos;
 	int currentIntPos;
 	bool interrupted;
-	u16 currentTime;
+	int currentTime;
 	GPU& gpu;
 	bool halt;
 
 	CPU(int, int, Memory&, Memory&, GPU&);
 	int checkArgument(int, int);
+	int checkArgumentH(int, int);
 	int checkArgumentG(int, int);
-	void execute(u16);
+	void execute();
 	void interrupt();
 	void tick();
 };

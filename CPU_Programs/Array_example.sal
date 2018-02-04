@@ -1,0 +1,22 @@
+data.
+s8.a x 3 1 2 3
+s8.a y 3 5 4 3
+s8 one 1
+
+program.start
+
+moveO.s x one regA
+moveO.s y one regB
+
+add regA regB
+
+cot regA
+
+moveO.s regA x one
+
+moveO.s x one regB
+moveO.s y one regA
+
+add regB regA
+
+cot regB

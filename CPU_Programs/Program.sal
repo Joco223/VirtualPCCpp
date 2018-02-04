@@ -1,0 +1,87 @@
+data.
+s8 x 1
+s8 x2 2
+s8 x3 3
+s8 x4 4
+s8 s5 5
+s8 x6 6
+s8 x7 7
+
+s8 x9 1
+s8 x10 2
+s8 x11 3
+s8 x12 4
+s8 x13 5
+s8 x14 6
+s8 x15 7
+
+s8 y 1
+s8 y2 2
+
+s8 cF1 92
+s8 cF2 224
+
+s8 J 49
+s8 a 69
+s8 c 71
+s8 k 79
+s8 o 83
+s8 j 78
+
+s8 G 46
+s8 r 86
+s8 e 73
+s8 n 82
+
+program.start
+
+move.s x9 regA
+move.s y regB
+
+sb.setID regA regB G
+
+move.s x10 regA
+sb.setID regA regB r
+sb.setCF regA regB cF1
+
+move.s x11 regA
+sb.setID regA regB e
+sb.setCF regA regB cF1
+
+move.s x12 regA
+sb.setID regA regB e
+sb.setCF regA regB cF1
+
+move.s x13 regA
+sb.setID regA regB n
+sb.setCF regA regB cF1
+
+move.s y2 regB
+move.s x9 regA
+
+sb.setID regA regB J
+sb.setCB regA regB cF2
+
+move.s x10 regA
+sb.setID regA regB a
+sb.setCB regA regB cF2
+
+move.s x11 regA
+sb.setID regA regB c
+sb.setCB regA regB cF2
+
+move.s x12 regA
+sb.setID regA regB k
+sb.setCB regA regB cF2
+
+move.s x13 regA
+sb.setID regA regB o
+sb.setCB regA regB cF2
+
+move.s x14 regA
+sb.setID regA regB j
+sb.setCB regA regB cF2
+
+move.s x15 regA
+sb.setID regA regB c
+sb.setCB regA regB cF2
