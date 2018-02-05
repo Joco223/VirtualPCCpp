@@ -124,13 +124,13 @@ void CPU::execute() {
 			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], 1);
 			if(sizeA >= 1 && sizeA <= 4) {
-				ram.memory[position + offset * sizeA] = registers[regA] & 0xFF;
+				ram.memory[position + (offset * sizeA)] = registers[regA] & 0xFF;
 				if(sizeA >= 2) {
-					ram.memory[position + offset * sizeA + 1] = (byte)(registers[regA] >> 8);
+					ram.memory[position + (offset * sizeA) + 1] = (byte)(registers[regA] >> 8);
 				}
 				if(sizeA == 4) {
-					ram.memory[position + offset * sizeA + 2] = (byte)(registers[regA] >> 16);
-					ram.memory[position + offset * sizeA + 3] = (byte)(registers[regA] >> 24);
+					ram.memory[position + (offset * sizeA) + 2] = (byte)(registers[regA] >> 16);
+					ram.memory[position + (offset * sizeA) + 3] = (byte)(registers[regA] >> 24);
 				}
 			}else{
 				std::cout << "Invalid data type size at instruction 0x03 at memory position: 0x" << std::hex << programCounter << '\n';
@@ -144,7 +144,7 @@ void CPU::execute() {
 			byte sizeA = getBits(argument, 1);
 			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], 1);
-			registers[regA] = checkArgument(memPos + offset * sizeA, sizeA);
+			registers[regA] = checkArgument(memPos + (offset * sizeA), sizeA);
 			programCounter += 8;
 		break; };
 
@@ -307,7 +307,7 @@ void CPU::execute() {
 		case 0x15: { //Decrement register by 1
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
-			registers[regA]++;
+			registers[regA]--;
 			programCounter += 2;
 		break; }		   
 
@@ -322,6 +322,13 @@ void CPU::execute() {
 			if(mode == 2) { gpu.setCharCF(registers[regA], registers[regB], arg); };
 			programCounter += 6;
 			break; }
+
+		case 0x17: { //Set register to 0
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			registers[regA] = 0;
+			programCounter += 2;
+		break; }
 	}
 }
 

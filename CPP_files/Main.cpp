@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> vNames;
 	int addMem = 0;
 
-	Assembly::readFile("CPU_Programs/Program.sal", code);
+	Assembly::readFile("CPU_Programs/Program2.sal", code);
 
 	Assembly::Compile(code, cpu1, vValues, vNames, addMem);
 

@@ -153,6 +153,7 @@ namespace Assembly {
 			std::string instruction = code[i];
 
 			if (instruction == "program.start") {
+				currentPos += additionalMemory;
 				continue;
 			}
 
@@ -269,7 +270,7 @@ namespace Assembly {
 				line++;
 			}else if (instruction == "sub") {
 				i += 2;
-				currentPos += 3;
+				currentPos += 2;
 				line++;
 			}else if (instruction.compare(0, 4, "mlt.") == 0) {
 				if(instruction[4] == 's'){
@@ -310,7 +311,7 @@ namespace Assembly {
 					line++;
 				}else if(instruction[4] == 'u') {
 					currentPos += 5;
-					i += 2;
+					i++;
 					line++;
 				}else{
 					std::cout << "Uknwown jump type at instruction >jmp< at line " << line << '\n';
@@ -826,6 +827,15 @@ namespace Assembly {
 
 				i++;
 				line++;
+			}else if(instruction == "clr") {
+				cpu.ram.memory[currentPos++] = 0x17;
+
+				byte arg = indexRegister(code, i, 1);
+
+				cpu.ram.memory[currentPos++] = arg;
+
+				i++;
+				line++;
 			}else if (instruction == "add") {
 				cpu.ram.memory[currentPos++] = 0x06;
 
@@ -957,7 +967,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = b2;
 					cpu.ram.memory[currentPos++] = b3;
 
-					i += 2;
+					i++;
 					line++;
 				}else{
 					std::cout << "Uknwown jump type at instruction >jmp< at line " << line << '\n';
