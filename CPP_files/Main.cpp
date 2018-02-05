@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 		if (pc1.cpu.halt == true && printed == false) {
 			t = clock() - t;
 			std::cout << "\n";
-			std::cout << "It took: " << t << " miliseconds for CPU to finish its task" << '\n';
+			std::cout << "It took: " << ((double)t/CLOCKS_PER_SEC) << " seconds for CPU to finish its task" << '\n';
 			printed = true;
 		}
 		gpu1.tick();
