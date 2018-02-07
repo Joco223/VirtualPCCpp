@@ -21,6 +21,7 @@
 #include "GPU.h"
 #include "Assembly.h"
 #include "GPUAssembly.h"
+#include "Compiler.h"
 
 int width = 320;
 int height = 240;
@@ -57,6 +58,12 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> vNames;
 	int addMem = 0;
 
+	std::vector<std::string> cCode;
+
+	Compiler::readFile("Program.cl", cCode);
+
+	Compiler::Compile(cCode, code);
+
 	Assembly::readFile("CPU_Programs/Program2.sal", code);
 
 	Assembly::Compile(code, cpu1, vValues, vNames, addMem);
@@ -84,7 +91,7 @@ int main(int argc, char* argv[]) {
 				quit = true;
 				break;
 			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym) {
+				/*switch (event.key.keysym.sym) {
 					case SDLK_LSHIFT: shift = !shift; std::cout << "Shift is: " << shift << '\n'; break;
 					case SDLK_RSHIFT: shift = !shift; std::cout << "Shift is: " << shift << '\n';break;
 					case SDLK_CAPSLOCK: caps_lock = !caps_lock; std::cout << "Caps Lock is: " << caps_lock << '\n';break;
@@ -133,7 +140,7 @@ int main(int argc, char* argv[]) {
 					case SDLK_x:         pc1.cpu.interrupted = true; if(caps_lock == true) { pc1.cpu.interruptRegister = 63; } else { pc1.cpu.interruptRegister = 92; } break;
 					case SDLK_y:         pc1.cpu.interrupted = true; if(caps_lock == true) { pc1.cpu.interruptRegister = 64; } else { pc1.cpu.interruptRegister = 93; } break;
 					case SDLK_z:         pc1.cpu.interrupted = true; if(caps_lock == true) { pc1.cpu.interruptRegister = 65; } else { pc1.cpu.interruptRegister = 94; } break;
-				}
+				}*/
 				break;
 			}
 
@@ -149,8 +156,8 @@ int main(int argc, char* argv[]) {
 			std::cout << "It took: " << ((double)t/CLOCKS_PER_SEC) << " seconds for CPU to finish its task" << '\n';
 			printed = true;
 		}
-		gpu1.tick();
-		gpu1.updateScreen();
+		//gpu1.tick();
+		//gpu1.updateScreen();
 		//NSSDL::updateSDL(pc1.screen);
 	}
 
