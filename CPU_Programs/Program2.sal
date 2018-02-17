@@ -1,93 +1,19 @@
 data.
-s8.a set 16 7 3 5 4 11 8 10 15 9 13 6 0 12 14 1 2
-s8 k 16
-s8 r 16
-s8 f 0
-s8 c 0
-s8 d 0
-s8 l 0
-s8 swap 0
+s8 x 5
+s8 y 10
+s8 zero 0
+
+fn testFN regA c, a, b
+moveP 1 regA
+moveP 2 regB
+add regA regB
+moveP regA 0
+ret
 
 program.start
 
-start:
-
-move.s c regA
-move.s k regB
-cmp.u.b regB regA
-
-jmp.z regB print
-
-move.s k regA
-dec regA
-move.s regA f
-
-start2:
-
-move.s d regA
-move.s f regB
-cmp.u.b regB regA
-
-jmp.z regB part1
-
-move.s d regA
-inc regA
-move.s regA l
-
-moveO.s set d regA
-moveO.s set l regB
-cmp.u.b regA regB
-
-jmp.z regA part3
-
-moveO.s set d regA
-move.s regA swap
-
-moveO.s set l regA
-moveO.s regA set d
-
-move.s swap regA
-moveO.s regA set l
-
-part3:
-
-move.s d regA
-inc regA
-move.s regA d
-
-jmp.u start2
-
-part1:
-
 clr regA
-move.s regA d
 
-move.s c regA
-inc regA
-move.s regA c
+call testFN zero x y
 
-jmp.u start
-
-print:
-
-clr regA
-move.s regA c
-
-part4:
-
-move.s c regA
-move.s r regB
-cmp.u.b regB regA
-
-jmp.z regB end
-
-moveO.s set c regA
 cot regA
-
-move.s c regA
-inc regA
-move.s regA c
-
-jmp.u part4
-
-end:

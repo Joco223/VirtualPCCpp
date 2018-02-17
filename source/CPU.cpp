@@ -122,7 +122,7 @@ void CPU::execute() {
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
 			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], 1);
+			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], sizeA);
 			if(sizeA >= 1 && sizeA <= 4) {
 				ram.memory[position + (offset * sizeA)] = registers[regA] & 0xFF;
 				if(sizeA >= 2) {
@@ -143,7 +143,7 @@ void CPU::execute() {
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
 			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], 1);
+			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], sizeA);
 			registers[regA] = checkArgument(memPos + (offset * sizeA), sizeA);
 			programCounter += 8;
 		break; };
@@ -151,9 +151,11 @@ void CPU::execute() {
 		case 0x05: { //Shutdown the pc
 			/*std::ofstream file;
 
+			//So it is all set up
+
 			file.open("HDD.txt", std::ios::out | std::ios::trunc);
 			file.close();
-
++
 			file.open("HDD.txt");
 			for (int i = 0; i < numSectors; i++) {
 				for (int j = 0; j < sectorSize; j++) {
@@ -163,6 +165,7 @@ void CPU::execute() {
 			}
 			file.close();
 			std::cout << '\n';*/
+
 			std::cout << "The PC has shut down" << '\n';
 			halt = true;
 			break; }
@@ -309,7 +312,7 @@ void CPU::execute() {
 			byte regA = getBits(argument, 0);
 			registers[regA]--;
 			programCounter += 2;
-		break; }		   
+		break; }
 
 		case 0x16: { //Change screen buffer elements
 			byte regA = getBits(ram.memory[programCounter + 1], 0);
@@ -329,6 +332,45 @@ void CPU::execute() {
 			registers[regA] = 0;
 			programCounter += 2;
 		break; }
+
+		case 0x18: { //Get parameter from stack_object
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte param = getBits(argument, 1);
+			registers[regA] = stack[currentStackPos].parameters[param];
+			programCounter += 2;
+		break; }
+
+		case 0x19: { //Set parameter in stack_object
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte param = getBits(argument, 1);
+			stack[currentStackPos].parameters[param] = registers[regA];
+			programCounter += 2;
+		break; }
+
+		case 0x1A: { //Call a function from the stack
+			currentStackPos = registers[0];
+
+			int offset = 0;
+
+			for(int i = 0; i < stack[currentStackPos].parameters.size(); i++) {
+				int memPos = ram.memory[programCounter + (3 + i * 3)] << 16 | ram.memory[programCounter + (2 + i * 3)] << 8 | ram.memory[programCounter + (1 + i * 3)];
+				byte arg = checkArgument(memPos, 1);
+
+				offset += 3;
+				stack[currentStackPos].parameters[i] = arg;
+			}
+
+			stack[currentStackPos].PP = programCounter + offset + 1;
+			programCounter = stack[currentStackPos].BP;
+		break; }
+
+		case 0x1B: { //Return from the function (Reserving first parameter as the return value)
+			programCounter = stack[currentStackPos].PP;
+			registers[stack[currentStackPos].return_register] = stack[currentStackPos].parameters[0];
+			//programCounter++;
+		break;}
 	}
 }
 

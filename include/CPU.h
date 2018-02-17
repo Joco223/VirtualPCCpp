@@ -11,6 +11,15 @@
 
 typedef unsigned char byte;
 
+struct stack_object {
+	std::string name;
+	std::vector<unsigned int> parameters;
+	std::vector<unsigned int> parametersSize;
+	unsigned int BP;
+	unsigned int PP;
+	int return_register;
+};
+
 class CPU {
 public:
 	Memory& ram;
@@ -21,6 +30,9 @@ public:
 
 	std::vector<unsigned int> registers;
 
+	std::vector<stack_object> stack;
+
+	unsigned int currentStackPos;
 	int programCounter;
 	int sectorSize;
 	int numSectors;

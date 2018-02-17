@@ -31,13 +31,13 @@ namespace Assembly {
 		}
 	}
 
-	int checkJmpPos(std::string argument, std::vector<std::string>& jumpNames, std::vector<int> jumpPos) {
+	int checkJmpPos(std::string argument, std::vector<jump_pos>& jmps, int currentDepth) {
 		bool varExists = false;
 		int id = 0;
 		int tmp = 0;
 
-		for (unsigned int i = 0; i < jumpNames.size(); i++) {
-			if (argument == jumpNames[i]) {
+		for (unsigned int i = 0; i < jmps.size(); i++) {
+			if (argument == jmps[i].name && currentDepth <= jmps[i].sDepth) {
 				varExists = true;
 				id = i;
 				break;
@@ -45,18 +45,18 @@ namespace Assembly {
 		}
 
 		if (varExists == true) {
-			tmp = jumpPos[id];
+			tmp = jmps[id].position;
 		}
 
 		return tmp;
 	}
 
-	int checkArgType(std::string& argument, CPU& cpu, std::vector<std::string>& vars, std::vector<int>& varValues) {
+	int checkArgType(std::string& argument, CPU& cpu, std::vector<variable>& vars, int currentDepth) {
 		bool varExists = false;
 		int id = 0;
 
 		for (unsigned int i = 0; i < vars.size(); i++) {
-			if (argument == vars[i]) {
+			if (argument == vars[i].name && currentDepth >= vars[i].sDepth) {
 				varExists = true;
 				id = i;
 				break;
@@ -64,17 +64,36 @@ namespace Assembly {
 		}
 
 		if (varExists == true) {
-			return varValues[id];
+			return vars[id].value;
 		}else if (varExists == false) {
-			if (argument == "REG0") {
-				return cpu.ram.memory.size() + 1;
-			}else if (argument == "REG1") {
-				return cpu.ram.memory.size() + 2;
-			}else if (argument == "REG_INT") {
-				return cpu.ram.memory.size() + 3;
-			}else {
-				return std::stoi(argument);
+			if(argument == "regA") {return cpu.ram.memory.size() +  1; };
+			if(argument == "regB") {return cpu.ram.memory.size() +  2; };
+			if(argument == "regC") {return cpu.ram.memory.size() +  3; };
+			if(argument == "regD") {return cpu.ram.memory.size() +  4; };
+			if(argument == "regE") {return cpu.ram.memory.size() +  5; };
+			if(argument == "regF") {return cpu.ram.memory.size() +  6; };
+			if(argument == "regG") {return cpu.ram.memory.size() +  7; };
+			if(argument == "regH") {return cpu.ram.memory.size() +  8; };
+			if(argument == "regI") {return cpu.ram.memory.size() +  9; };
+			if(argument == "regJ") {return cpu.ram.memory.size() + 10; };
+			if(argument == "regK") {return cpu.ram.memory.size() + 11; };
+			if(argument == "regL") {return cpu.ram.memory.size() + 12; };
+		}
+	}
+
+	int checkFunction(std::string function, CPU& cpu, std::vector<stack_object>& stack) {
+		bool fnExists = false;
+		int id = 0;
+
+		for(int i = 0; i < stack.size(); i++){
+			if(function == stack[i].name) {
+				fnExists = true;
+				id = i;
 			}
+		}
+
+		if(fnExists == true){
+			return id;
 		}
 	}
 
@@ -138,11 +157,13 @@ namespace Assembly {
 		int additionalMemory = 0;
 		int GadditionalMemory = 0;
 		int line = 0;
+		int stackPos = 0;
 
-		std::vector<int> jumpPositions;
-		std::vector<std::string> jumpNames;
-		std::vector<int> varValues;
-		std::vector<std::string> vars;
+		int scopeDepth = 0;
+
+		std::vector<jump_pos> jumpPositions;
+		std::vector<variable> variables;
+		std::vector<int> fnOffset;
 
 		bool dataM = false;
 		bool interM = false;
@@ -209,6 +230,29 @@ namespace Assembly {
 					i += (2 + endInc);
 					line++;
 					continue;
+				}else if(instruction == "d16.a") {
+					std::string arg2 = code[i + 2];
+
+					int Arg2 = std::stoi(arg2);
+
+					bool ended = false;
+					int endInc = Arg2;
+
+					for (int j = 0; j < Arg2; j++) {
+						if (ended == false) {
+							if(code[i + 3 + j] == "#"){
+								ended = true;
+								endInc = j + 1;
+							}else{
+								currentPos += 2;
+							}
+						}
+
+					}
+
+					i += (2 + endInc);
+					line++;
+					continue;
 				}
 			}
 
@@ -248,6 +292,10 @@ namespace Assembly {
 					cpu.ram.Clear();
 					break;
 				}
+			}else if(instruction.compare(0, 5, "moveP") == 0) {
+				currentPos += 2;
+				i += 2;
+				line++;
 			}else if(instruction == "clr") {
 				i++;
 				currentPos += 2;
@@ -371,23 +419,43 @@ namespace Assembly {
 				currentPos++;
 				line++;
 			}else if(instruction == "sb.setID") {
-				currentPos += 6;	
+				currentPos += 6;
 				i += 3;
 				line++;
 			}else if(instruction == "sb.setCB") {
-				currentPos += 6;	
+				currentPos += 6;
 				i += 3;
 				line++;
 			}else if(instruction == "sb.setCF") {
-				currentPos += 6;	
+				currentPos += 6;
 				i += 3;
 				line++;
+			}else if(!instruction.compare(0, 2, "fn")) {
+				int r = 0;
+
+				while (code[i + 3 + r].back() == ',') {
+					r++;
+				}
+				fnOffset.push_back(r + 1);
+
+				i += 3 + r;
+			}else if(!instruction.compare(0, 4, "call")) {
+				for(int k = 0; k < fnOffset[stackPos]; k++){
+					currentPos += 3;
+				}
+				currentPos++;
+				i += 1 + fnOffset[stackPos];
+			}else if(!instruction.compare(0, 3, "ret")) {
+				currentPos++;
 			}else{
 				if (instruction.back() == ':') {
 					std::string tmp = instruction;
 					tmp.erase(tmp.end() - 1);
-					jumpNames.push_back(tmp);
-					jumpPositions.push_back(currentPos);
+					jump_pos temp;
+					temp.sDepth = scopeDepth;
+					temp.name = tmp;
+					temp.position = currentPos;
+					jumpPositions.push_back(temp);
 					line++;
 				}else{
 					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
@@ -408,6 +476,7 @@ namespace Assembly {
 		line = 0;
 		dataM = false;
 		interM = false;
+		scopeDepth = 0;
 
 		for (unsigned int i = 0; i < code.size(); i++) {
 
@@ -444,15 +513,20 @@ namespace Assembly {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
-					vars.push_back(arg1);
 					int Arg2 = std::stoi(arg2);
-					varValues.push_back(currentPos);
+
+					variable temp;
+					temp.name = arg1;
+					temp.value = currentPos;
+					temp.sDepth = scopeDepth;
+					temp.size = 1;
+					variables.push_back(temp);
 
 					cpu.ram.memory[currentPos++] = (byte)Arg2;
 					i += 2;
 					line++;
 					continue;
-				}else if (instruction == "d16") {
+				}/*else if (instruction == "d16") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
@@ -466,6 +540,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = b2;
 					i += 2;
 					line++;
+					continue;
 				}else if (instruction == "l32") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -482,6 +557,7 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = b4;
 					i += 2;
 					line++;
+					continue;
 				}else if(instruction == "s8.a") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -509,7 +585,37 @@ namespace Assembly {
 					i += (2 + endInc);
 					line++;
 					continue;
-				}
+				}else if(instruction == "d16.a") {
+					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
+
+					vars.push_back(arg1);
+					int Arg2 = std::stoi(arg2);
+					varValues.push_back(currentPos);
+
+					bool ended = false;
+					int endInc = Arg2;
+
+					for (int j = 0; j < Arg2; j++) {
+						int element = 0;
+						if (ended == false) {
+							if(code[i + 3 + j] == "#"){
+								ended = true;
+								endInc = j + 1;
+							}else{
+								element = checkArgType(code[i + 3 + j], cpu, vars, varValues);
+							}
+						}
+						byte b1, b2;
+						convertByte2(element, b1, b2);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+					}
+
+					i += (2 + endInc);
+					line++;
+					continue;
+				}*/
 			}
 
 			if(instruction.compare(0, 5, "move.") == 0) {
@@ -522,7 +628,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -540,8 +646,8 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 1], cpu, vars, varValues);
-						
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
+
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
 						cpu.ram.memory[currentPos++] = b1;
@@ -560,7 +666,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -578,7 +684,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 1], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -598,7 +704,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -616,7 +722,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 1], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -642,7 +748,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -650,7 +756,7 @@ namespace Assembly {
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
 
-						int arg3 = checkArgType(code[i + 3], cpu, vars, varValues);
+						int arg3 = checkArgType(code[i + 3], cpu, variables, scopeDepth);
 
 						byte b4, b5, b6;
 						convertByte3(arg3, b4, b5, b6);
@@ -668,15 +774,15 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 1], cpu, vars, varValues);
-						
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
+
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
 						cpu.ram.memory[currentPos++] = b1;
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
 
-						int arg3 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg3 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b4, b5, b6;
 						convertByte3(arg3, b4, b5, b6);
@@ -696,7 +802,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -704,7 +810,7 @@ namespace Assembly {
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
 
-						int arg3 = checkArgType(code[i + 3], cpu, vars, varValues);
+						int arg3 = checkArgType(code[i + 3], cpu, variables, scopeDepth);
 
 						byte b4, b5, b6;
 						convertByte3(arg3, b4, b5, b6);
@@ -722,7 +828,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 1], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -730,7 +836,7 @@ namespace Assembly {
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
 
-						int arg3 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg3 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b4, b5, b6;
 						convertByte3(arg3, b4, b5, b6);
@@ -750,7 +856,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -758,7 +864,7 @@ namespace Assembly {
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
 
-						int arg3 = checkArgType(code[i + 3], cpu, vars, varValues);
+						int arg3 = checkArgType(code[i + 3], cpu, variables, scopeDepth);
 
 						byte b4, b5, b6;
 						convertByte3(arg3, b4, b5, b6);
@@ -776,7 +882,7 @@ namespace Assembly {
 
 						cpu.ram.memory[currentPos++] = arg;
 
-						int arg2 = checkArgType(code[i + 1], cpu, vars, varValues);
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
 
 						byte b1, b2, b3;
 						convertByte3(arg2, b1, b2, b3);
@@ -784,7 +890,7 @@ namespace Assembly {
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
 
-						int arg3 = checkArgType(code[i + 2], cpu, vars, varValues);
+						int arg3 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
 						byte b4, b5, b6;
 						convertByte3(arg3, b4, b5, b6);
@@ -800,6 +906,28 @@ namespace Assembly {
 					cpu.ram.Clear();
 					break;
 				}
+			}else if(instruction.compare(0, 5, "moveP") == 0) {
+				if(isRegister(code, i)) {
+					std::string regA = code[i + 1];
+					std::string paramA = code[i + 2];
+
+					byte arg = indexRegister(code, i, 1);
+					arg |= (std::stoi(paramA) << 4);
+
+					cpu.ram.memory[currentPos++] = 0x19;
+					cpu.ram.memory[currentPos++] = arg;
+				}else{
+					std::string regA = code[i + 2];
+					std::string paramA = code[i + 1];
+
+					byte arg = indexRegister(code, i, 2);
+					arg |= (std::stoi(paramA) << 4);
+
+					cpu.ram.memory[currentPos++] = 0x18;
+					cpu.ram.memory[currentPos++] = arg;
+				}
+				i += 2;
+				line++;
 			}else if(instruction == "inc") {
 				cpu.ram.memory[currentPos++] = 0x12;
 
@@ -923,7 +1051,7 @@ namespace Assembly {
 
 					cpu.ram.memory[currentPos++] = arg;
 
-					int arg2 = checkJmpPos(code[i + 2], jumpNames, jumpPositions);
+					int arg2 = checkJmpPos(code[i + 2], jumpPositions, scopeDepth);
 
 					byte b1, b2, b3;
 					convertByte3(arg2, b1, b2, b3);
@@ -941,7 +1069,7 @@ namespace Assembly {
 
 					cpu.ram.memory[currentPos++] = arg;
 
-					int arg2 = checkJmpPos(code[i + 2], jumpNames, jumpPositions);
+					int arg2 = checkJmpPos(code[i + 2], jumpPositions, scopeDepth);
 
 					byte b1, b2, b3;
 					convertByte3(arg2, b1, b2, b3);
@@ -959,7 +1087,7 @@ namespace Assembly {
 
 					cpu.ram.memory[currentPos++] = arg;
 
-					int arg2 = checkJmpPos(code[i + 1], jumpNames, jumpPositions);
+					int arg2 = checkJmpPos(code[i + 1], jumpPositions, scopeDepth);
 
 					byte b1, b2, b3;
 					convertByte3(arg2, b1, b2, b3);
@@ -1072,8 +1200,8 @@ namespace Assembly {
 
 				cpu.ram.memory[currentPos++] = 0x0;
 
-				int arg2 = checkArgType(code[i + 3], cpu, vars, varValues);
-						
+				int arg2 = checkArgType(code[i + 3], cpu, variables, scopeDepth);
+
 				byte b1, b2, b3;
 				convertByte3(arg2, b1, b2, b3);
 				cpu.ram.memory[currentPos++] = b1;
@@ -1092,8 +1220,8 @@ namespace Assembly {
 
 				cpu.ram.memory[currentPos++] = 0x1;
 
-				int arg2 = checkArgType(code[i + 3], cpu, vars, varValues);
-						
+				int arg2 = checkArgType(code[i + 3], cpu, variables, scopeDepth);
+
 				byte b1, b2, b3;
 				convertByte3(arg2, b1, b2, b3);
 				cpu.ram.memory[currentPos++] = b1;
@@ -1112,8 +1240,8 @@ namespace Assembly {
 
 				cpu.ram.memory[currentPos++] = 0x2;
 
-				int arg2 = checkArgType(code[i + 3], cpu, vars, varValues);
-						
+				int arg2 = checkArgType(code[i + 3], cpu, variables, scopeDepth);
+
 				byte b1, b2, b3;
 				convertByte3(arg2, b1, b2, b3);
 				cpu.ram.memory[currentPos++] = b1;
@@ -1122,6 +1250,79 @@ namespace Assembly {
 
 				i += 3;
 				line++;
+			}else if(!instruction.compare(0, 2, "fn")) {
+				std::string name = code[i + 1];
+				std::string return_reg = code[i + 2];
+				std::vector<std::string> parameters;
+				std::vector<unsigned int> paramVal;
+				std::vector<unsigned int> paramSize;
+
+				int r = 0;
+
+				scopeDepth++;
+
+				while (code[i + 3 + r].back() == ',') {
+					std::string tempo = code[i + 3 + r];
+					if(tempo.back() == ',') {
+						tempo.erase(tempo.end() - 1);
+					}
+					parameters.push_back(tempo);
+
+					variable temp;
+					temp.name = tempo;
+					temp.value = 0;
+					temp.sDepth = scopeDepth;
+					temp.size = 4;
+					variables.push_back(temp);
+					paramSize.push_back(4);
+
+					r++;
+				}
+				std::string tempo = code[i + 4 + r];
+				parameters.push_back(tempo);
+				variable temp2;
+				temp2.name = tempo;
+				temp2.value = 0;
+				temp2.sDepth = scopeDepth;
+				temp2.size = 1;
+				variables.push_back(temp2);
+				paramSize.push_back(4);
+
+				paramVal.resize(parameters.size());
+
+				stack_object temp;
+				temp.name = name;
+				temp.parameters.resize(parameters.size());
+				temp.parametersSize = paramSize;
+				temp.BP = currentPos;
+				temp.PP = 0;
+				temp.return_register = indexRegister(code, i, 2);
+				cpu.stack.push_back(temp);
+
+				i += 3 + r;
+			}else if(!instruction.compare(0, 4, "call")) {
+				std::string function = code[i + 1];
+
+				stackPos = checkFunction(function, cpu, cpu.stack);
+
+				cpu.ram.memory[currentPos++] = 0x1A;
+
+				for(int k = 0; k < cpu.stack[stackPos].parameters.size(); k++){
+					std::string parameter = code[i + 2 + k];
+
+					int param = checkArgType(parameter, cpu, variables, scopeDepth);
+
+					byte b1, b2, b3;
+					convertByte3(param, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+					cpu.ram.memory[currentPos++] = b3;
+				}
+
+				i += cpu.stack[stackPos].parameters.size() + 1;
+			}else if(!instruction.compare(0, 3, "ret")) {
+				cpu.ram.memory[currentPos++] = 0x1B;
+				scopeDepth--;
 			}else{
 				if (instruction.back() == ':') {
 					line++;
@@ -1138,6 +1339,7 @@ namespace Assembly {
 			}
 
 		}
+
 
 		finalCP = GadditionalMemory;
 

@@ -11,6 +11,7 @@
 typedef unsigned char byte;
 
 namespace Compiler {
-	void Compile(std::vector<std::string>& code, std::vector<std::string>& assembly_code);
+	void Parse(std::vector<std::string>& tokens);
+	void splitFile(std::vector<std::string>& code, std::vector<std::string>& tokens);
 	void readFile(std::string path, std::vector<std::string>& code);
 }
