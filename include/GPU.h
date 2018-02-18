@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <time.h> 
+#include <time.h>
 
 #include "Memory.h"
 #include "SDLWindow.h"
@@ -32,6 +32,11 @@ struct screenCharacter {
 	byte characterID;
 };
 
+struct screenPos {
+	int x;
+	int y;
+};
+
 class GPU {
 public:
 	Memory commandBuffer;
@@ -44,6 +49,7 @@ public:
 	std::vector<task_id> tasks;
 	std::vector<screenCharacter> screenCharacters;
 	std::vector<GPUCore> cores;
+	std::vector<screenPos> charactersNUpdate;
 	SDL_Texture* font;
 
 	GPU(int, int, int, int, SDLWindow*, Memory&);

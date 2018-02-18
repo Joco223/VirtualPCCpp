@@ -350,26 +350,27 @@ void CPU::execute() {
 		break; }
 
 		case 0x1A: { //Call a function from the stack
-			currentStackPos = registers[0];
+			currentStackPos = ram.memory[programCounter + 1];
+			stack[currentStackPos].return_register = ram.memory[programCounter + 2];
 
 			int offset = 0;
 
 			for(int i = 0; i < stack[currentStackPos].parameters.size(); i++) {
-				int memPos = ram.memory[programCounter + (3 + i * 3)] << 16 | ram.memory[programCounter + (2 + i * 3)] << 8 | ram.memory[programCounter + (1 + i * 3)];
+				int memPos = ram.memory[programCounter + (5 + i * 3)] << 16 | ram.memory[programCounter + (4 + i * 3)] << 8 | ram.memory[programCounter + (3 + i * 3)];
 				byte arg = checkArgument(memPos, 1);
 
 				offset += 3;
 				stack[currentStackPos].parameters[i] = arg;
 			}
 
-			stack[currentStackPos].PP = programCounter + offset + 1;
+			stack[currentStackPos].PP = programCounter + offset + 3;
 			programCounter = stack[currentStackPos].BP;
 		break; }
 
 		case 0x1B: { //Return from the function (Reserving first parameter as the return value)
+			byte argument = ram.memory[programCounter + 1];
 			programCounter = stack[currentStackPos].PP;
-			registers[stack[currentStackPos].return_register] = stack[currentStackPos].parameters[0];
-			//programCounter++;
+			registers[stack[currentStackPos].return_register] = stack[currentStackPos].parameters[argument];
 		break;}
 	}
 }

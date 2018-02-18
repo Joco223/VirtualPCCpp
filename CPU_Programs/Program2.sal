@@ -1,19 +1,17 @@
 data.
 s8 x 5
-s8 y 10
-s8 zero 0
+s8 y 25
+s8 z 0
 
-fn testFN regA c, a, b
-moveP 1 regA
-moveP 2 regB
+fn sum c, a, b
+moveP a regA
+moveP b regB
 add regA regB
-moveP regA 0
-ret
+moveP regA c
+ret c
 
 program.start
 
-clr regA
-
-call testFN zero x y
+call regA sum z x y
 
 cot regA

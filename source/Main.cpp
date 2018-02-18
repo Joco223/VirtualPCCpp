@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <time.h>
+#include <thread>
 
 #include "NSSDL.h"
 #include "SDLWindow.h"
@@ -29,6 +30,11 @@ int height = 240;
 bool quit = false;
 
 typedef unsigned char byte;
+
+void runGPU (GPU* gpu) {
+	gpu->tick();
+	gpu->updateScreen();
+}
 
 int main(int argc, char* argv[]) {
 	SDL_Event event;
@@ -87,6 +93,8 @@ int main(int argc, char* argv[]) {
 	bool printed = false;
 	bool measured = false;
 
+	std::thread GPU1 (runGPU, &gpu1);
+
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -109,10 +117,9 @@ int main(int argc, char* argv[]) {
 			std::cout << "It took: " << ((double)t/CLOCKS_PER_SEC) << " seconds for CPU to finish its task" << '\n';
 			printed = true;
 		}
-		//gpu1.tick();
-		//gpu1.updateScreen();
-		//NSSDL::updateSDL(pc1.screen);
 	}
+
+	GPU1.join();
 
 	SDL_Quit();
 

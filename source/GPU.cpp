@@ -12,7 +12,7 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCount, int commandArgBuffe
 	for (int x = 0; x < coreCount; x++) {
 		cores.emplace_back(vRam, screen_, 256, x, 0);
 	}
-	
+
 	for(int y = 0; y < 30; y++) {
 		for(int x = 0; x < 53; x++) {
 			screenCharacter tmp;
@@ -37,19 +37,22 @@ void GPU::loadFont() {
 }
 
 void GPU::setCharID(byte x, byte y, byte id) {
-	screenCharacters[y * 53 + x].characterID = id; 
+	screenCharacters[y * 53 + x].characterID = id;
+	charactersNUpdate.push_back({x, y});
 }
 
 void GPU::setCharCB(byte x, byte y, byte cB) {
 	screenCharacters[y * 53 + x].rB = (cB >> 5) & 0b00000111;
 	screenCharacters[y * 53 + x].gB = (cB >> 2) & 0b00111;
 	screenCharacters[y * 53 + x].bB = cB & 0b11;
+	charactersNUpdate.push_back({x, y});
 }
 
 void GPU::setCharCF(byte x, byte y, byte cF) {
 	screenCharacters[y * 53 + x].r = (cF >> 5) & 0b00000111;
 	screenCharacters[y * 53 + x].g = (cF >> 2) & 0b00111;
 	screenCharacters[y * 53 + x].b = cF & 0b11;
+	charactersNUpdate.push_back({x, y});
 }
 
 void GPU::updateScreen() {
@@ -59,28 +62,30 @@ void GPU::updateScreen() {
 	source.h = 8;
 	target.w = 6;
 	target.h = 8;
-	for(int y = 0; y < 30; y++) {
-		for(int x = 0; x < 53; x++) {
-			source.x = 7 * 6;
-			source.y = 6 * 8;
 
-			target.x = x * 6;
-			target.y = y * 8;
+	for(auto i : charactersNUpdate) {
+		source.x = 7 * 6;
+		source.y = 6 * 8;
 
-			SDL_SetTextureColorMod(font, screenCharacters[y * 53 + x].rB * 36.428, screenCharacters[y * 53 + x].gB * 36.428, screenCharacters[y * 53 + x].bB * 85);
+		target.x = i.x * 6;
+		target.y = i.y * 8;
 
-			SDL_RenderCopy(screen->renderer, font, &source, &target);
+		SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].rB * 36.428, screenCharacters[i.y * 53 + i.x].gB * 36.428, screenCharacters[i.y * 53 + i.x].bB * 85);
 
-			source.x = (screenCharacters[y * 53 + x].characterID % 10) * 6;
-			source.y = (screenCharacters[y * 53 + x].characterID / 10) * 8;
-			
+		SDL_RenderCopy(screen->renderer, font, &source, &target);
 
-			SDL_SetTextureColorMod(font, screenCharacters[y * 53 + x].r * 36.428, screenCharacters[y * 53 + x].g * 36.428, screenCharacters[y * 53 + x].b * 85);
+		source.x = (screenCharacters[i.y * 53 + i.x].characterID % 10) * 6;
+		source.y = (screenCharacters[i.y * 53 + i.x].characterID / 10) * 8;
 
-			SDL_RenderCopy(screen->renderer, font, &source, &target);
-		}
+
+		SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].r * 36.428, screenCharacters[i.y * 53 + i.x].g * 36.428, screenCharacters[i.y * 53 + i.x].b * 85);
+
+		SDL_RenderCopy(screen->renderer, font, &source, &target);
 	}
-	SDL_RenderPresent(screen->renderer);
+
+	if(charactersNUpdate.size() > 0) { SDL_RenderPresent(screen->renderer); };
+
+	charactersNUpdate.clear();
 }
 
 void convertByte(int number, byte& b1, byte& b2, byte& b3) {
@@ -116,6 +121,6 @@ void GPU::tick() {
 			}
 		}else{
 			cores[i].tick();
-		}		
+		}
 	}
 }

@@ -56,7 +56,7 @@ namespace Assembly {
 		int id = 0;
 
 		for (unsigned int i = 0; i < vars.size(); i++) {
-			if (argument == vars[i].name && currentDepth >= vars[i].sDepth) {
+			if (argument == vars[i].name && currentDepth <= vars[i].sDepth) {
 				varExists = true;
 				id = i;
 				break;
@@ -433,20 +433,21 @@ namespace Assembly {
 			}else if(!instruction.compare(0, 2, "fn")) {
 				int r = 0;
 
-				while (code[i + 3 + r].back() == ',') {
+				while (code[i + 2 + r].back() == ',') {
 					r++;
 				}
 				fnOffset.push_back(r + 1);
 
-				i += 3 + r;
+				i += 2 + r;
 			}else if(!instruction.compare(0, 4, "call")) {
 				for(int k = 0; k < fnOffset[stackPos]; k++){
 					currentPos += 3;
 				}
-				currentPos++;
-				i += 1 + fnOffset[stackPos];
+				currentPos += 3;
+				i += 2 + fnOffset[stackPos];
 			}else if(!instruction.compare(0, 3, "ret")) {
-				currentPos++;
+				currentPos += 2;;
+				i++;
 			}else{
 				if (instruction.back() == ':') {
 					std::string tmp = instruction;
@@ -526,13 +527,17 @@ namespace Assembly {
 					i += 2;
 					line++;
 					continue;
-				}/*else if (instruction == "d16") {
+				}else if (instruction == "d16") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
-					vars.push_back(arg1);
 					int Arg2 = std::stoi(arg2);
-					varValues.push_back(currentPos);
+					variable temp;
+					temp.name = arg1;
+					temp.value = currentPos;
+					temp.sDepth = scopeDepth;
+					temp.size = 2;
+					variables.push_back(temp);
 
 					byte b1, b2;
 					convertByte2(Arg2, b1, b2);
@@ -545,9 +550,13 @@ namespace Assembly {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
-					vars.push_back(arg1);
 					int Arg2 = std::stoi(arg2);
-					varValues.push_back(currentPos);
+					variable temp;
+					temp.name = arg1;
+					temp.value = currentPos;
+					temp.sDepth = scopeDepth;
+					temp.size = 4;
+					variables.push_back(temp);
 
 					byte b1, b2, b3, b4;
 					convertByte4(Arg2, b1, b2, b3, b4);
@@ -562,9 +571,13 @@ namespace Assembly {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
-					vars.push_back(arg1);
 					int Arg2 = std::stoi(arg2);
-					varValues.push_back(currentPos);
+					variable temp;
+					temp.name = arg1;
+					temp.value = currentPos;
+					temp.sDepth = scopeDepth;
+					temp.size = 1;
+					variables.push_back(temp);
 
 					bool ended = false;
 					int endInc = Arg2;
@@ -576,7 +589,7 @@ namespace Assembly {
 								ended = true;
 								endInc = j + 1;
 							}else{
-								element = checkArgType(code[i + 3 + j], cpu, vars, varValues);
+								element = std::stoi(code[i + 3 + j]);
 							}
 						}
 						cpu.ram.memory[currentPos++] = (byte)element;
@@ -585,7 +598,7 @@ namespace Assembly {
 					i += (2 + endInc);
 					line++;
 					continue;
-				}else if(instruction == "d16.a") {
+				}/*else if(instruction == "d16.a") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
@@ -912,7 +925,7 @@ namespace Assembly {
 					std::string paramA = code[i + 2];
 
 					byte arg = indexRegister(code, i, 1);
-					arg |= (std::stoi(paramA) << 4);
+					arg |= (checkArgType(code[i + 2], cpu, variables, scopeDepth) << 4);
 
 					cpu.ram.memory[currentPos++] = 0x19;
 					cpu.ram.memory[currentPos++] = arg;
@@ -921,7 +934,7 @@ namespace Assembly {
 					std::string paramA = code[i + 1];
 
 					byte arg = indexRegister(code, i, 2);
-					arg |= (std::stoi(paramA) << 4);
+					arg |= (checkArgType(code[i + 1], cpu, variables, scopeDepth) << 4);
 
 					cpu.ram.memory[currentPos++] = 0x18;
 					cpu.ram.memory[currentPos++] = arg;
@@ -1252,7 +1265,6 @@ namespace Assembly {
 				line++;
 			}else if(!instruction.compare(0, 2, "fn")) {
 				std::string name = code[i + 1];
-				std::string return_reg = code[i + 2];
 				std::vector<std::string> parameters;
 				std::vector<unsigned int> paramVal;
 				std::vector<unsigned int> paramSize;
@@ -1261,8 +1273,8 @@ namespace Assembly {
 
 				scopeDepth++;
 
-				while (code[i + 3 + r].back() == ',') {
-					std::string tempo = code[i + 3 + r];
+				while (code[i + 2 + r].back() == ',') {
+					std::string tempo = code[i + 2 + r];
 					if(tempo.back() == ',') {
 						tempo.erase(tempo.end() - 1);
 					}
@@ -1270,7 +1282,7 @@ namespace Assembly {
 
 					variable temp;
 					temp.name = tempo;
-					temp.value = 0;
+					temp.value = r;
 					temp.sDepth = scopeDepth;
 					temp.size = 4;
 					variables.push_back(temp);
@@ -1278,11 +1290,11 @@ namespace Assembly {
 
 					r++;
 				}
-				std::string tempo = code[i + 4 + r];
+				std::string tempo = code[i + 2 + r];
 				parameters.push_back(tempo);
 				variable temp2;
 				temp2.name = tempo;
-				temp2.value = 0;
+				temp2.value = r;
 				temp2.sDepth = scopeDepth;
 				temp2.size = 1;
 				variables.push_back(temp2);
@@ -1296,19 +1308,20 @@ namespace Assembly {
 				temp.parametersSize = paramSize;
 				temp.BP = currentPos;
 				temp.PP = 0;
-				temp.return_register = indexRegister(code, i, 2);
 				cpu.stack.push_back(temp);
 
-				i += 3 + r;
+				i += 2 + r;
 			}else if(!instruction.compare(0, 4, "call")) {
-				std::string function = code[i + 1];
+				std::string function = code[i + 2];
 
 				stackPos = checkFunction(function, cpu, cpu.stack);
 
 				cpu.ram.memory[currentPos++] = 0x1A;
+				cpu.ram.memory[currentPos++] = stackPos;
+				cpu.ram.memory[currentPos++] = indexRegister(code, i, 1);
 
 				for(int k = 0; k < cpu.stack[stackPos].parameters.size(); k++){
-					std::string parameter = code[i + 2 + k];
+					std::string parameter = code[i + 3 + k];
 
 					int param = checkArgType(parameter, cpu, variables, scopeDepth);
 
@@ -1319,10 +1332,12 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = b3;
 				}
 
-				i += cpu.stack[stackPos].parameters.size() + 1;
+				i += cpu.stack[stackPos].parameters.size() + 2;
 			}else if(!instruction.compare(0, 3, "ret")) {
 				cpu.ram.memory[currentPos++] = 0x1B;
+				cpu.ram.memory[currentPos++] = checkArgType(code[i + 1], cpu, variables, scopeDepth);
 				scopeDepth--;
+				i++;
 			}else{
 				if (instruction.back() == ':') {
 					line++;
