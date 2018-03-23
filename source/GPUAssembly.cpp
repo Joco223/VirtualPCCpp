@@ -4,10 +4,22 @@ namespace GPUAssembly {
 
 	std::vector<std::string> lines;
 
-	void convertByte(int& number, byte& b1, byte& b2, byte& b3) {
+	void convertByte2(int& number, byte& b1, byte& b2) {
+		b1 = number & 0xff;
+		b2 = (byte)(number >> 8);
+	}
+
+	void convertByte3(int& number, byte& b1, byte& b2, byte& b3) {
 		b1 = number & 0xff;
 		b2 = (byte)(number >> 8);
 		b3 = (byte)(number >> 16);
+	}
+
+	void convertByte4(int& number, byte& b1, byte& b2, byte& b3, byte& b4) {
+		b1 = number & 0xff;
+		b2 = (byte)(number >> 8);
+		b3 = (byte)(number >> 16);
+		b4 = (byte)(number >> 24);
 	}
 
 	bool checkArgSize(int& arg, int argc, std::string& instruction, unsigned int& instructionC, int maxSize) {
@@ -19,12 +31,13 @@ namespace GPUAssembly {
 		}
 	}
 
-	void checkJmpPos(int& arg, std::string argument, std::vector<std::string>& jumpNames, std::vector<int> jumpPos) {
+	int checkJmpPos(std::string argument, std::vector<jump_pos>& jmps, int currentDepth) {
 		bool varExists = false;
 		int id = 0;
+		int tmp = 0;
 
-		for (unsigned int i = 0; i < jumpNames.size(); i++) {
-			if (argument == jumpNames[i]) {
+		for (unsigned int i = 0; i < jmps.size(); i++) {
+			if (argument == jmps[i].name && currentDepth <= jmps[i].sDepth) {
 				varExists = true;
 				id = i;
 				break;
@@ -32,16 +45,18 @@ namespace GPUAssembly {
 		}
 
 		if (varExists == true) {
-			arg = jumpPos[id];
+			tmp = jmps[id].position;
 		}
+
+		return tmp;
 	}
 
-	void checkArgType(int& arg, std::string& argument, GPU& gpu, std::vector<std::string>& vars, std::vector<int>& varValues) {
+	int checkArgType(std::string& argument, GPU& gpu, std::vector<variable>& vars, int currentDepth) {
 		bool varExists = false;
 		int id = 0;
 
 		for (unsigned int i = 0; i < vars.size(); i++) {
-			if (argument == vars[i]) {
+			if (argument == vars[i].name && currentDepth <= vars[i].sDepth) {
 				varExists = true;
 				id = i;
 				break;
@@ -49,36 +64,20 @@ namespace GPUAssembly {
 		}
 
 		if (varExists == true) {
-			arg = varValues[id];
+			return vars[id].value;
 		}else if (varExists == false) {
-			if (argument == "reg0") {
-				arg = 256 + 1;
-			}else if (argument == "reg1") {
-				arg = 256 + 2;
-			}else if (argument == "idx") {
-				arg = 256 + 3;
-			}else if (argument == "idy") {
-				arg = 256 + 4;
-			}else {
-				arg = std::stoi(argument);
-			}
-		}	
-	}
-
-	void checkArgTypeV(int& arg, std::string& argument, GPU& gpu, std::vector<std::string>& vars, std::vector<int>& varValues) {
-		bool varExists = false;
-		int id = 0;
-
-		for (unsigned int i = 0; i < vars.size(); i++) {
-			if (argument == vars[i]) {
-				varExists = true;
-				id = i;
-				break;
-			}
-		}
-
-		if (varExists == true) {
-			arg = varValues[id];
+			if(argument == "regA") {return gpu.vRam.memory.size() +  1; };
+			if(argument == "regB") {return gpu.vRam.memory.size() +  2; };
+			if(argument == "regC") {return gpu.vRam.memory.size() +  3; };
+			if(argument == "regD") {return gpu.vRam.memory.size() +  4; };
+			if(argument == "regE") {return gpu.vRam.memory.size() +  5; };
+			if(argument == "regF") {return gpu.vRam.memory.size() +  6; };
+			if(argument == "regG") {return gpu.vRam.memory.size() +  7; };
+			if(argument == "regH") {return gpu.vRam.memory.size() +  8; };
+			if(argument == "regI") {return gpu.vRam.memory.size() +  9; };
+			if(argument == "regJ") {return gpu.vRam.memory.size() + 10; };
+			if(argument == "regK") {return gpu.vRam.memory.size() + 11; };
+			if(argument == "regL") {return gpu.vRam.memory.size() + 12; };
 		}
 	}
 
@@ -99,298 +98,794 @@ namespace GPUAssembly {
 							if (buf[0] == '/' && buf[1] == '/') {break;}
 							code.push_back(buf);
 						}
-					}		
+					}
 				}
 			}
 		}
 	}
 
-	void Compile(std::vector<std::string>& code, GPU& gpu, std::vector<int>& vValues, std::vector<std::string>& vNames, int newCP) {
-		
+	bool isRegister(std::vector<std::string>& code, int i){
+		return code[i + 1] == "regA" || code[i + 1] == "regB" || code[i + 1] == "regC" || code[i + 1] == "regD" ||
+		   	   code[i + 1] == "regE" || code[i + 1] == "regF" || code[i + 1] == "regG" || code[i + 1] == "regH" ||
+		   	   code[i + 1] == "regI" || code[i + 1] == "regJ" || code[i + 1] == "regK" || code[i + 1] == "regL";
+	}
 
-		int currentPos = newCP;
-		int additionalMemory = 0;
+	int indexRegister(std::vector<std::string>& code, int i, int k){
+		if(code[i + k] == "regA") {return  0;}
+		if(code[i + k] == "regB") {return  1;}
+		if(code[i + k] == "regC") {return  2;}
+		if(code[i + k] == "regD") {return  3;}
+		if(code[i + k] == "regE") {return  4;}
+		if(code[i + k] == "regF") {return  5;}
+		if(code[i + k] == "regG") {return  6;}
+		if(code[i + k] == "regH") {return  7;}
+		if(code[i + k] == "regI") {return  8;}
+		if(code[i + k] == "regJ") {return  9;}
+		if(code[i + k] == "regK") {return 10;}
+		if(code[i + k] == "regL") {return 11;}
+	}
+
+	void Compile(std::vector<std::string>& code, GPU& gpu, std::vector<variable>& variables) {
+		std::vector<char> charactersA = {'0',  '1', '2', '3', '4',  '5',  '6', '7', '8', '9',
+										 '!', '\"', '#', '$', '%',  '&', '\'', '(', ')', '*',
+										 '+',  '-', ',', '.', '/', '\\',  ':', ';', '<', '>',
+										 '=',  '?', '[', ']', '{',  '}',  '`', '^', '|', '~',
+										 'A',  'B', 'C', 'D', 'E',  'F',  'G', 'H', 'I', 'J',
+										 'K',  'L', 'M', 'N', 'O',  'P',  'Q', 'R', 'S', 'T',
+										 'U',  'V', 'W', 'X', 'Y',  'Z',  '_', ' ', '@', 'a',
+										 'b',  'c', 'd', 'e', 'f',  'g',  'h', 'i', 'j', 'k',
+										 'l',  'm', 'n', 'o', 'p',  'q',  'r', 's', 't', 'u',
+										 'v',  'w', 'x', 'y', 'z'};
+
+		int currentPos = 0;
 		int line = 0;
-		std::vector<int> jumpPositions;
-		std::vector<std::string> vars;
-		std::vector<std::string> jumpNames;
-		std::vector<int> varValues;
 
-		bool dataM = false;
+		std::vector<jump_pos> jumpPositions;
+
 
 		for (unsigned int i = 0; i < code.size(); i++) {
 
 			std::string instruction = code[i];
 
-			if(instruction == "data_s") {
-				dataM = true;
-				i++;
-				instruction = code[i];
-				line++;
+			if(instruction == "kernel_size") {
+				int x = std::stoi(code[i + 1]);
+				int y = std::stoi(code[i + 2]);
+
+				for(int p = 0; p < y; p++){
+					for(int k = 0; k < x; k++){
+						gpu.tasks.push_back({k, p});
+					}
+				}
+
+				i += 2;
+				continue;
 			}
 
-			if(instruction == "data_e") {
-				dataM = false;
-				currentPos += additionalMemory;
+			if(instruction.compare(0, 5, "move.") == 0) {
+				if(instruction[5] == 's'){
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[5] == 'd') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[5] == 'l') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else{
+					std::cout << "Uknwown data type at instruction >move< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if(instruction.compare(0, 6, "moveO.") == 0) {
+				if(instruction[6] == 's'){
+					currentPos += 8;
+					i += 3;
+					line++;
+				}else if(instruction[6] == 'd') {
+					currentPos += 8;
+					i += 3;
+					line++;
+				}else if(instruction[6] == 'l') {
+					currentPos += 8;
+					i += 3;
+					line++;
+				}else{
+					std::cout << "Uknwown data type at instruction >moveO< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if(instruction == "clr") {
 				i++;
-				instruction = code[i];
+				currentPos += 2;
 				line++;
-			}
-
-			if (dataM == true) {
-				if (instruction == "u8") {
-					additionalMemory++;
+			}else if(instruction == "inc") {
+				i++;
+				currentPos += 2;
+				line++;
+			}else if(instruction == "dec") {
+				i++;
+				currentPos += 2;
+				line++;
+			}else if(instruction == "g.IDX") {
+				i++;
+				currentPos += 2;
+				line++;
+			}else if(instruction == "g.IDY") {
+				i++;
+				currentPos += 2;
+				line++;
+			}else if(instruction == "g.ID") {
+				i++;
+				currentPos += 2;
+				line++;
+			}else if(instruction == "cot") {
+				i++;
+				currentPos += 2;
+				line++;
+			}else if (instruction == "add") {
+				i += 2;
+				currentPos += 2;
+				line++;
+			}else if (instruction == "sub") {
+				i += 2;
+				currentPos += 2;
+				line++;
+			}else if (instruction.compare(0, 4, "mlt.") == 0) {
+				if(instruction[4] == 's'){
+					currentPos += 2;
 					i += 2;
 					line++;
-				}else if (instruction == "u16") {
-					additionalMemory += 2;
-					line++;
+				}else if(instruction[4] == 'u') {
+					currentPos += 2;
 					i += 2;
+					line++;
+				}else{
+					std::cout << "Uknwown sign type at instruction >mlt< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if (instruction.compare(0, 4, "div.") == 0) {
+				if(instruction[4] == 's'){
+					currentPos += 2;
+					i += 2;
+					line++;
+				}else if(instruction[4] == 'u') {
+					currentPos += 2;
+					i += 2;
+					line++;
+				}else{
+					std::cout << "Uknwown sign type at instruction >div< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if (instruction.compare(0, 4, "jmp.") == 0) {
+				if(instruction[4] == 'z') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[4] == 'o') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[4] == 'u') {
+					currentPos += 5;
+					i++;
+					line++;
+				}else{
+					std::cout << "Uknwown jump type at instruction >jmp< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if (instruction.compare(0, 4, "cmp.") == 0) {
+				if(instruction[4] == 's' && instruction[5] == '.') {
+					if(instruction[6] == 'b') {
+						currentPos += 2;
+						i += 2;
+						line++;
+					}else if(instruction[6] == 'b' && instruction[7] == 'e') {
+						currentPos += 2;
+						i += 2;
+						line++;
+					}else if(instruction[6] == 'e') {
+						currentPos += 2;
+						i += 2;
+						line++;
+					}else{
+						std::cout << "Uknwown comparison type at instruction >cmp< at line " << line << '\n';
+						gpu.progMem.Clear();
+						break;
+					}
+				}else if(instruction[4] == 'u' && instruction[5] == '.') {
+					if(instruction[6] == 'b') {
+						currentPos += 2;
+						i += 2;
+						line++;
+					}else if(instruction[6] == 'b' && instruction[7] == 'e') {
+						currentPos += 2;
+						i += 2;
+						line++;
+					}else if(instruction[6] == 'e') {
+						currentPos += 2;
+						i += 2;
+						line++;
+					}else{
+						std::cout << "Uknwown comparison type at instruction >cmp< at line " << line << '\n';
+						gpu.progMem.Clear();
+						break;
+					}
 				}else {
+					std::cout << "Uknown sign at instruction >cmp< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if (instruction.compare(0, 5, "displ") == 0) {
+				i += 3;
+				currentPos += 3;
+				line++;
+			}else{
+				if (instruction.back() == ':') {
+					std::string tmp = instruction;
+					tmp.erase(tmp.end() - 1);
+					jump_pos temp;
+					temp.sDepth = 0;
+					temp.name = tmp;
+					temp.position = currentPos;
+					jumpPositions.push_back(temp);
+					line++;
+				}else{
 					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
 					std::cout << '\n';
 					std::cout << lines[line] << '\n';
 					std::cout << "^" << '\n';
 					std::cout << '\n';
 					std::cout << "Compilation terminated." << '\n';
-					gpu.vRam.Clear();
+					gpu.progMem.Clear();
 					break;
 				}
-			}else if (dataM == false) {
-				if (instruction == "load0_8") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load1_8") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load0_16") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load1_16") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "wrt0_16") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "wrt1_16") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "wrt0_8") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "wrt1_8") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load0_8a") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load1_8a") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load0_16a") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load1_16a") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "wrt0_16a") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "wrt1_16a") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "wrt0_8a") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "wrt1_8a") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "sum") {
-					currentPos++;
-					line++;
-				}else if (instruction == "sub") {
-					currentPos++;
-					line++;
-				}else if (instruction == "mlt") {
-					currentPos++;
-					line++;
-				}else if (instruction == "div") {
-					currentPos++;
-					line++;
-				}else if (instruction == "reg0_b") {
-					currentPos++;
-					line++;
-				}else if (instruction == "reg0_be") {
-					currentPos++;
-					line++;
-				}else if (instruction == "reg0_be_s") {
-					currentPos++;
-					line++;
-				}else if (instruction == "reg1_b") {
-					currentPos++;
-					line++;
-				}else if (instruction == "reg1_be") {
-					currentPos++;
-					line++;
-				}else if (instruction == "reg_eql") {
-					currentPos++;
-					line++;
-				}else if (instruction == "reg_dif") {
-					currentPos++;
-					line++;
-				}else if (instruction == "jmp") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "cmp") {
-					currentPos += 4;
-					i += 2;
-					line++;
-				}else if (instruction == "get_idx") {
-					currentPos++;
-					line++;
-				}else if (instruction == "get_idy") {
-					currentPos++;
-					line++;
-				}else if (instruction == "p_out") {
-					currentPos++;
-					line++;
-				}else if (instruction == "loadR") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "loadG") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "loadB") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "kernel_size") {
-					i += 2;
-					line++;
-				}else if (instruction == "load0_8g") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load1_8g") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load0_16g") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "load1_16g") {
-					currentPos += 3;
-					i++;
-					line++;
-				}else if (instruction == "max") {
-					currentPos += 7;
-					i += 3;
-					line++;
-				}else if (instruction == "min") {
-					currentPos += 7;
-					i += 3;
-					line++;
-				}else{
-					if (instruction.back() == ':') {
-						std::string tmp = instruction;
-						tmp.erase(tmp.end() - 1);
-						jumpNames.push_back(tmp);
-						jumpPositions.push_back(currentPos);
-						line++;
-					}else{
-						std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
-						std::cout << '\n';
-						std::cout << lines[line] << '\n';
-						std::cout << "^" << '\n';
-						std::cout << '\n';
-						std::cout << "Compilation terminated." << '\n';
-						gpu.vRam.Clear();
-						return;
-						break;
-					}	
-				}
-
 			}
 
 		}
 
+		gpu.progMem.memory.resize(currentPos + 2);
 		currentPos = 0;
-		additionalMemory = 0;
+		line = 0;
 
 		for (unsigned int i = 0; i < code.size(); i++) {
 
 			std::string instruction = code[i];
 
-			if(instruction == "data_s") {
-				dataM = true;
-				i++;
-				line++;
-				instruction = code[i];
+			if(instruction == "kernel_size") {
+				i += 2;
+				continue;
 			}
 
-			if(instruction == "data_e") {
-				dataM = false;
-				currentPos += additionalMemory;
-				gpu.programCounter = currentPos;
-				i++;
-				line++;
-				instruction = code[i];
-			}
+			if(instruction.compare(0, 5, "move.") == 0) {
+				if(instruction[5] == 's'){
+					if(isRegister(code, i)) {
+						//No write to single memory position in vram
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x01;
 
-			if (dataM == true) {
-				if (instruction == "u8") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
+						byte arg = indexRegister(code, i, 2);
+						arg |= (1 << 4);
 
-					vars.push_back(arg1);
-					int Arg2 = std::stoi(arg2);
-					varValues.push_back(additionalMemory);
+						gpu.progMem.memory[currentPos++] = arg;
 
-					for (int k = 0; k < gpu.cores.size(); k++) {
-						gpu.cores[k].intMem.memory[additionalMemory] = (byte)Arg2;
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
 					}
+				}else if(instruction[5] == 'd') {
+					if(isRegister(code, i)) {
+						//No write to single memory position in vram
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x01;
 
-					additionalMemory++;
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x2 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[5] == 'l') {
+					if(isRegister(code, i)) {
+						//No write to single memory position in vram
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x01;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x3 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else{
+					std::cout << "Uknwown data type at instruction >move< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if(instruction.compare(0, 6, "moveO.") == 0) {
+				if(instruction[6] == 's'){
+					if(isRegister(code, i)) {
+						gpu.progMem.memory[currentPos++] = 0x03;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x1 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 3], gpu, variables, 0);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						gpu.progMem.memory[currentPos++] = b4;
+						gpu.progMem.memory[currentPos++] = b5;
+						gpu.progMem.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x04;
+
+						byte arg = indexRegister(code, i, 3);
+						arg |= (1 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						gpu.progMem.memory[currentPos++] = b4;
+						gpu.progMem.memory[currentPos++] = b5;
+						gpu.progMem.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}
+				}else if(instruction[6] == 'd') {
+					if(isRegister(code, i)) {
+						gpu.progMem.memory[currentPos++] = 0x03;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x2 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 3], gpu, variables, 0);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						gpu.progMem.memory[currentPos++] = b4;
+						gpu.progMem.memory[currentPos++] = b5;
+						gpu.progMem.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x04;
+
+						byte arg = indexRegister(code, i, 3);
+						arg |= (0x2 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						gpu.progMem.memory[currentPos++] = b4;
+						gpu.progMem.memory[currentPos++] = b5;
+						gpu.progMem.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}
+				}else if(instruction[6] == 'l') {
+					if(isRegister(code, i)) {
+						gpu.progMem.memory[currentPos++] = 0x03;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x3 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 3], gpu, variables, 0);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						gpu.progMem.memory[currentPos++] = b4;
+						gpu.progMem.memory[currentPos++] = b5;
+						gpu.progMem.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x04;
+
+						byte arg = indexRegister(code, i, 3);
+						arg |= (0x3 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						gpu.progMem.memory[currentPos++] = b4;
+						gpu.progMem.memory[currentPos++] = b5;
+						gpu.progMem.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}
+				}else{
+					std::cout << "Uknwown data type at instruction >move< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if(instruction == "inc") {
+				gpu.progMem.memory[currentPos++] = 0x12;
+
+				byte arg = indexRegister(code, i, 1);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i++;
+				line++;
+			}else if(instruction == "dec") {
+				gpu.progMem.memory[currentPos++] = 0x13;
+
+				byte arg = indexRegister(code, i, 1);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i++;
+				line++;
+			}else if(instruction == "clr") {
+				gpu.progMem.memory[currentPos++] = 0x14;
+
+				byte arg = indexRegister(code, i, 1);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i++;
+				line++;
+			}else if(instruction == "g.IDX") {
+				gpu.progMem.memory[currentPos++] = 0x16;
+
+				byte arg = indexRegister(code, i, 1);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i++;
+				line++;
+			}else if(instruction == "g.IDY") {
+				gpu.progMem.memory[currentPos++] = 0x17;
+
+				byte arg = indexRegister(code, i, 1);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i++;
+				line++;
+			}else if(instruction == "g.ID") {
+				gpu.progMem.memory[currentPos++] = 0x18;
+
+				byte arg = indexRegister(code, i, 1);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i++;
+				line++;
+			}else if (instruction == "add") {
+				gpu.progMem.memory[currentPos++] = 0x06;
+
+				byte arg = indexRegister(code, i, 1);
+				byte arg2 = indexRegister(code, i, 2);
+				arg |= (arg2 << 4);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i += 2;
+				line++;
+			}else if (instruction == "sub") {
+				gpu.progMem.memory[currentPos++] = 0x07;
+
+				byte arg = indexRegister(code, i, 1);
+				byte arg2 = indexRegister(code, i, 2);
+				arg |= (arg2 << 4);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i += 2;
+				line++;
+			}else if (instruction.compare(0, 4, "mlt.") == 0) {
+				if(instruction[4] == 's'){
+					gpu.progMem.memory[currentPos++] = 0x08;
+
+					byte arg = indexRegister(code, i, 1);
+					byte arg2 = indexRegister(code, i, 2);
+					arg |= (arg2 << 4);
+
+					gpu.progMem.memory[currentPos++] = arg;
+
 					i += 2;
 					line++;
-				}else if (instruction == "u16") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
+				}else if(instruction[4] == 'u') {
+					gpu.progMem.memory[currentPos++] = 0x09;
 
-					vars.push_back(arg1);
-					int Arg2 = std::stoi(arg2);
-					varValues.push_back(additionalMemory);
+					byte arg = indexRegister(code, i, 1);
+					byte arg2 = indexRegister(code, i, 2);
+					arg |= (arg2 << 4);
+
+					gpu.progMem.memory[currentPos++] = arg;
+
+					i += 2;
+					line++;
+				}else{
+					std::cout << "Uknwown sign type at instruction >mlt< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if (instruction.compare(0, 4, "div.") == 0) {
+				if(instruction[4] == 's'){
+					gpu.progMem.memory[currentPos++] = 0x0A;
+
+					byte arg = indexRegister(code, i, 1);
+					byte arg2 = indexRegister(code, i, 2);
+					arg |= (arg2 << 4);
+
+					gpu.progMem.memory[currentPos++] = arg;
+
+					i += 2;
+					line++;
+				}else if(instruction[4] == 'u') {
+					gpu.progMem.memory[currentPos++] = 0x0B;
+
+					byte arg = indexRegister(code, i, 1);
+					byte arg2 = indexRegister(code, i, 2);
+					arg |= (arg2 << 4);
+
+					gpu.progMem.memory[currentPos++] = arg;
+
+					i += 2;
+					line++;
+				}else{
+					std::cout << "Uknwown sign type at instruction >div< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if (instruction.compare(0, 4, "jmp.") == 0) {
+				if(instruction[4] == 'z') {
+					gpu.progMem.memory[currentPos++] = 0x11;
+
+					byte arg = indexRegister(code, i, 1);
+					arg |= (0x0 << 4);
+
+					gpu.progMem.memory[currentPos++] = arg;
+
+					int arg2 = checkJmpPos(code[i + 2], jumpPositions, 0);
 
 					byte b1, b2, b3;
-					convertByte(Arg2, b1, b2, b3);
+					convertByte3(arg2, b1, b2, b3);
+					gpu.progMem.memory[currentPos++] = b1;
+					gpu.progMem.memory[currentPos++] = b2;
+					gpu.progMem.memory[currentPos++] = b3;
 
-					for (int k = 0; k < gpu.cores.size(); k++) {
-						gpu.cores[k].intMem.memory[additionalMemory] = b1;
-						gpu.cores[k].intMem.memory[additionalMemory] = b2;
-					}
-
-					additionalMemory += 2;
 					i += 2;
+					line++;
+				}else if(instruction[4] == 'o') {
+					gpu.progMem.memory[currentPos++] = 0x11;
+
+					byte arg = indexRegister(code, i, 1);
+					arg |= (0x1 << 4);
+
+					gpu.progMem.memory[currentPos++] = arg;
+
+					int arg2 = checkJmpPos(code[i + 2], jumpPositions, 0);
+
+					byte b1, b2, b3;
+					convertByte3(arg2, b1, b2, b3);
+					gpu.progMem.memory[currentPos++] = b1;
+					gpu.progMem.memory[currentPos++] = b2;
+					gpu.progMem.memory[currentPos++] = b3;
+
+					i += 2;
+					line++;
+				}else if(instruction[4] == 'u') {
+					gpu.progMem.memory[currentPos++] = 0x11;
+
+					byte arg = 0;
+					arg |= (0x2 << 4);
+
+					gpu.progMem.memory[currentPos++] = arg;
+
+					int arg2 = checkJmpPos(code[i + 1], jumpPositions, 0);
+
+					byte b1, b2, b3;
+					convertByte3(arg2, b1, b2, b3);
+					gpu.progMem.memory[currentPos++] = b1;
+					gpu.progMem.memory[currentPos++] = b2;
+					gpu.progMem.memory[currentPos++] = b3;
+
+					i++;
+					line++;
+				}else{
+					std::cout << "Uknwown jump type at instruction >jmp< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if (instruction.compare(0, 4, "cmp.") == 0) {
+				if(instruction[4] == 's' && instruction[5] == '.') {
+					if(instruction[6] == 'b') {
+						gpu.progMem.memory[currentPos++] = 0x0C;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (indexRegister(code, i, 2) << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						i += 2;
+						line++;
+					}else if(instruction[6] == 'b' && instruction[7] == 'e') {
+						gpu.progMem.memory[currentPos++] = 0x0E;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (indexRegister(code, i, 2) << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						i += 2;
+						line++;
+					}else if(instruction[6] == 'e') {
+						gpu.progMem.memory[currentPos++] = 0x10;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (indexRegister(code, i, 2) << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						i += 2;
+						line++;
+					}else{
+						std::cout << "Uknwown comparison type at instruction >cmp< at line " << line << '\n';
+						gpu.progMem.Clear();
+						break;
+					}
+				}else if(instruction[4] == 'u' && instruction[5] == '.') {
+					if(instruction[6] == 'b') {
+						gpu.progMem.memory[currentPos++] = 0x0D;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (indexRegister(code, i, 2) << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						i += 2;
+						line++;
+					}else if(instruction[6] == 'b' && instruction[7] == 'e') {
+						gpu.progMem.memory[currentPos++] = 0x0F;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (indexRegister(code, i, 2) << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						i += 2;
+						line++;
+					}else if(instruction[6] == 'e') {
+						gpu.progMem.memory[currentPos++] = 0x10;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (indexRegister(code, i, 2) << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						i += 2;
+						line++;
+					}else{
+						std::cout << "Uknwown comparison type at instruction >cmp< at line " << line << '\n';
+						gpu.progMem.Clear();
+						break;
+					}
+				}else {
+					std::cout << "Uknown sign at instruction >cmp< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
+			}else if (instruction.compare(0, 5, "displ") == 0) {
+				gpu.progMem.memory[currentPos++] = 0x15;
+
+				byte arg = indexRegister(code, i, 1);
+				arg |= (indexRegister(code, i, 2) << 4);
+				byte arg2 = indexRegister(code, i, 3);
+
+				gpu.progMem.memory[currentPos++] = arg;
+				gpu.progMem.memory[currentPos++] = arg2;
+
+				i += 3;
+				line++;
+			}else{
+				if (instruction.back() == ':') {
 					line++;
 				}else{
 					std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
@@ -399,754 +894,9 @@ namespace GPUAssembly {
 					std::cout << "^" << '\n';
 					std::cout << '\n';
 					std::cout << "Compilation terminated." << '\n';
-					gpu.vRam.Clear();
+					gpu.progMem.Clear();
 					break;
 				}
-			}else if (dataM == false) {
-				if (instruction == "load0_8") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 3;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "load1_8") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 4;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "load0_16") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 1;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "load1_16") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 2;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "wrt0_16") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 5;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "wrt1_16") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 6;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "wrt0_8") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 7;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "wrt1_8") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 8;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "sum") {
-					gpu.vRam.memory[currentPos++] = 10;
-					line++;
-				}else if (instruction == "sub") {
-					gpu.vRam.memory[currentPos++] = 11;
-					line++;
-				}else if (instruction == "mlt") {
-					gpu.vRam.memory[currentPos++] = 12;
-					line++;
-				}else if (instruction == "div") {
-					gpu.vRam.memory[currentPos++] = 13;
-					line++;
-				}else if (instruction == "reg0_b") {
-					gpu.vRam.memory[currentPos++] = 14;
-					line++;
-				}else if (instruction == "reg0_be") {
-					gpu.vRam.memory[currentPos++] = 15;
-					line++;
-				}else if (instruction == "reg0_be_s") {
-					gpu.vRam.memory[currentPos++] = 29;
-					line++;
-				}else if (instruction == "reg1_b") {
-					gpu.vRam.memory[currentPos++] = 16;
-					line++;
-				}else if (instruction == "reg1_be") {
-					gpu.vRam.memory[currentPos++] = 17;
-					line++;
-				}else if (instruction == "reg_eql") {
-					gpu.vRam.memory[currentPos++] = 18;
-					line++;
-				}else if (instruction == "reg_dif") {
-					gpu.vRam.memory[currentPos++] = 19;
-					line++;
-				}else if (instruction == "jmp") {
-					std::string arg1 = code[i + 1];
-					int pos;
-
-					gpu.vRam.memory[currentPos++] = 20;
-
-					checkJmpPos(pos, arg1, jumpNames, jumpPositions);
-
-					byte b1, b2, b3;
-					convertByte(pos, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "cmp") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 21;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					int pos;
-
-					checkJmpPos(pos, arg2, jumpNames, jumpPositions);
-
-					gpu.vRam.memory[currentPos++] = (byte)Arg1;
-					byte b1, b2, b3;
-					convertByte(pos, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i += 2;
-					line++;
-				}else if(instruction == "get_idx") {
-					gpu.vRam.memory[currentPos++] = 31;
-					line++;
-				}else if(instruction == "get_idy") {
-					gpu.vRam.memory[currentPos++] = 32;
-					line++;
-				}else if(instruction == "p_out") {
-					gpu.vRam.memory[currentPos++] = 30;
-					line++;
-				}else if (instruction == "loadR") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 26;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "loadG") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 27;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "loadB") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 28;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "kernel_size") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-					
-					int xSize = std::stoi(arg1);
-					int ySize = std::stoi(arg2);
-
-					for (int y = 0; y < ySize; y++) {
-						for (int x = 0; x < xSize; x++) {
-							task_id tmp;
-							tmp.x = x;
-							tmp.y = y;
-							gpu.tasks.push_back(tmp);
-						}
-					}
-
-					i += 2;
-					line++;
-				}else if (instruction == "load0_8g") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 35;
-
-					int Arg1;
-					checkArgTypeV(Arg1, arg1, gpu, vNames, vValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "load1_8g") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 36;
-
-					int Arg1;
-					checkArgTypeV(Arg1, arg1, gpu, vNames, vValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "load0_16g") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 33;
-
-					int Arg1;
-					checkArgTypeV(Arg1, arg1, gpu, vNames, vValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "load1_16g") {
-					std::string arg1 = code[i + 1];
-
-					gpu.vRam.memory[currentPos++] = 34;
-
-					int Arg1;
-					checkArgTypeV(Arg1, arg1, gpu, vNames, vValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					i++;
-					line++;
-				}else if (instruction == "max") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-					std::string arg3 = code[i + 3];
-
-					gpu.vRam.memory[currentPos++] = 37;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					int Arg3;
-					checkArgType(Arg3, arg3, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					byte b7, b8, b9;
-					convertByte(Arg3, b7, b8, b9);
-					gpu.vRam.memory[currentPos++] = b7;
-					gpu.vRam.memory[currentPos++] = b8;
-
-					i += 3;
-					line++;
-				}else if (instruction == "min") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-					std::string arg3 = code[i + 3];
-
-					gpu.vRam.memory[currentPos++] = 38;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					int Arg3;
-					checkArgType(Arg3, arg3, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					byte b7, b8, b9;
-					convertByte(Arg3, b7, b8, b9);
-					gpu.vRam.memory[currentPos++] = b7;
-					gpu.vRam.memory[currentPos++] = b8;
-
-					i += 3;
-					line++;
-				}else if (instruction == "load0_8a") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 42;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "load1_8a") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 43;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "load0_16a") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 40;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "load1_16a") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 41;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "load0_8a_g") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 46;
-
-					int Arg1;
-					checkArgTypeV(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "load1_8a_g") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 47;
-
-					int Arg1;
-					checkArgTypeV(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "load0_16a_g") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 44;
-
-					int Arg1;
-					checkArgTypeV(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "load1_16a_g") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 45;
-
-					int Arg1;
-					checkArgTypeV(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "wrt0_16a") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 48;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "wrt1_16a") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 49;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "wrt0_8a") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 50;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else if (instruction == "wrt1_8a") {
-					std::string arg1 = code[i + 1];
-					std::string arg2 = code[i + 2];
-
-					gpu.vRam.memory[currentPos++] = 51;
-
-					int Arg1;
-					checkArgType(Arg1, arg1, gpu, vars, varValues);
-
-					if(checkArgSize(Arg1, 1, instruction, i, 65535) == true) { break; }
-
-					int Arg2;
-					checkArgType(Arg2, arg2, gpu, vars, varValues);
-
-					byte b1, b2, b3;
-					convertByte(Arg1, b1, b2, b3);
-					gpu.vRam.memory[currentPos++] = b1;
-					gpu.vRam.memory[currentPos++] = b2;
-
-					byte b4, b5, b6;
-					convertByte(Arg2, b4, b5, b6);
-					gpu.vRam.memory[currentPos++] = b4;
-					gpu.vRam.memory[currentPos++] = b5;
-
-					i += 2;
-					line++;
-				}else{
-					if (instruction.back() == ':') {
-						line++;
-					}else{
-						std::cout << "Unknown instruction >" << instruction << "< at line " << line << '\n';
-						std::cout << '\n';
-						std::cout << lines[line] << '\n';
-						std::cout << "^" << '\n';
-						std::cout << '\n';
-						std::cout << "Compilation terminated." << '\n';
-						gpu.vRam.Clear();
-						break;
-					}	
-				}
-
 			}
 
 		}

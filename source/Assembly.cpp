@@ -1194,6 +1194,7 @@ namespace Assembly {
 					break;
 				}
 			}else if (instruction == "gpu_str") {
+				cpu.ram.memory[currentPos++] = 0x1C;
 				currentPos++;
 				line++;
 			}else if (instruction == "wait") {

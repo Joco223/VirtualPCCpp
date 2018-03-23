@@ -1,16 +1,15 @@
 #include "GPU.h"
 
 
-GPU::GPU(int commandBufferSize, int vRamSize, int coreCount, int commandArgBufferSize, SDLWindow* screen_, Memory& ram_)
+GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coureCountY, int commandArgBufferSize, SDLWindow* screen_, Memory& ram_)
 	:
-	commandBuffer(Memory(commandBufferSize)),
-	commandArgBuffer(Memory(commandArgBufferSize)),
 	vRam(Memory(vRamSize)),
 	ram(ram_),
-	screen(screen_)
+	screen(screen_),
+	started(true)
 {
-	for (int x = 0; x < coreCount; x++) {
-		cores.emplace_back(vRam, screen_, 256, x, 0);
+	for (int x = 0; x < (coreCountX * coureCountY); x++) {
+		cores.emplace_back(vRam, progMem, screen_, coureCountY, x, 0);
 	}
 
 	for(int y = 0; y < 30; y++) {
@@ -56,7 +55,7 @@ void GPU::setCharCF(byte x, byte y, byte cF) {
 }
 
 void GPU::updateScreen() {
-	SDL_Rect source;
+	/*SDL_Rect source;
 	SDL_Rect target;
 	source.w = 6;
 	source.h = 8;
@@ -83,9 +82,15 @@ void GPU::updateScreen() {
 		SDL_RenderCopy(screen->renderer, font, &source, &target);
 	}
 
-	if(charactersNUpdate.size() > 0) { SDL_RenderPresent(screen->renderer); };
+	if(charactersNUpdate.size() > 0) {
+		SDL_RenderPresent(screen->renderer);
+		charactersNUpdate.clear();
+	};*/
 
-	charactersNUpdate.clear();
+	SDL_UpdateTexture(screen->texture, NULL, screen->pixels, screen->pixelSpace->pitch);
+	SDL_RenderClear(screen->renderer);
+	SDL_RenderCopy(screen->renderer, screen->texture, NULL, NULL);
+	SDL_RenderPresent(screen->renderer);
 }
 
 void convertByte(int number, byte& b1, byte& b2, byte& b3) {
@@ -97,7 +102,7 @@ void convertByte(int number, byte& b1, byte& b2, byte& b3) {
 void GPU::startCores() {
 	for (int i = 0; i < cores.size(); i++) {
 		if (tasks.size() > 0) {
-			cores[i].programCounter = programCounter;
+			cores[i].programCounter = 0;
 			cores[i].idX = tasks[0].x;
 			cores[i].idY = tasks[0].y;
 			tasks.erase(tasks.begin());
@@ -110,17 +115,21 @@ void GPU::startCores() {
 }
 
 void GPU::tick() {
-	for (int i = 0; i < cores.size(); i++) {
-		if (cores[i].halt == true) {
-			if (tasks.size() > 0) {
-				cores[i].programCounter = programCounter;
-				cores[i].idX = tasks[0].x;
-				cores[i].idY = tasks[0].y;
-				tasks.erase(tasks.begin());
-				cores[i].halt = false;
+	if(started) {
+		for (int i = 0; i < cores.size(); i++) {
+			if (cores[i].halt == true) {
+				if (tasks.size() > 0) {
+					cores[i].programCounter = 0;
+					cores[i].idX = tasks[0].x;
+					cores[i].idY = tasks[0].y;
+					tasks.erase(tasks.begin());
+					cores[i].halt = false;
+				}else{
+					started = false;
+				}
+			}else{
+				cores[i].tick();
 			}
-		}else{
-			cores[i].tick();
 		}
 	}
 }

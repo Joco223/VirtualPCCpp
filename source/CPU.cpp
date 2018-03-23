@@ -372,6 +372,11 @@ void CPU::execute() {
 			programCounter = stack[currentStackPos].PP;
 			registers[stack[currentStackPos].return_register] = stack[currentStackPos].parameters[argument];
 		break;}
+
+		case 0x1C: {
+			gpu.started = true;
+			programCounter++;
+		break;}
 	}
 }
 

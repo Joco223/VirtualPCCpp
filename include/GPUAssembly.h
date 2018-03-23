@@ -15,6 +15,20 @@
 typedef unsigned char byte;
 
 namespace GPUAssembly {
-	void Compile(std::vector<std::string>& code, GPU& cpu, std::vector<int>& vValues, std::vector<std::string>& vNames, int newCP);
+
+	struct variable {
+		std::string name;
+		int size;
+		int value;
+		int sDepth;
+	};
+
+	struct jump_pos {
+		std::string name;
+		int position;
+		int sDepth;
+	};
+
+	void Compile(std::vector<std::string>& code, GPU& gpu, std::vector<variable>& variables);
 	void readFile(std::string path, std::vector<std::string>& code);
-}
+};

@@ -50,8 +50,9 @@ int main(int argc, char* argv[]) {
 
 	Memory ram1(16000000);
 	Memory hdd1(512 * 512);
+	//Sector size ^     ^ number of sectors
 
-	GPU gpu1(4096, 64000, 256, 16384, &pc1W, ram1);
+	GPU gpu1(4096, 64000, 16, 16, 16384, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
@@ -77,9 +78,11 @@ int main(int argc, char* argv[]) {
 
 	Assembly::Compile(code, cpu1, vValues, vNames, addMem);
 
-	//GPUAssembly::readFile("GPU_Programs/Program.sgal", gpu_code);
+	GPUAssembly::readFile("GPU_Programs/Program.sgal", gpu_code);
 
-	//GPUAssembly::Compile(gpu_code, gpu1, vValues, vNames, addMem);
+	std::vector<GPUAssembly::variable> tmp;
+
+	GPUAssembly::Compile(gpu_code, gpu1, tmp);
 
 	gpu1.loadFont();
 
@@ -93,7 +96,8 @@ int main(int argc, char* argv[]) {
 	bool printed = false;
 	bool measured = false;
 
-	std::thread GPU1 (runGPU, &gpu1);
+	//std::thread GPU1 (runGPU, &gpu1);
+
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -111,15 +115,18 @@ int main(int argc, char* argv[]) {
 			measured = true;
 		}
 		pc1.cpu.tick();
-		if (pc1.cpu.halt == true && printed == false) {
+		gpu1.tick();
+		gpu1.updateScreen();
+
+		if (gpu1.started == false && printed == false) {
 			t = clock() - t;
 			std::cout << "\n";
-			std::cout << "It took: " << ((double)t/CLOCKS_PER_SEC) << " seconds for CPU to finish its task" << '\n';
+			std::cout << "It took: " << ((double)t/CLOCKS_PER_SEC) << " seconds for GPU to finish its task" << '\n';
 			printed = true;
 		}
 	}
 
-	GPU1.join();
+	//GPU1.join();
 
 	SDL_Quit();
 

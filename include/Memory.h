@@ -11,6 +11,7 @@ public:
 	std::vector<byte> memory;
 
 	Memory(int);
+	Memory();
 
 	void Clear();
 	bool Empty();

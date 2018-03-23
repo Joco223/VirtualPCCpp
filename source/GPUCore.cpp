@@ -1,414 +1,255 @@
 #include "GPUCore.h"
 
-GPUCore::GPUCore(Memory& vRam_, SDLWindow* screen_, int intMemSize, int idX_, int idY_) 
+GPUCore::GPUCore(Memory& vRam_, Memory& progMem_, SDLWindow* screen_, int coresYS_, int idX_, int idY_)
 	:
 	vRam(vRam_),
+	progMem(progMem_),
+	coresYS(coresYS_),
 	screen(screen_),
 	halt(true),
 	idX(idX_),
-	intMem(Memory(intMemSize)),
 	idY(idY_)
-	{}
+	{
+		registers.resize(12);
+	}
 
 void GPUCore::tick() {
 	if (halt == false) {
-		registerOP = vRam.memory[programCounter];
+		registerOP = progMem.memory[programCounter];
 		execute(registerOP);
 	}
 }
 
-int GPUCore::checkArgumentV(int source, int size) {
+int GPUCore::checkArgument(int source, int size) {
 	if ((unsigned int)source <= vRam.memory.size()) {
-		if(size == 1) { return vRam.memory[source] & 0xFF; }
-		if(size == 2) { return (vRam.memory[source + 1] << 8 | (vRam.memory[source] & 0xFF)); } 
-	}else {
-		return 0;
+		if(size == 1) { return vRam.memory[source] & 0xFF; } else {return 0;}
+		if(size == 2) { return vRam.memory[source + 1] <<  8 | (vRam.memory[source] & 0xFF); } else {return 0;}
+		if(size == 3) { return vRam.memory[source + 3] << 24 | (vRam.memory[source + 2] << 16) | (vRam.memory[source + 1] << 8) | (vRam.memory[source] & 0xFF); } else {return 0;}
+	}else{
+		return registers[source - (vRam.memory.size() + 1)];
 	}
 }
 
-int GPUCore::checkArgumentInt(int source, int size) {
-	if ((unsigned int)source <= intMem.memory.size()) {
-		if(size == 1) { return intMem.memory[source] & 0xFF; }
-		if(size == 2) { return intMem.memory[source + 1] << 8 | (intMem.memory[source] & 0xFF); }
-	}else if (source == intMem.memory.size() + 1) {
-		return register0;
-	}else if (source == intMem.memory.size() + 2) {
-		return register1;
-	}else if (source == intMem.memory.size() + 3) {
-		return idX;
-	}else if (source == intMem.memory.size() + 4) {
-		return idY;
-	}else {
-		return 0;
-	}
+byte GPUCore::getBits(byte origin, byte length){
+	return (origin >> (4 * length)) & 0xF;
 }
 
 void GPUCore::execute(int registerOP) {
 	int inst = registerOP;
 
 	switch (inst) {
-		case 0: {
+		case 0x00: { //Halt
 			halt = true;
 			break; }
 
-		case 1: { //Load to register0 from ram, 2 bytes
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register0 = checkArgumentInt(memPos, 2);
-			programCounter += 2;
-			programCounter++;
-			break; }
+		case 0x01: {
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int memPos = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			registers[regA] = checkArgument(memPos, sizeA);
+			programCounter += 5;
+		break; };
 
-		case 2: { //Load to register1 from ram, 2 bytes
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register1 = checkArgumentInt(memPos, 2);
-			programCounter += 2;
-			programCounter++;
-			break; }
-
-		case 3: { //Load to register0 from ram, 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register0 = checkArgumentInt(memPos, 1);
-			programCounter += 2;
-			programCounter++;
-			break; }
-
-		case 4: { //Load to register1 from ram, 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register1 = checkArgumentInt(memPos, 1);
-			programCounter += 2;
-			programCounter++;
-			break; }
-
-		case 5: { //Write from register0 to ram 2 bytes
-			byte arg1 = vRam.memory[programCounter + 1];
-			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			intMem.memory[position] = (register0 & 0xFF);
-			intMem.memory[position + 1] = (byte)(register0 >> 8);
-			programCounter += 2;
-			programCounter++;
-			break; }
-
-		case 6: { //Write from register1 to ram 2 bytes
-			byte arg1 = vRam.memory[programCounter + 1];
-			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			intMem.memory[position] = (register1 & 0xFF);
-			intMem.memory[position + 1] = (byte)(register1 >> 8);
-			programCounter += 2;
-			programCounter++;
-			break; }
-
-		case 7: { //Write from register0 to ram 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			intMem.memory[position] = (register0 & 0xFF);
-			programCounter += 2;
-			programCounter++;
-			break; }
-
-		case 8: { //Write from register1 to ram 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			intMem.memory[position] = (register1 & 0xFF);
-			programCounter += 2;
-			programCounter++;
-			break; }
-
-		case 10: { //Add register0 and register1
-			register0 = register0 + register1;
-			programCounter++;
-			break; }
-
-		case 11: { //Subtract register1 from register0
-			register0 = register0 - register1;
-			programCounter++;
-			break; }
-
-		case 12: { //Multiply register0 and register1
-			register0 = register0 * register1;
-			programCounter++;
-			break; }
-
-		case 13: { //Divide register0 by register1
-			register0 = register0 / register1;
-			programCounter++;
-			break; }
-
-		case 14: { //Check if register0 is greater than register1
-			register0 = register0 > register1;
-			programCounter++;
-			break; }
-
-		case 15: { //Check if register0 is greater or equal to register1
-			register0 = register0 >= register1;
-			programCounter++;
-			break; }
-
-		case 16: { //Check if register1 is greater than register0
-			register0 = register0 < register1;
-			programCounter++;
-			break; }
-
-		case 17: { //Check if register1 is greater or equal to register0
-			register0 = register0 <= register1;
-			programCounter++;
-			break; }
-
-		case 18: { //Check if register0 and register1 have same values
-			register0 = register0 == register1;
-			programCounter++;
-			break; }
-
-		case 19: { //Check if register0 is different than register1
-			register0 = register0 != register1;
-			programCounter++;
-			break; }
-
-		case 20: { //Jump to place in code
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-
-			programCounter = memPos;
-			break; }
-
-		case 21: { //Compare to true/false
-			byte condition = vRam.memory[programCounter + 1];
-			byte arg1 = vRam.memory[programCounter + 2];
-			int position = vRam.memory[programCounter + 3] << 8 | arg1;
-			if (register0 == condition) {
-				programCounter += 3;
-				programCounter++;
-			}else if(register0 != condition){		
-				programCounter = position;	
+		case 0x03: {
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int position = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int offset = checkArgument(progMem.memory[programCounter + 7] << 16 | progMem.memory[programCounter + 6] << 8 | progMem.memory[programCounter + 5], sizeA);
+			if(sizeA >= 1 && sizeA <= 4) {
+				vRam.memory[position + (offset * sizeA)] = registers[regA] & 0xFF;
+				if(sizeA >= 2) {
+					vRam.memory[position + (offset * sizeA) + 1] = (byte)(registers[regA] >> 8);
+				}
+				if(sizeA == 4) {
+					vRam.memory[position + (offset * sizeA) + 2] = (byte)(registers[regA] >> 16);
+					vRam.memory[position + (offset * sizeA) + 3] = (byte)(registers[regA] >> 24);
+				}
 			}
-			break; }
+			programCounter += 8;
+		break; }
 
-		case 26: { //Load to register1 from ram, 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			regR = checkArgumentInt(memPos, 1);
+		case 0x04: {
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int memPos = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int offset = checkArgument(progMem.memory[programCounter + 7] << 16 | progMem.memory[programCounter + 6] << 8 | progMem.memory[programCounter + 5], sizeA);
+			registers[regA] = checkArgument(memPos + (offset * sizeA), sizeA);
+			programCounter += 8;
+		break; };
+
+		case 0x06: { //Addition
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] + registers[regB];
 			programCounter += 2;
-			programCounter++;
-			break; }
+		break; }
 
-		case 27: { //Load to register1 from ram, 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			regG = checkArgumentInt(memPos, 1);
+		case 0x07: { //Subtraction
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] - registers[regB];
 			programCounter += 2;
-			programCounter++;
-			break; }
+		break; }
 
-		case 28: { //Load to register1 from ram, 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			regB = checkArgumentInt(memPos, 1);
+		case 0x08: { //Signed multiplication
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = static_cast<signed int>(registers[regA]) * static_cast<signed int>(registers[regB]);
 			programCounter += 2;
-			programCounter++;
-			break; }
+		break; }
 
-		case 29: { //Check if register0 is greater or equal to register1
-			
-			break; }
-
-		case 30: { //Color a single pixel on screen
-			screen->pixels[register1 * 320 + register0] = int(regB << 16) | int(regG << 8) | int(regR);
-
-			programCounter++;
-			break; }
-
-		case 31: { //Get core id
-			register0 = idX;
-			programCounter++;
-			break; }
-
-		case 32: { //Get core id
-			register0 = idY;
-			programCounter++;
-			break; }
-
-		case 33: { //Load to register0 from ram, 2 bytes
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register0 = checkArgumentV(memPos, 2);
+		case 0x09: { //Unsigned multiplication
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] * registers[regB];
 			programCounter += 2;
-			programCounter++;
-			break; }
+		break; }
 
-		case 34: { //Load to register1 from ram, 2 bytes
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register1 = checkArgumentV(memPos, 2);
+		case 0x0A: { //Signed integer division
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = static_cast<signed int>(registers[regA]) / static_cast<signed int>(registers[regB]);
 			programCounter += 2;
-			programCounter++;
-			break; }
+		break; }
 
-		case 35: { //Load to register0 from ram, 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register0 = checkArgumentV(memPos, 1);
+		case 0x0B: { //Unsigned integer division
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] / registers[regB];
 			programCounter += 2;
-			programCounter++;
-			break; }
+		break; }
 
-		case 36: { //Load to register1 from ram, 1 byte
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			register1 = checkArgumentV(memPos, 1);
+		case 0x0C: { //Signed larger than comparison
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = static_cast<signed int>(registers[regA]) > static_cast<signed int>(registers[regB]);
 			programCounter += 2;
-			programCounter++;
+		break; }
+
+		case 0x0D: { //Unsigned larger than comarison
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] > registers[regB];
+			programCounter += 2;
+		break; }
+
+		case 0x0E: { //Signed larger than or equal to comparison
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = static_cast<signed int>(registers[regA]) >= static_cast<signed int>(registers[regB]);
+			programCounter += 2;
+		break; }
+
+		case 0x0F: { //Unsigned larger than or equal to comarison
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] >= registers[regB];
+			programCounter += 2;
+		break; }
+
+		case 0x10: { //Equal comparison
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] == registers[regB];
+			programCounter += 2;
+		break; }
+
+		case 0x11: { //Jump to place in code
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte typeA = getBits(argument, 1);
+			int position = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			switch(typeA) {
+				case 0x0: {
+					if(registers[regA] == 0){
+						programCounter = position;
+					}else{
+						programCounter += 5;
+					}
+				break; }
+
+				case 0x1: {
+					if(registers[regA] == 1){
+						programCounter = position;
+					}else{
+						programCounter += 5;
+					}
+				break; }
+
+				case 0x2: {
+					programCounter = position;
+				break; }
+			}
+
+
 			break; }
 
-		case 37: {
-			byte arg1 = vRam.memory[programCounter + 1];
-			byte arg2 = vRam.memory[programCounter + 3];
-			byte arg3 = vRam.memory[programCounter + 5];
+		case 0x12: { //Increment register by 1
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			registers[regA]++;
+			programCounter += 2;
+		break; }
 
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int memPos2 = vRam.memory[programCounter + 4] << 8 | arg2;
-			int memPos3 = vRam.memory[programCounter + 6] << 8 | arg3;
+		case 0x13: { //Decrement register by 1
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			registers[regA]--;
+			programCounter += 2;
+		break; }
 
-			int v1 = checkArgumentInt(memPos, 2);
-			int v2 = checkArgumentInt(memPos2, 2);
-			int v3 = checkArgumentInt(memPos3, 2);
+		case 0x14: { //Set register to 0
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			registers[regA] = 0;
+			programCounter += 2;
+		break; }
 
-			register0 = std::max({v1, v2, v3});
+		case 0x15: { //Color a single pixel on screen
+			byte argument = progMem.memory[programCounter + 1];
+			byte regR = registers[getBits(argument, 0)];
+			byte regG = registers[getBits(argument, 1)];
+			byte argument2 = progMem.memory[programCounter + 2];
+			byte regB = registers[getBits(argument2, 0)];
 
-			programCounter += 6;
-			programCounter++;
+			screen->pixels[registers[1] * 320 + registers[0]] = int(regB << 16) | int(regG << 8) | int(regR);
+
+			programCounter += 3;
 			break; }
 
-		case 38: {
-			byte arg1 = vRam.memory[programCounter + 1];
-			byte arg2 = vRam.memory[programCounter + 3];
-			byte arg3 = vRam.memory[programCounter + 5];
-
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int memPos2 = vRam.memory[programCounter + 4] << 8 | arg2;
-			int memPos3 = vRam.memory[programCounter + 6] << 8 | arg3;
-
-			int v1 = checkArgumentInt(memPos, 2);
-			int v2 = checkArgumentInt(memPos2, 2);
-			int v3 = checkArgumentInt(memPos3, 2);
-
-			register0 = std::min({v1, v2, v3});
-
-			programCounter += 6;
-			programCounter++;
+		case 0x16: { //Get core idX
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			registers[regA] = idX;
+			programCounter += 2;
 			break; }
 
-		case 40: { //Load 2 bytes into register0 with offset
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentInt(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			register0 = checkArgumentInt(memPos + offset * 2, 2);
-			programCounter += 4;
-			programCounter++;
+		case 0x17: { //Get core idY
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			registers[regA] = idY;
+			programCounter += 2;
 			break; }
 
-		case 41: { //Load 2 bytes into register1 with offset
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentInt(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			register1 = checkArgumentInt(memPos + offset * 2, 2);
-			programCounter += 4;
-			programCounter++;
+		case 0x18: { //Get core ID
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			registers[regA] = (idX + coresYS * idY);
+			programCounter += 2;
 			break; }
-
-		case 42: { //Load 1 byte into register0 with offset
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentInt(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			register0 = checkArgumentInt(memPos + offset, 1);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 43: { //Load 1 byte into register1 with offset
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentInt(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			register1 = checkArgumentInt(memPos + offset, 1);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 44: { //Load 2 bytes into register0 with offset asdasd
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentV(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			register0 = checkArgumentV(memPos + offset * 2, 2);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 45: { //Load 2 bytes into register1 with offset asdasd
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentV(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			register1 = checkArgumentV(memPos + offset * 2, 2);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 46: { //Load 1 byte into register0 with offset asdasd
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentV(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			register0 = checkArgumentV(memPos + offset, 1);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 47: { //Load 1 byte into register1 with offset asdasd
-			byte arg1 = vRam.memory[programCounter + 1];
-			int memPos = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentV(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			register1 = checkArgumentV(memPos + offset, 1);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 48: { //Write from register0 to ram 2 bytes with offset
-			byte arg1 = vRam.memory[programCounter + 1];
-			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentInt(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			intMem.memory[position + offset] = (register0 & 0xFF);
-			intMem.memory[position + 1 + offset] = (byte)(register0 >> 8);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 49: { //Write from register1 to ram 2 bytes with offset
-			byte arg1 = vRam.memory[programCounter + 1];
-			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentInt(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			intMem.memory[position + offset] = (register1 & 0xFF);
-			intMem.memory[position + 1 + offset] = (byte)(register1 >> 8);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 50: { //Write from register0 to ram 1 byte with offset
-			byte arg1 = vRam.memory[programCounter + 1];
-			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentInt(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			intMem.memory[position + offset] = (register0 & 0xFF);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
-		case 51: { //Write from register1 to ram 1 byte with offset
-			byte arg1 = vRam.memory[programCounter + 1];
-			int position = vRam.memory[programCounter + 2] << 8 | arg1;
-			int offset = checkArgumentInt(vRam.memory[programCounter + 4] << 8 | vRam.memory[programCounter + 3], 1);
-			intMem.memory[position + offset] = (register1 & 0xFF);
-			programCounter += 4;
-			programCounter++;
-			break; }
-
 	}
 }

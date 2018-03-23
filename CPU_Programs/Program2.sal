@@ -1,17 +1,12 @@
 data.
 s8 x 5
-s8 y 25
-s8 z 0
-
-fn sum c, a, b
-moveP a regA
-moveP b regB
-add regA regB
-moveP regA c
-ret c
+s8 y 10
 
 program.start
 
-call regA sum z x y
-
+move.s x regA
+move.s y regB
+add regA regB
 cot regA
+
+gpu_str

@@ -12,9 +12,6 @@
 #include "SDLWindow.h"
 #include "GPUCore.h"
 
-typedef unsigned char byte;
-typedef uint16_t u16;
-
 struct task_id {
 	int x;
 	int y;
@@ -41,8 +38,8 @@ class GPU {
 public:
 	Memory commandBuffer;
 	Memory commandArgBuffer;
-	std::vector<int> stack;
 	Memory vRam;
+	Memory progMem;
 	Memory& ram;
 	SDLWindow* screen;
 	int programCounter;
@@ -51,8 +48,10 @@ public:
 	std::vector<GPUCore> cores;
 	std::vector<screenPos> charactersNUpdate;
 	SDL_Texture* font;
+	int coresX, coresY;
+	bool started;
 
-	GPU(int, int, int, int, SDLWindow*, Memory&);
+	GPU(int, int, int, int, int, SDLWindow*, Memory&);
 	void setCharID(byte x, byte y, byte ID);
 	void setCharCB(byte x, byte y, byte cB);
 	void setCharCF(byte x, byte y, byte cF);

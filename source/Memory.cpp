@@ -5,6 +5,8 @@ Memory::Memory(int size) {
 	Clear();
 }
 
+Memory::Memory() {};
+
 void Memory::Clear() {
 	for (unsigned int i = 0; i < memory.size(); i++) {
 		memory[i] = 0;

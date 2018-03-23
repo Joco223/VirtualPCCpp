@@ -1,0 +1,7 @@
+kernel_size 255 255
+
+g.IDX regA
+g.IDY regB
+g.IDX regC
+
+displ regC regC regC
