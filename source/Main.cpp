@@ -81,14 +81,24 @@ int main(int argc, char* argv[]) {
 	//Compiler::splitFile(cCode, tokens);
 
 	//Compiler::Parse(tokens);
+	std::vector<Assembly::variable> tmp2;
 
 	Assembly::readFile("CPU_Programs/Program2.sal", code);
 
-	Assembly::Compile(code, cpu1, vValues, vNames, addMem);
+	Assembly::Compile(code, cpu1, gpu1, tmp2, addMem);
 
 	GPUAssembly::readFile("GPU_Programs/Program.sgal", gpu_code);
 
 	std::vector<GPUAssembly::variable> tmp;
+
+	for(int i = 0; i < tmp2.size(); i++) {
+		GPUAssembly::variable tempo;
+		tempo.name = tmp2[i].name;
+		tempo.size = tmp2[i].size;
+		tempo.value = tmp2[i].value;
+		tempo.sDepth = 0;
+		tmp.push_back(tempo);
+	};
 
 	GPUAssembly::Compile(gpu_code, gpu1, tmp);
 

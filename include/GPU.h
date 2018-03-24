@@ -52,6 +52,7 @@ public:
 	bool started;
 	int currentTask;
 	bool screenUpdated;
+	int tasksX, tasksY;
 
 	GPU(int, int, int, int, int, SDLWindow*, Memory&);
 	void setCharID(byte x, byte y, byte ID);

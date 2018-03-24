@@ -69,6 +69,7 @@ int CPU::checkArgumentG(int source, int size) {
 	if ((unsigned int)source <= gpu.vRam.memory.size()) {
 		if(size == 1) { return gpu.vRam.memory[source] & 0xFF; } else {return 0;}
 		if(size == 2) { return gpu.vRam.memory[source + 1] <<  8 | (gpu.vRam.memory[source] & 0xFF); } else {return 0;}
+		if(size == 3) { return gpu.vRam.memory[source + 3] << 24 | (gpu.vRam.memory[source + 2] << 16) | (gpu.vRam.memory[source + 1] << 8) | (gpu.vRam.memory[source] & 0xFF); } else {return 0;}
 	}else if (source == gpu.vRam.memory.size() + 1) {
 		return interruptRegister;
 	}else {
@@ -298,7 +299,6 @@ void CPU::execute() {
 		case 0x13: { //Cout from register
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
-			std::cout << registers[regA] << '\n';
 			programCounter += 2;
 		break; }
 
@@ -374,9 +374,76 @@ void CPU::execute() {
 		break;}
 
 		case 0x1C: {
-			gpu.started = true;
+			if(gpu.tasks.size() == 0){
+				for(int y = 0; y < gpu.tasksY; y++){
+					for(int x = 0; x < gpu.tasksX; x++){
+						gpu.tasks.push_back({x, y});
+					}
+				}
+				gpu.started = true;
+			}
 			programCounter++;
-		break;}
+		break; }
+
+		case 0x1D: {
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			registers[regA] = checkArgumentG(memPos, sizeA);
+			programCounter += 5;
+		break; }
+
+		case 0x1E: {
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			if(sizeA >= 1 && sizeA <= 3) {
+				gpu.vRam.memory[position] = registers[regA] & 0xFF;
+				if(sizeA >= 2) {
+					gpu.vRam.memory[position + 1] = (byte)(registers[regA] >> 8);
+				}
+				if(sizeA == 3) {
+					gpu.vRam.memory[position + 2] = (byte)(registers[regA] >> 16);
+					gpu.vRam.memory[position + 3] = (byte)(registers[regA] >> 24);
+				}
+			}else{
+				std::cout << "Invalid data type size at instruction 0x1E at memory position: 0x" << std::hex << programCounter << '\n';
+			}
+			programCounter += 5;
+		break; }
+
+		case 0x1F: {
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], sizeA);
+			if(sizeA >= 1 && sizeA <= 4) {
+				gpu.vRam.memory[position + (offset * sizeA)] = registers[regA] & 0xFF;
+				if(sizeA >= 2) {
+					gpu.vRam.memory[position + (offset * sizeA) + 1] = (byte)(registers[regA] >> 8);
+				}
+				if(sizeA == 4) {
+					gpu.vRam.memory[position + (offset * sizeA) + 2] = (byte)(registers[regA] >> 16);
+					gpu.vRam.memory[position + (offset * sizeA) + 3] = (byte)(registers[regA] >> 24);
+				}
+			}else{
+				std::cout << "Invalid data type size at instruction 0x1F at memory position: 0x" << std::hex << programCounter << '\n';
+			}
+			programCounter += 8;
+		break; }
+
+		case 0x20: {
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], sizeA);
+			registers[regA] = checkArgumentG(memPos + (offset * sizeA), sizeA);
+			programCounter += 8;
+		break; };
 	}
 }
 

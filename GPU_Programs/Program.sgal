@@ -3,4 +3,6 @@ kernel_size 320 240
 g.IDX regA
 g.IDY regB
 
+move.s r regC
+
 displ regA regB regC

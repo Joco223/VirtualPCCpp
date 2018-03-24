@@ -20,6 +20,6 @@ namespace Assembly {
 		int sDepth;
 	};
 
-	void Compile(std::vector<std::string>& code, CPU& cpu, std::vector<int>& vValues, std::vector<std::string>& vNames, int& finalCP);
+	void Compile(std::vector<std::string>& code, CPU& cpu, GPU& gpu, std::vector<variable>& gVariables, int& finalCP);
 	void readFile(std::string path, std::vector<std::string>& code);
 };

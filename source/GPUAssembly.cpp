@@ -151,11 +151,8 @@ namespace GPUAssembly {
 				int x = std::stoi(code[i + 1]);
 				int y = std::stoi(code[i + 2]);
 
-				for(int p = 0; p < y; p++){
-					for(int k = 0; k < x; k++){
-						gpu.tasks.push_back({k, p});
-					}
-				}
+				gpu.tasksX = x;
+				gpu.tasksY = y;
 
 				i += 2;
 				continue;

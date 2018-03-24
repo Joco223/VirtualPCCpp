@@ -1,12 +1,8 @@
 data.
-s8 x 5
-s8 y 10
+s8.g r 50
 
 program.start
 
-move.s x regA
-move.s y regB
-add regA regB
-cot regA
+start:
 
 gpu_str

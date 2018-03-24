@@ -141,7 +141,7 @@ namespace Assembly {
 		if(code[i + k] == "regL") {return 11;}
 	}
 
-	void Compile(std::vector<std::string>& code, CPU& cpu, std::vector<int>& vValues, std::vector<std::string>& vNames, int& finalCP) {
+	void Compile(std::vector<std::string>& code, CPU& cpu, GPU& gpu, std::vector<variable>& gVariables, int& finalCP) {
 		std::vector<char> charactersA = {'0',  '1', '2', '3', '4',  '5',  '6', '7', '8', '9',
 										 '!', '\"', '#', '$', '%',  '&', '\'', '(', ')', '*',
 										 '+',  '-', ',', '.', '/', '\\',  ':', ';', '<', '>',
@@ -154,6 +154,7 @@ namespace Assembly {
 										 'v',  'w', 'x', 'y', 'z'};
 
 		int currentPos = 0;
+		int currentPosG = 0;
 		int additionalMemory = 0;
 		int GadditionalMemory = 0;
 		int line = 0;
@@ -197,6 +198,10 @@ namespace Assembly {
 			if (dataM == true) {
 				if (instruction == "s8") {
 					currentPos++;
+					i += 2;
+					continue;
+				}else if (instruction == "s8.g") {
+					currentPosG++;
 					i += 2;
 					continue;
 				}else if (instruction == "d16") {
@@ -256,7 +261,7 @@ namespace Assembly {
 				}
 			}
 
-			if(instruction.compare(0, 5, "move.") == 0) {
+			if(instruction.compare(0, 5, "move.") == 0 && instruction.length() == 5) {
 				if(instruction[5] == 's'){
 					currentPos += 5;
 					i += 2;
@@ -448,6 +453,42 @@ namespace Assembly {
 			}else if(!instruction.compare(0, 3, "ret")) {
 				currentPos += 2;;
 				i++;
+			}else if(instruction.compare(0, 7, "move.g.") == 0) {
+				if(instruction[7] == 's'){
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[7] == 'd') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[7] == 'l') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else{
+					std::cout << "Uknwown data type at instruction >move.g.< at line " << line << '\n';
+					cpu.ram.Clear();
+					break;
+				}
+			}else if(instruction.compare(0, 8, "moveO.g.") == 0) {
+				if(instruction[8] == 's'){
+					currentPos += 8;
+					i += 3;
+					line++;
+				}else if(instruction[8] == 'd') {
+					currentPos += 8;
+					i += 3;
+					line++;
+				}else if(instruction[8] == 'l') {
+					currentPos += 8;
+					i += 3;
+					line++;
+				}else{
+					std::cout << "Uknwown data type at instruction >moveO.g.< at line " << line << '\n';
+					cpu.ram.Clear();
+					break;
+				}
 			}else{
 				if (instruction.back() == ':') {
 					std::string tmp = instruction;
@@ -473,6 +514,7 @@ namespace Assembly {
 		}
 
 		currentPos = 0;
+		currentPosG = 0;
 		additionalMemory = 0;
 		line = 0;
 		dataM = false;
@@ -501,11 +543,11 @@ namespace Assembly {
 
 			if (instruction == "interrupt.e") {
 				interM = false;
-				cpu.ram.memory[currentPos++] = 30;
+				/*cpu.ram.memory[currentPos++] = 30;
 				cpu.interTartgetPos = currentPos;
 				cpu.ram.memory[currentPos++] = 0;
 				cpu.ram.memory[currentPos++] = 0;
-				cpu.programCounter = currentPos;
+				cpu.programCounter = currentPos;*/
 				continue;
 			}
 
@@ -524,6 +566,23 @@ namespace Assembly {
 					variables.push_back(temp);
 
 					cpu.ram.memory[currentPos++] = (byte)Arg2;
+					i += 2;
+					line++;
+					continue;
+				}else if (instruction == "s8.g") {
+					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
+
+					int Arg2 = std::stoi(arg2);
+
+					variable temp;
+					temp.name = arg1;
+					temp.value = currentPosG;
+					temp.sDepth = scopeDepth;
+					temp.size = 1;
+					gVariables.push_back(temp);
+
+					gpu.vRam.memory[currentPosG++] = (byte)Arg2;
 					i += 2;
 					line++;
 					continue;
@@ -631,7 +690,7 @@ namespace Assembly {
 				}*/
 			}
 
-			if(instruction.compare(0, 5, "move.") == 0) {
+			if(instruction.compare(0, 5, "move.") == 0 && instruction.length() == 5) {
 				if(instruction[5] == 's'){
 					if(isRegister(code, i)) {
 						cpu.ram.memory[currentPos++] = 0x02;
@@ -1195,7 +1254,6 @@ namespace Assembly {
 				}
 			}else if (instruction == "gpu_str") {
 				cpu.ram.memory[currentPos++] = 0x1C;
-				currentPos++;
 				line++;
 			}else if (instruction == "wait") {
 				currentPos += 2;
@@ -1339,6 +1397,294 @@ namespace Assembly {
 				cpu.ram.memory[currentPos++] = checkArgType(code[i + 1], cpu, variables, scopeDepth);
 				scopeDepth--;
 				i++;
+			}else if(instruction.compare(0, 7, "move.g.") == 0) {
+				if(instruction[7] == 's'){
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x1E;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x1 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x1D;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (1 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[7] == 'd') {
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x1E;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x2 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x1D;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x2 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[7] == 'l') {
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x1E;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x3 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x1D;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x3 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else{
+					std::cout << "Uknwown data type at instruction >move.g< at line " << line << '\n';
+					cpu.ram.Clear();
+					break;
+				}
+			}else if(instruction.compare(0, 8, "moveO.g.") == 0) {
+				if(instruction[8] == 's'){
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x1F;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x1 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 3], cpu, gVariables, scopeDepth);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						cpu.ram.memory[currentPos++] = b4;
+						cpu.ram.memory[currentPos++] = b5;
+						cpu.ram.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x20;
+
+						byte arg = indexRegister(code, i, 3);
+						arg |= (1 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						cpu.ram.memory[currentPos++] = b4;
+						cpu.ram.memory[currentPos++] = b5;
+						cpu.ram.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}
+				}else if(instruction[8] == 'd') {
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x1F;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x2 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 3], cpu, gVariables, scopeDepth);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						cpu.ram.memory[currentPos++] = b4;
+						cpu.ram.memory[currentPos++] = b5;
+						cpu.ram.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x20;
+
+						byte arg = indexRegister(code, i, 3);
+						arg |= (0x2 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						cpu.ram.memory[currentPos++] = b4;
+						cpu.ram.memory[currentPos++] = b5;
+						cpu.ram.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}
+				}else if(instruction[8] == 'l') {
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x1F;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x3 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 3], cpu, gVariables, scopeDepth);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						cpu.ram.memory[currentPos++] = b4;
+						cpu.ram.memory[currentPos++] = b5;
+						cpu.ram.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x20;
+
+						byte arg = indexRegister(code, i, 3);
+						arg |= (0x3 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, gVariables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						int arg3 = checkArgType(code[i + 2], cpu, gVariables, scopeDepth);
+
+						byte b4, b5, b6;
+						convertByte3(arg3, b4, b5, b6);
+						cpu.ram.memory[currentPos++] = b4;
+						cpu.ram.memory[currentPos++] = b5;
+						cpu.ram.memory[currentPos++] = b6;
+
+						i += 3;
+						line++;
+					}
+				}else{
+					std::cout << "Uknwown data type at instruction >moveO.g< at line " << line << '\n';
+					cpu.ram.Clear();
+					break;
+				}
 			}else{
 				if (instruction.back() == ':') {
 					line++;

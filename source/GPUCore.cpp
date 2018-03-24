@@ -225,7 +225,7 @@ void GPUCore::execute(int registerOP) {
 			byte argument2 = progMem.memory[programCounter + 2];
 			byte regB = registers[getBits(argument2, 0)];
 
-			screen->pixels[registers[1] * 320 + registers[0]] = int(regB << 16) | int(regG << 8) | int(regR);
+			screen->pixels[registers[1] * 320 + registers[0]] = int(regR << 16) | int(regG << 8) | int(regB);
 
 			programCounter += 3;
 			screenUpdated = true;
