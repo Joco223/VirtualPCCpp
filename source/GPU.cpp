@@ -6,10 +6,12 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coureCountY, i
 	vRam(Memory(vRamSize)),
 	ram(ram_),
 	screen(screen_),
-	started(true)
+	started(true),
+	currentTask(0),
+	screenUpdated(false)
 {
 	for (int x = 0; x < (coreCountX * coureCountY); x++) {
-		cores.emplace_back(vRam, progMem, screen_, coureCountY, x, 0);
+		cores.emplace_back(vRam, progMem, screen_, screenUpdated, coureCountY, x, 0);
 	}
 
 	for(int y = 0; y < 30; y++) {
@@ -87,10 +89,14 @@ void GPU::updateScreen() {
 		charactersNUpdate.clear();
 	};*/
 
-	SDL_UpdateTexture(screen->texture, NULL, screen->pixels, screen->pixelSpace->pitch);
-	SDL_RenderClear(screen->renderer);
-	SDL_RenderCopy(screen->renderer, screen->texture, NULL, NULL);
-	SDL_RenderPresent(screen->renderer);
+	if(currentTask % 15 == 0){
+		SDL_UpdateTexture(screen->texture, NULL, screen->pixels, screen->pixelSpace->pitch);
+		SDL_RenderClear(screen->renderer);
+		SDL_RenderCopy(screen->renderer, screen->texture, NULL, NULL);
+		SDL_RenderPresent(screen->renderer);
+		screenUpdated = false;
+	}
+
 }
 
 void convertByte(int number, byte& b1, byte& b2, byte& b3) {
@@ -118,13 +124,15 @@ void GPU::tick() {
 	if(started) {
 		for (int i = 0; i < cores.size(); i++) {
 			if (cores[i].halt == true) {
-				if (tasks.size() > 0) {
+				if (currentTask < tasks.size()) {
 					cores[i].programCounter = 0;
-					cores[i].idX = tasks[0].x;
-					cores[i].idY = tasks[0].y;
-					tasks.erase(tasks.begin());
+					cores[i].idX = tasks[currentTask].x;
+					cores[i].idY = tasks[currentTask].y;
 					cores[i].halt = false;
+					currentTask++;
 				}else{
+					tasks.clear();
+					currentTask = 0;
 					started = false;
 				}
 			}else{

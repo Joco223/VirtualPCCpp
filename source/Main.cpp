@@ -31,9 +31,17 @@ bool quit = false;
 
 typedef unsigned char byte;
 
-void runGPU (GPU* gpu) {
-	gpu->tick();
-	gpu->updateScreen();
+void runGPUCores (GPU *gpu) {
+	while(true){
+		gpu->tick();
+
+	}
+}
+
+void updateGPUSCreen (GPU *gpu){
+	while(true){
+		gpu->updateScreen();
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -96,8 +104,8 @@ int main(int argc, char* argv[]) {
 	bool printed = false;
 	bool measured = false;
 
-	//std::thread GPU1 (runGPU, &gpu1);
-
+	std::thread GPU1 (runGPUCores, &gpu1);
+	std::thread GPU1S (updateGPUSCreen, &gpu1);
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -115,8 +123,6 @@ int main(int argc, char* argv[]) {
 			measured = true;
 		}
 		pc1.cpu.tick();
-		gpu1.tick();
-		gpu1.updateScreen();
 
 		if (gpu1.started == false && printed == false) {
 			t = clock() - t;
@@ -126,7 +132,8 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	//GPU1.join();
+	GPU1.join();
+	GPU1S.join();
 
 	SDL_Quit();
 

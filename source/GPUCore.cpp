@@ -1,6 +1,6 @@
 #include "GPUCore.h"
 
-GPUCore::GPUCore(Memory& vRam_, Memory& progMem_, SDLWindow* screen_, int coresYS_, int idX_, int idY_)
+GPUCore::GPUCore(Memory& vRam_, Memory& progMem_, SDLWindow* screen_, bool& screenUpdated_, int coresYS_, int idX_, int idY_)
 	:
 	vRam(vRam_),
 	progMem(progMem_),
@@ -8,16 +8,15 @@ GPUCore::GPUCore(Memory& vRam_, Memory& progMem_, SDLWindow* screen_, int coresY
 	screen(screen_),
 	halt(true),
 	idX(idX_),
-	idY(idY_)
+	idY(idY_),
+	screenUpdated(screenUpdated_)
 	{
 		registers.resize(12);
 	}
 
 void GPUCore::tick() {
-	if (halt == false) {
-		registerOP = progMem.memory[programCounter];
-		execute(registerOP);
-	}
+	registerOP = progMem.memory[programCounter];
+	execute(registerOP);
 }
 
 int GPUCore::checkArgument(int source, int size) {
@@ -229,6 +228,7 @@ void GPUCore::execute(int registerOP) {
 			screen->pixels[registers[1] * 320 + registers[0]] = int(regB << 16) | int(regG << 8) | int(regR);
 
 			programCounter += 3;
+			screenUpdated = true;
 			break; }
 
 		case 0x16: { //Get core idX

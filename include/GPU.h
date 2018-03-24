@@ -50,6 +50,8 @@ public:
 	SDL_Texture* font;
 	int coresX, coresY;
 	bool started;
+	int currentTask;
+	bool screenUpdated;
 
 	GPU(int, int, int, int, int, SDLWindow*, Memory&);
 	void setCharID(byte x, byte y, byte ID);
