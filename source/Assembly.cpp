@@ -261,7 +261,7 @@ namespace Assembly {
 				}
 			}
 
-			if(instruction.compare(0, 5, "move.") == 0 && instruction.length() == 5) {
+			if(instruction.compare(0, 5, "move.") == 0 && instruction.length() == 6) {
 				if(instruction[5] == 's'){
 					currentPos += 5;
 					i += 2;
@@ -690,7 +690,7 @@ namespace Assembly {
 				}*/
 			}
 
-			if(instruction.compare(0, 5, "move.") == 0 && instruction.length() == 5) {
+			if(instruction.compare(0, 5, "move.") == 0 && instruction.length() == 6) {
 				if(instruction[5] == 's'){
 					if(isRegister(code, i)) {
 						cpu.ram.memory[currentPos++] = 0x02;

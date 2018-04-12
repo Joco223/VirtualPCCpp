@@ -299,6 +299,7 @@ void CPU::execute() {
 		case 0x13: { //Cout from register
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
+			std::cout << registers[regA] << '\n';
 			programCounter += 2;
 		break; }
 
