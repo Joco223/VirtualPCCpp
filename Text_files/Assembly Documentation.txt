@@ -25,6 +25,7 @@ s8 - 8 bit number
 d16 - 16 bit number
 l32 - 32 bit number
 s8.a - array of 8 bit numbers
+s8.g - 8 bit number on vRam
 (more coming soon...)
 
 Instruction set:
@@ -47,6 +48,9 @@ the register argument
 moveO.s - Move 8 bits of data from a register to an adress in memory with an
 offset or move 8 bits of data from an adress in memory with an offset to a
 register (moveO.s x offset regA)
+
+move.g.s - Same as move.s, just accessing the vRam and not Ram (no .d and .l yet)
+moveO.g.s - Same as moveO.s, just accessing the vRam and not Ram (no .d and .l yet)
 
 --For the following instructions you put the register you want to perform on
 as the argument
@@ -118,6 +122,8 @@ the value that is going to be set (sb.setCF regA regB x)
 
 Colors go from 0-255, a picture is in the folder same as vPC that shows all
 the color options
+
+gpu_str - Start executing the loaded GPU program
 
 
 Character codes:

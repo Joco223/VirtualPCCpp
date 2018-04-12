@@ -1,8 +1,10 @@
-kernel_size 320 240
+kernel_size 32 32
 
 g.IDX regA
 g.IDY regB
 
 move.s r regC
+add regA regC
+add regB regC
 
 displ regA regB regC
