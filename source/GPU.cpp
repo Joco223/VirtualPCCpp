@@ -57,14 +57,19 @@ void GPU::setCharCF(byte x, byte y, byte cF) {
 }
 
 void GPU::updateScreen() {
-	/*SDL_Rect source;
+	SDL_UpdateTexture(screen->texture, NULL, screen->pixels, screen->pixelSpace->pitch);
+	SDL_RenderClear(screen->renderer);
+
+	SDL_SetRenderTarget(screen->renderer, screen->texture);
+
+	SDL_Rect source;
 	SDL_Rect target;
 	source.w = 6;
 	source.h = 8;
 	target.w = 6;
 	target.h = 8;
 
-	for(auto i : charactersNUpdate) {
+	for(auto& i : charactersNUpdate) {
 		source.x = 7 * 6;
 		source.y = 6 * 8;
 
@@ -78,25 +83,15 @@ void GPU::updateScreen() {
 		source.x = (screenCharacters[i.y * 53 + i.x].characterID % 10) * 6;
 		source.y = (screenCharacters[i.y * 53 + i.x].characterID / 10) * 8;
 
-
 		SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].r * 36.428, screenCharacters[i.y * 53 + i.x].g * 36.428, screenCharacters[i.y * 53 + i.x].b * 85);
 
 		SDL_RenderCopy(screen->renderer, font, &source, &target);
 	}
 
-	if(charactersNUpdate.size() > 0) {
-		SDL_RenderPresent(screen->renderer);
-		charactersNUpdate.clear();
-	};*/
+	SDL_SetRenderTarget(screen->renderer, nullptr);
 
-	if(currentTask % 15 == 0){
-		SDL_UpdateTexture(screen->texture, NULL, screen->pixels, screen->pixelSpace->pitch);
-		SDL_RenderClear(screen->renderer);
-		SDL_RenderCopy(screen->renderer, screen->texture, NULL, NULL);
-		SDL_RenderPresent(screen->renderer);
-		screenUpdated = false;
-	}
-
+	SDL_RenderCopy(screen->renderer, screen->texture, NULL, NULL);
+	SDL_RenderPresent(screen->renderer);
 }
 
 void convertByte(int number, byte& b1, byte& b2, byte& b3) {
@@ -122,6 +117,7 @@ void GPU::startCores() {
 
 void GPU::tick() {
 	if(started) {
+
 		for (int i = 0; i < cores.size(); i++) {
 			if (cores[i].halt == true) {
 				if (currentTask < tasks.size()) {
@@ -133,7 +129,6 @@ void GPU::tick() {
 				}else{
 					tasks.clear();
 					currentTask = 0;
-					started = false;
 				}
 			}else{
 				cores[i].tick();

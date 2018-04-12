@@ -1,22 +1,19 @@
 data.
-s8.a x 3 1 2 3
-s8.a y 3 5 4 3
-s8 one 1
+s8 x 100
+s8 y 100
+
+s8 x2 40
+s8 y2 25
+s8 red 63
 
 program.start
 
-moveO.s x one regA
-moveO.s y one regB
+move.s x regA
+move.s y regB
 
-add regA regB
+gpu.str regA regB
 
-cot regA
+move.s x2 regA
+move.s y2 regB
 
-moveO.s regA x one
-
-moveO.s x one regB
-moveO.s y one regA
-
-add regB regA
-
-cot regB
+sb.setID regA regB red

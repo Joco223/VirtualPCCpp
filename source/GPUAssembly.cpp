@@ -147,16 +147,6 @@ namespace GPUAssembly {
 
 			std::string instruction = code[i];
 
-			if(instruction == "kernel_size") {
-				int x = std::stoi(code[i + 1]);
-				int y = std::stoi(code[i + 2]);
-
-				gpu.tasksX = x;
-				gpu.tasksY = y;
-
-				i += 2;
-				continue;
-			}
 
 			if(instruction.compare(0, 5, "move.") == 0) {
 				if(instruction[5] == 's'){
@@ -353,11 +343,6 @@ namespace GPUAssembly {
 		for (unsigned int i = 0; i < code.size(); i++) {
 
 			std::string instruction = code[i];
-
-			if(instruction == "kernel_size") {
-				i += 2;
-				continue;
-			}
 
 			if(instruction.compare(0, 5, "move.") == 0) {
 				if(instruction[5] == 's'){

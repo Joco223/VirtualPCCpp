@@ -106,7 +106,9 @@ in unsigned mode, result is stored in first register (cmp.u.b regA regB)
 cmp.u.be - Compare if first register golds a greater or equal value than
 second register in unsigned mode, result is stored in first register (cmp.u.be
 regA regB)
-gpu_str - Start the GPU program (subject to change)
+
+gpu.str - Start the GPU program, first and second register hold the X and Y
+size of the program (gpu.str regA regB)
 
 sb.setID - Set character ID in the screen buffer held in the GPU, first and
 second register hold the x and y value and third argument is value that is
@@ -122,8 +124,6 @@ the value that is going to be set (sb.setCF regA regB x)
 
 Colors go from 0-255, a picture is in the folder same as vPC that shows all
 the color options
-
-gpu_str - Start executing the loaded GPU program
 
 
 Character codes:

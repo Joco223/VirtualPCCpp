@@ -374,8 +374,11 @@ void CPU::execute() {
 			registers[stack[currentStackPos].return_register] = stack[currentStackPos].parameters[argument];
 		break;}
 
-		case 0x1C: {
-			if(gpu.tasks.size() == 0){
+		case 0x1C: { //Starts GPU program exectuion
+			gpu.tasksX = registers[getBits(ram.memory[programCounter + 1], 0)];
+			gpu.tasksY = registers[getBits(ram.memory[programCounter + 1], 1)];
+
+			if(gpu.tasks.size() == 0) {
 				for(int y = 0; y < gpu.tasksY; y++){
 					for(int x = 0; x < gpu.tasksX; x++){
 						gpu.tasks.push_back({x, y});
@@ -383,7 +386,8 @@ void CPU::execute() {
 				}
 				gpu.started = true;
 			}
-			programCounter++;
+
+			programCounter += 2;
 		break; }
 
 		case 0x1D: {

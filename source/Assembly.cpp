@@ -413,8 +413,9 @@ namespace Assembly {
 					cpu.ram.Clear();
 					break;
 				}
-			}else if (instruction == "gpu_str") {
-				currentPos++;
+			}else if (instruction == "gpu.str") {
+				currentPos += 2;
+				i += 2;
 				line++;
 			}else if (instruction == "wait") {
 				currentPos += 2;
@@ -1252,8 +1253,15 @@ namespace Assembly {
 					cpu.ram.Clear();
 					break;
 				}
-			}else if (instruction == "gpu_str") {
+			}else if (instruction == "gpu.str") {
 				cpu.ram.memory[currentPos++] = 0x1C;
+
+				byte arg1 = indexRegister(code, i, 1);
+				arg1 |= (indexRegister(code, i , 2) << 4);
+
+				cpu.ram.memory[currentPos++] = arg1;
+
+				i += 2;
 				line++;
 			}else if (instruction == "wait") {
 				currentPos += 2;
