@@ -40,6 +40,7 @@ void runGPUCores (GPU *gpu) {
 
 void updateGPUSCreen (GPU *gpu){
 	while(true){
+		gpu->updateCharacters();
 		gpu->updateScreen();
 	}
 }
@@ -110,16 +111,11 @@ int main(int argc, char* argv[]) {
 	bool caps_lock = false;
 	bool space = false;
 
-	clock_t t;
-	bool printed = false;
-	bool measured = false;
+	int ticks = 0;
+	int targetTicks = 3000;
 
-	std::thread GPU1 (runGPUCores, &gpu1);
-	std::thread GPU1S (updateGPUSCreen, &gpu1);
-
-	auto now = std::chrono::high_resolution_clock::now();
-	auto lastFrame = std::chrono::high_resolution_clock::now();
-	int ups = 1000; //How may updates per second there is
+	//std::thread GPU1(runGPUCores, &gpu1);
+	//std::thread GPU1S(updateGPUSCreen, &gpu1);
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -132,32 +128,21 @@ int main(int argc, char* argv[]) {
 			}
 
 		}
-		if (measured == false) {
-			t = clock();
-			measured = true;
+
+		if(ticks >= targetTicks){
+			pc1.cpu.tick();
+			gpu1.updateCharacters();
+			gpu1.tick();
+			gpu1.updateScreen();
+			ticks = 0;
 		}
+		ticks++;
 
-		now = std::chrono::high_resolution_clock::now();
-		std::chrono::nanoseconds delta = now - lastFrame;
-		lastFrame = now;
 
-		if(delta.count() < (1e9/ups)){
-			long int wait = ((1e9/ups) - delta.count());
-			std::this_thread::sleep_for(std::chrono::nanoseconds(wait));
-		}
-
-		pc1.cpu.tick();
-
-		/*if (gpu1.started == false && printed == false) {
-			t = clock() - t;
-			std::cout << "\n";
-			std::cout << "It took: " << ((double)t/CLOCKS_PER_SEC) << " seconds for GPU to finish its task" << '\n';
-			printed = true;
-		}*/
 	}
 
-	GPU1.join();
-	GPU1S.join();
+	//GPU1.join();
+	//GPU1S.join();
 
 	SDL_Quit();
 

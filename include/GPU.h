@@ -48,6 +48,7 @@ public:
 	std::vector<GPUCore> cores;
 	std::vector<screenPos> charactersNUpdate;
 	SDL_Texture* font;
+	SDL_Texture* characterBuffer;
 	int coresX, coresY;
 	bool started;
 	int currentTask;
@@ -58,6 +59,7 @@ public:
 	void setCharID(byte x, byte y, byte ID);
 	void setCharCB(byte x, byte y, byte cB);
 	void setCharCF(byte x, byte y, byte cF);
+	void updateCharacters();
 	void loadFont();
 	void updateScreen();
 	void executeCommand();

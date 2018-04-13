@@ -29,6 +29,9 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coureCountY, i
 			screenCharacters.push_back(tmp);
 		}
 	}
+
+	characterBuffer = SDL_CreateTexture(screen->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 320, 240);
+	SDL_SetRenderTarget(screen->renderer, screen->texture);
 }
 
 void GPU::loadFont() {
@@ -56,10 +59,8 @@ void GPU::setCharCF(byte x, byte y, byte cF) {
 	charactersNUpdate.push_back({x, y});
 }
 
-void GPU::updateScreen() {
-	SDL_UpdateTexture(screen->texture, NULL, screen->pixels, screen->pixelSpace->pitch);
-
-	SDL_SetRenderTarget(screen->renderer, screen->texture);
+void GPU::updateCharacters() {
+	SDL_SetRenderTarget(screen->renderer, characterBuffer);
 
 	SDL_Rect source;
 	SDL_Rect target;
@@ -88,14 +89,19 @@ void GPU::updateScreen() {
 			SDL_RenderCopy(screen->renderer, font, &source, &target);
 		}
 	}
+
 	SDL_SetRenderTarget(screen->renderer, nullptr);
 
-	SDL_RenderCopy(screen->renderer, screen->texture, NULL, NULL);
-	SDL_RenderPresent(screen->renderer);
-
-	if(charactersNUpdate.size() > 5){
-		charactersNUpdate.erase(charactersNUpdate.begin() + 3);
+	if(charactersNUpdate.size() > 0){
+		charactersNUpdate.erase(charactersNUpdate.begin(), charactersNUpdate.end());
 	}
+}
+
+void GPU::updateScreen() {
+	SDL_UpdateTexture(screen->texture, nullptr, screen->pixels, screen->pixelSpace->pitch);
+
+	SDL_RenderCopy(screen->renderer, characterBuffer, nullptr, nullptr);
+	SDL_RenderPresent(screen->renderer);
 }
 
 void convertByte(int number, byte& b1, byte& b2, byte& b3) {
