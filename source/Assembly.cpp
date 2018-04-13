@@ -1713,7 +1713,8 @@ namespace Assembly {
 
 		finalCP = GadditionalMemory;
 
-		std::cout << "CPU program size is: " << currentPos << " bytes" << '\n';
+		std::cout << "CPU program size is: " << currentPos << " bytes." << '\n';
+		std::cout << "Free RAM left: " << (cpu.ram.memory.size() - currentPos) << " bytes." << '\n';
 		std::cout << '\n';
 	}
 }

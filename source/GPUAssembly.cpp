@@ -883,7 +883,9 @@ namespace GPUAssembly {
 
 		}
 
-		std::cout << "GPU program size is: " << currentPos << " bytes" << '\n';
-		std::cout << '\n';
+		if(currentPos > 0){
+			std::cout << "GPU program size is: " << currentPos << " bytes" << '\n';
+			std::cout << '\n';
+		}
 	}
 }

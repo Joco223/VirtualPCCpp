@@ -58,7 +58,6 @@ void GPU::setCharCF(byte x, byte y, byte cF) {
 
 void GPU::updateScreen() {
 	SDL_UpdateTexture(screen->texture, NULL, screen->pixels, screen->pixelSpace->pitch);
-	SDL_RenderClear(screen->renderer);
 
 	SDL_SetRenderTarget(screen->renderer, screen->texture);
 
@@ -70,28 +69,33 @@ void GPU::updateScreen() {
 	target.h = 8;
 
 	for(auto& i : charactersNUpdate) {
-		source.x = 7 * 6;
-		source.y = 6 * 8;
+		if(i.x > 0 && i.x < 53 && i.y > 0 && i.y < 30) {
+			source.x = 7 * 6;
+			source.y = 6 * 8;
 
-		target.x = i.x * 6;
-		target.y = i.y * 8;
+			target.x = i.x * 6;
+			target.y = i.y * 8;
 
-		SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].rB * 36.428, screenCharacters[i.y * 53 + i.x].gB * 36.428, screenCharacters[i.y * 53 + i.x].bB * 85);
+			SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].rB * 36.428, screenCharacters[i.y * 53 + i.x].gB * 36.428, screenCharacters[i.y * 53 + i.x].bB * 85);
 
-		SDL_RenderCopy(screen->renderer, font, &source, &target);
+			SDL_RenderCopy(screen->renderer, font, &source, &target);
 
-		source.x = (screenCharacters[i.y * 53 + i.x].characterID % 10) * 6;
-		source.y = (screenCharacters[i.y * 53 + i.x].characterID / 10) * 8;
+			source.x = (screenCharacters[i.y * 53 + i.x].characterID % 10) * 6;
+			source.y = (screenCharacters[i.y * 53 + i.x].characterID / 10) * 8;
 
-		SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].r * 36.428, screenCharacters[i.y * 53 + i.x].g * 36.428, screenCharacters[i.y * 53 + i.x].b * 85);
+			SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].r * 36.428, screenCharacters[i.y * 53 + i.x].g * 36.428, screenCharacters[i.y * 53 + i.x].b * 85);
 
-		SDL_RenderCopy(screen->renderer, font, &source, &target);
+			SDL_RenderCopy(screen->renderer, font, &source, &target);
+		}
 	}
-
 	SDL_SetRenderTarget(screen->renderer, nullptr);
 
 	SDL_RenderCopy(screen->renderer, screen->texture, NULL, NULL);
 	SDL_RenderPresent(screen->renderer);
+
+	if(charactersNUpdate.size() > 5){
+		charactersNUpdate.erase(charactersNUpdate.begin() + 3);
+	}
 }
 
 void convertByte(int number, byte& b1, byte& b2, byte& b3) {

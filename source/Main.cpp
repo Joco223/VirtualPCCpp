@@ -117,6 +117,10 @@ int main(int argc, char* argv[]) {
 	std::thread GPU1 (runGPUCores, &gpu1);
 	std::thread GPU1S (updateGPUSCreen, &gpu1);
 
+	auto now = std::chrono::high_resolution_clock::now();
+	auto lastFrame = std::chrono::high_resolution_clock::now();
+	int ups = 1000; //How may updates per second there is
+
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -132,14 +136,24 @@ int main(int argc, char* argv[]) {
 			t = clock();
 			measured = true;
 		}
+
+		now = std::chrono::high_resolution_clock::now();
+		std::chrono::nanoseconds delta = now - lastFrame;
+		lastFrame = now;
+
+		if(delta.count() < (1e9/ups)){
+			long int wait = ((1e9/ups) - delta.count());
+			std::this_thread::sleep_for(std::chrono::nanoseconds(wait));
+		}
+
 		pc1.cpu.tick();
 
-		if (gpu1.started == false && printed == false) {
+		/*if (gpu1.started == false && printed == false) {
 			t = clock() - t;
 			std::cout << "\n";
 			std::cout << "It took: " << ((double)t/CLOCKS_PER_SEC) << " seconds for GPU to finish its task" << '\n';
 			printed = true;
-		}
+		}*/
 	}
 
 	GPU1.join();
