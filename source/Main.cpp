@@ -13,6 +13,7 @@
 #include <string>
 #include <time.h>
 #include <thread>
+#include <unordered_map>
 
 #include "NSSDL.h"
 #include "SDLWindow.h"
@@ -24,8 +25,9 @@
 #include "GPUAssembly.h"
 #include "Compiler.h"
 
-int width = 320;
-int height = 240;
+int scale = 2;
+int width = (640 * scale);
+int height = (480 * scale);
 
 bool quit = false;
 
@@ -58,14 +60,14 @@ int main(int argc, char* argv[]) {
 	SDLWindow pc1W(window2, surface2, pixelSpace2, renderer2, texture2, pixels2);
 
 	Memory ram1(16000000);
-	Memory hdd1(512 * 512);
+	Memory hdd1(4090 * 4090);
 	//Sector size ^     ^ number of sectors
 
-	GPU gpu1(4096, 64000, 16, 16, 16384, &pc1W, ram1);
+	GPU gpu1(16000000, 16, 16, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
-	CPU cpu1(512, 512, ram1, hdd1, gpu1);
+	CPU cpu1(4090, 4090, ram1, hdd1, gpu1);
 
 	std::vector<std::string> code;
 	std::vector<std::string> gpu_code;
@@ -108,14 +110,20 @@ int main(int argc, char* argv[]) {
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
 	bool shift = false;
-	bool caps_lock = false;
-	bool space = false;
-
-	int ticks = 0;
-	int targetTicks = 3000;
 
 	//std::thread GPU1(runGPUCores, &gpu1);
 	//std::thread GPU1S(updateGPUSCreen, &gpu1);
+
+	std::unordered_map<int, int> mapKey = { {39, 0}, { 4,69}, {14,79}, { 24,89}, {224, 99}, {61,109}, {70,119}, {80,129}, {52,11},
+											{30, 1}, { 5,70}, {15,80}, { 25,90}, {226,100}, {62,110}, {71,120}, {81,130}, {54,22},
+										 	{31, 2}, { 6,71}, {16,81}, { 26,91}, { 44,101}, {63,111}, {72,121}, {79,131}, {55,23},
+										 	{32, 3}, { 7,72}, {17,82}, { 27,92}, {230,102}, {64,112}, {73,122}, {53, 36}, {56,24},
+											{33, 4}, { 8,73}, {18,83}, { 28,93}, {228,103}, {65,113}, {74,123}, {45, 21},
+										 	{34, 5}, { 9,74}, {19,84}, { 29,94}, {229,104}, {66,114}, {75,124}, {46, 30},
+										 	{35, 6}, {10,75}, {20,85}, { 40,95}, { 42,105}, {67,115}, {76,125}, {49, 28},
+										 	{36, 7}, {11,76}, {21,86}, { 43,96}, { 58,106}, {68,116}, {77,126}, {47, 32},
+										 	{37, 8}, {12,77}, {22,87}, { 57,97}, { 59,107}, {69,117}, {78,127}, {48, 33},
+										 	{38, 9}, {13,78}, {23,88}, {225,98}, { 60,108}, {41,118}, {82,128}, {51, 27} };
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -124,21 +132,21 @@ int main(int argc, char* argv[]) {
 				quit = true;
 				break;
 			case SDL_KEYDOWN:
+				if(mapKey.find(event.key.keysym.scancode) == mapKey.end()){
+					std::cout << "Unknown button: " << event.key.keysym.scancode << '\n';
+				}else{
+					pc1.cpu.interrupted = true;
+					pc1.cpu.registers[12] = 1;
+					pc1.cpu.interRegisters[0] = mapKey.find(event.key.keysym.scancode)->second;
+				}
 				break;
 			}
-
 		}
 
-		if(ticks >= targetTicks){
-			pc1.cpu.tick();
-			gpu1.updateCharacters();
-			gpu1.tick();
-			gpu1.updateScreen();
-			ticks = 0;
-		}
-		ticks++;
-
-
+		pc1.cpu.tick();
+		gpu1.updateCharacters();
+		gpu1.tick();
+		gpu1.updateScreen();
 	}
 
 	//GPU1.join();

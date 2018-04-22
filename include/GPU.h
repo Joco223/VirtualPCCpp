@@ -34,6 +34,8 @@ struct screenPos {
 	int y;
 };
 
+extern int scale;
+
 class GPU {
 public:
 	Memory commandBuffer;
@@ -55,7 +57,7 @@ public:
 	bool screenUpdated;
 	int tasksX, tasksY;
 
-	GPU(int, int, int, int, int, SDLWindow*, Memory&);
+	GPU(int, int, int, SDLWindow*, Memory&);
 	void setCharID(byte x, byte y, byte ID);
 	void setCharCB(byte x, byte y, byte cB);
 	void setCharCF(byte x, byte y, byte cF);

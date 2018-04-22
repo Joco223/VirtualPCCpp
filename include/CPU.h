@@ -26,9 +26,9 @@ public:
 	Memory& hdd;
 
 	int registerOP;
-	int interruptRegister;
 
 	std::vector<unsigned int> registers;
+	std::vector<unsigned int> interRegisters;
 
 	std::vector<stack_object> stack;
 
@@ -39,7 +39,9 @@ public:
 	int interPos;
 	int interTartgetPos;
 	int currentIntPos;
+	int interFinishPos;
 	bool interrupted;
+	bool interruptExecution;
 	int currentTime;
 	GPU& gpu;
 	bool halt;

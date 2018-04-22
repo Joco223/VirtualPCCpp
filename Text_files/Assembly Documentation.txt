@@ -3,22 +3,15 @@ Character RGB values are limited to 8bit pallete (256 colors)
 Character space is limited X: 0 - 53, Y: 0 - 30 (For the resolution of 320x240)
 Comments can be written with //, that line is ignored
 Main memory size is 16,000,000 bytes
+vRam size is 16,000,000 bytes
+HDD size is 16,728,100 bytes
+
+--------------------------------------------------------------------------------------
 
 You have data sections so you can do:
 data.s         //Needed if you want variables
 s8 x 5         //Variable x with type of 1 byte and stored value 5
 s8.a y 3 1 2 3 //Array y with type of 2 byte elements (3 of them) with values 1 2 and 3
-
-You can set jump postions for jmp instructions
-
-forward:
-
-You define jump positions by typing the name of it and putting a colon at the end of it
-
-You can do regA...regM for using register values as arguments for instructions
-
-You need to put >program.start< at where you want the CPU to start executing
-the code
 
 Data types:
 s8 - 8 bit number
@@ -27,6 +20,40 @@ l32 - 32 bit number
 s8.a - array of 8 bit numbers
 s8.g - 8 bit number on vRam
 (more coming soon...)
+
+--------------------------------------------------------------------------------------
+
+You can set jump postions for jmp instructions
+
+forward:
+
+You define jump positions by typing the name of it and putting a colon at the end of it
+
+--------------------------------------------------------------------------------------
+
+You can do regA...regM for using register values as arguments for instructions
+
+--------------------------------------------------------------------------------------
+
+You need to put >program.start< at where you want the CPU to start executing
+the code
+
+--------------------------------------------------------------------------------------
+
+You need to put interrupt.s and interrupt.e like this before program.start,
+it is a must to have both of these
+
+interrupt.s
+//Instuctions here
+interrupt.e
+
+program.start
+
+Interrupt type is stored in the 13th register (regInter) and interrupt data is
+stored in special registers (interRegA...interRegH) which can be accessed with
+>moveI< (moveI interRegA regA). You cannot write to interrupt data registers
+
+--------------------------------------------------------------------------------------
 
 Instruction set:
 --For >move< instructions, first argument is origin data location and second
@@ -51,6 +78,12 @@ register (moveO.s x offset regA)
 
 move.g.s - Same as move.s, just accessing the vRam and not Ram (no .d and .l yet)
 moveO.g.s - Same as moveO.s, just accessing the vRam and not Ram (no .d and .l yet)
+
+--For >move.h< instructions, same argument rules apply as for >move<
+instructions but offset argument goes after the memory adress argument, not
+the register argument
+
+move.h.s - Same as move.s, just accessing the HDD and not Ram
 
 --For the following instructions you put the register you want to perform on
 as the argument
@@ -122,9 +155,14 @@ sb.setCF - Set the charater foreground color in the screen buffer held in the
 GPU, first and second register hold the x and y value and third argument is
 the value that is going to be set (sb.setCF regA regB x)
 
+stop - Shuts down the vPC and saves the HDD to a file. Stop is a must at the end of
+a program, else the vPC will work incorrectly (Assembler will warn you if you didn't
+put one)
+
 Colors go from 0-255, a picture is in the folder same as vPC that shows all
 the color options
 
+--------------------------------------------------------------------------------------
 
 Character codes:
 0:  0,  -: 21,  C: 42,  X: 63,  p: 84
@@ -148,3 +186,16 @@ $: 13,  {: 34,  P: 55,  h: 76,
 ): 18,  ~: 39,  U: 60,  m: 81,
 *: 19,  A: 40,  V: 61,  n: 82,
 +: 20,  B: 41,  W: 62,  o: 83,
+
+Key codes:
+return:       95, F1:  106, F12:       117, up:     128,
+tab:          96, F2:  107, esc:       118, left:   129,
+caps lock:    97, F3:  108, prt sc:    119, down:   130,
+left shift:   98, F4:  109, scr lk:    120, right:  131
+left ctrl:    99, F5:  110, pause:     121,
+left alt:    100, F6:  111. insert:    122,
+space:       101, F7:  112, home:      123,
+right alt:   102, F8:  113. page up:   124,
+right ctrl:  103, F9:  114, delte:     125,
+right shift: 104, F10: 115, end:       126,
+backspace:   105, F11: 116, page down: 127,

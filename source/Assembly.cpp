@@ -78,6 +78,7 @@ namespace Assembly {
 			if(argument == "regJ") {return cpu.ram.memory.size() + 10; };
 			if(argument == "regK") {return cpu.ram.memory.size() + 11; };
 			if(argument == "regL") {return cpu.ram.memory.size() + 12; };
+			if(argument == "regInter") {return cpu.ram.memory.size() + 13; };
 		}
 	}
 
@@ -123,7 +124,7 @@ namespace Assembly {
 	bool isRegister(std::vector<std::string>& code, int i){
 		return code[i + 1] == "regA" || code[i + 1] == "regB" || code[i + 1] == "regC" || code[i + 1] == "regD" ||
 		   	   code[i + 1] == "regE" || code[i + 1] == "regF" || code[i + 1] == "regG" || code[i + 1] == "regH" ||
-		   	   code[i + 1] == "regI" || code[i + 1] == "regJ" || code[i + 1] == "regK" || code[i + 1] == "regL";
+		   	   code[i + 1] == "regI" || code[i + 1] == "regJ" || code[i + 1] == "regK" || code[i + 1] == "regL" || code[i + 1] == "regInter";
 	}
 
 	int indexRegister(std::vector<std::string>& code, int i, int k){
@@ -139,6 +140,18 @@ namespace Assembly {
 		if(code[i + k] == "regJ") {return  9;}
 		if(code[i + k] == "regK") {return 10;}
 		if(code[i + k] == "regL") {return 11;}
+		if(code[i + k] == "regInter") {return 12;}
+	}
+
+	int indexInterRegister(std::vector<std::string>& code, int i, int k){
+		if(code[i + k] == "interRegA") {return  0;}
+		if(code[i + k] == "interRegB") {return  1;}
+		if(code[i + k] == "interRegC") {return  2;}
+		if(code[i + k] == "interRegD") {return  3;}
+		if(code[i + k] == "interRegE") {return  4;}
+		if(code[i + k] == "interRegF") {return  5;}
+		if(code[i + k] == "interRegG") {return  6;}
+		if(code[i + k] == "interRegH") {return  7;}
 	}
 
 	void Compile(std::vector<std::string>& code, CPU& cpu, GPU& gpu, std::vector<variable>& gVariables, int& finalCP) {
@@ -191,7 +204,7 @@ namespace Assembly {
 
 			if (instruction == "interrupt.e") {
 				interM = false;
-				currentPos += 3;
+				currentPos += 4;
 				continue;
 			}
 
@@ -298,6 +311,10 @@ namespace Assembly {
 					break;
 				}
 			}else if(instruction.compare(0, 5, "moveP") == 0) {
+				currentPos += 2;
+				i += 2;
+				line++;
+			}else if(instruction.compare(0, 5, "moveI") == 0) {
 				currentPos += 2;
 				i += 2;
 				line++;
@@ -422,7 +439,7 @@ namespace Assembly {
 				i++;
 				line++;
 			}else if(instruction == "stop") {
-				currentPos++;
+				hasStop = true;
 				line++;
 			}else if(instruction == "sb.setID") {
 				currentPos += 6;
@@ -455,6 +472,24 @@ namespace Assembly {
 				currentPos += 2;;
 				i++;
 			}else if(instruction.compare(0, 7, "move.g.") == 0) {
+				if(instruction[7] == 's'){
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[7] == 'd') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[7] == 'l') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else{
+					std::cout << "Uknwown data type at instruction >move.g.< at line " << line << '\n';
+					cpu.ram.Clear();
+					break;
+				}
+			}else if(instruction.compare(0, 7, "move.h.") == 0) {
 				if(instruction[7] == 's'){
 					currentPos += 5;
 					i += 2;
@@ -544,11 +579,13 @@ namespace Assembly {
 
 			if (instruction == "interrupt.e") {
 				interM = false;
-				/*cpu.ram.memory[currentPos++] = 30;
+				cpu.ram.memory[currentPos++] = 0x22;
 				cpu.interTartgetPos = currentPos;
 				cpu.ram.memory[currentPos++] = 0;
 				cpu.ram.memory[currentPos++] = 0;
-				cpu.programCounter = currentPos;*/
+				cpu.ram.memory[currentPos++] = 0;
+				cpu.programCounter = currentPos;
+				cpu.interFinishPos = currentPos;
 				continue;
 			}
 
@@ -1001,6 +1038,21 @@ namespace Assembly {
 				}
 				i += 2;
 				line++;
+			}else if(instruction.compare(0, 5, "moveI") == 0) {
+				if(!isRegister(code, i)) {
+					std::string regA = code[i + 1];
+					std::string paramA = code[i + 2];
+
+					byte arg = indexRegister(code, i, 1);
+					arg |= indexInterRegister(code, i, 2);
+
+					cpu.ram.memory[currentPos++] = 0x21;
+					cpu.ram.memory[currentPos++] = arg;
+				}else{
+					std::cout << "Can't write to interrupt registers at line " << line << '\n';
+				}
+				i += 2;
+				line++;
 			}else if(instruction == "inc") {
 				cpu.ram.memory[currentPos++] = 0x12;
 
@@ -1268,7 +1320,7 @@ namespace Assembly {
 				i++;
 				line++;
 			}else if(instruction == "stop") {
-				currentPos++;
+				cpu.ram.memory[currentPos++] = 0x05;
 				line++;
 			}else if(instruction == "sb.setID") {
 				cpu.ram.memory[currentPos++] = 0x16;
@@ -1693,6 +1745,126 @@ namespace Assembly {
 					cpu.ram.Clear();
 					break;
 				}
+			}else if(instruction.compare(0, 7, "move.h.") == 0) {
+				if(instruction[7] == 's'){
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x24;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x1 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = std::stoi(code[i + 2]);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x23;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (1 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = std::stoi(code[i + 1]);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[7] == 'd') {
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x24;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x2 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = std::stoi(code[i + 2]);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x23;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x2 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = std::stoi(code[i + 1]);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[7] == 'l') {
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x24;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x3 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = std::stoi(code[i + 2]);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x23;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x3 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = std::stoi(code[i + 1]);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else{
+					std::cout << "Uknwown data type at instruction >move.h< at line " << line << '\n';
+					cpu.ram.Clear();
+					break;
+				}
 			}else{
 				if (instruction.back() == ':') {
 					line++;
@@ -1708,6 +1880,11 @@ namespace Assembly {
 				}
 			}
 
+		}
+
+		if(hasStop == false){
+			std::cout << "No >stop< instruction found, aborting compilation..." << '\n';
+			cpu.ram.Clear();
 		}
 
 

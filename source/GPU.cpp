@@ -1,7 +1,7 @@
 #include "GPU.h"
 
 
-GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coureCountY, int commandArgBufferSize, SDLWindow* screen_, Memory& ram_)
+GPU::GPU(int vRamSize, int coreCountX, int coureCountY, SDLWindow* screen_, Memory& ram_)
 	:
 	vRam(Memory(vRamSize)),
 	ram(ram_),
@@ -14,8 +14,8 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coureCountY, i
 		cores.emplace_back(vRam, progMem, screen_, screenUpdated, coureCountY, x, 0);
 	}
 
-	for(int y = 0; y < 30; y++) {
-		for(int x = 0; x < 53; x++) {
+	for(int y = 0; y < 60; y++) {
+		for(int x = 0; x < 106; x++) {
 			screenCharacter tmp;
 			tmp.x = x;
 			tmp.y = y;
@@ -25,13 +25,12 @@ GPU::GPU(int commandBufferSize, int vRamSize, int coreCountX, int coureCountY, i
 			tmp.rB = 0;
 			tmp.gB = 0;
 			tmp.bB = 0;
-			tmp.characterID = 95;
+			tmp.characterID = 97;
 			screenCharacters.push_back(tmp);
 		}
 	}
 
-	characterBuffer = SDL_CreateTexture(screen->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 320, 240);
-	SDL_SetRenderTarget(screen->renderer, screen->texture);
+	characterBuffer = SDL_CreateTexture(screen->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 640 * scale, 480 * scale);
 }
 
 void GPU::loadFont() {
@@ -41,21 +40,21 @@ void GPU::loadFont() {
 }
 
 void GPU::setCharID(byte x, byte y, byte id) {
-	screenCharacters[y * 53 + x].characterID = id;
+	screenCharacters[y * 106 + x].characterID = id;
 	charactersNUpdate.push_back({x, y});
 }
 
 void GPU::setCharCB(byte x, byte y, byte cB) {
-	screenCharacters[y * 53 + x].rB = (cB >> 5) & 0b00000111;
-	screenCharacters[y * 53 + x].gB = (cB >> 2) & 0b00111;
-	screenCharacters[y * 53 + x].bB = cB & 0b11;
+	screenCharacters[y * 106 + x].rB = (cB >> 5) & 0b00000111;
+	screenCharacters[y * 106 + x].gB = (cB >> 2) & 0b00111;
+	screenCharacters[y * 106 + x].bB = cB & 0b11;
 	charactersNUpdate.push_back({x, y});
 }
 
 void GPU::setCharCF(byte x, byte y, byte cF) {
-	screenCharacters[y * 53 + x].r = (cF >> 5) & 0b00000111;
-	screenCharacters[y * 53 + x].g = (cF >> 2) & 0b00111;
-	screenCharacters[y * 53 + x].b = cF & 0b11;
+	screenCharacters[y * 106 + x].r = (cF >> 5) & 0b00000111;
+	screenCharacters[y * 106 + x].g = (cF >> 2) & 0b00111;
+	screenCharacters[y * 106 + x].b = cF & 0b11;
 	charactersNUpdate.push_back({x, y});
 }
 
@@ -66,25 +65,25 @@ void GPU::updateCharacters() {
 	SDL_Rect target;
 	source.w = 6;
 	source.h = 8;
-	target.w = 6;
-	target.h = 8;
+	target.w = 6 * scale;
+	target.h = 8 * scale;
 
 	for(auto& i : charactersNUpdate) {
-		if(i.x > 0 && i.x < 53 && i.y > 0 && i.y < 30) {
+		if(i.x > 0 && i.x < 106 && i.y > 0 && i.y < 60) {
 			source.x = 7 * 6;
 			source.y = 6 * 8;
 
-			target.x = i.x * 6;
-			target.y = i.y * 8;
+			target.x = i.x * 6 * scale;
+			target.y = i.y * 8 * scale;
 
-			SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].rB * 36.428, screenCharacters[i.y * 53 + i.x].gB * 36.428, screenCharacters[i.y * 53 + i.x].bB * 85);
+			SDL_SetTextureColorMod(font, screenCharacters[i.y * 106 + i.x].rB * 36.428, screenCharacters[i.y * 106 + i.x].gB * 36.428, screenCharacters[i.y * 106 + i.x].bB * 85);
 
 			SDL_RenderCopy(screen->renderer, font, &source, &target);
 
-			source.x = (screenCharacters[i.y * 53 + i.x].characterID % 10) * 6;
-			source.y = (screenCharacters[i.y * 53 + i.x].characterID / 10) * 8;
+			source.x = (screenCharacters[i.y * 106 + i.x].characterID % 10) * 6;
+			source.y = (screenCharacters[i.y * 106 + i.x].characterID / 10) * 8;
 
-			SDL_SetTextureColorMod(font, screenCharacters[i.y * 53 + i.x].r * 36.428, screenCharacters[i.y * 53 + i.x].g * 36.428, screenCharacters[i.y * 53 + i.x].b * 85);
+			SDL_SetTextureColorMod(font, screenCharacters[i.y * 106 + i.x].r * 36.428, screenCharacters[i.y * 106 + i.x].g * 36.428, screenCharacters[i.y * 106 + i.x].b * 85);
 
 			SDL_RenderCopy(screen->renderer, font, &source, &target);
 		}
@@ -98,8 +97,6 @@ void GPU::updateCharacters() {
 }
 
 void GPU::updateScreen() {
-	SDL_UpdateTexture(screen->texture, nullptr, screen->pixels, screen->pixelSpace->pitch);
-
 	SDL_RenderCopy(screen->renderer, characterBuffer, nullptr, nullptr);
 	SDL_RenderPresent(screen->renderer);
 }

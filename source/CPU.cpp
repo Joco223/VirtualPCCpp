@@ -4,7 +4,6 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 	:
 	registerOP(0),
 	programCounter(0),
-	interruptRegister(0),
 	currentTime(0),
 	ram(ram_),
 	halt(false),
@@ -15,9 +14,12 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 	gpu(gpu_)
 {
 
-	registers.resize(12);
+	registers.resize(13);
+	interRegisters.resize(8);
+	interrupted = false;
+	interruptExecution = false;
 
-	/*std::ifstream HDD;
+	std::ifstream HDD;
 	HDD.open("HDD.txt");
 	std::string line;
 
@@ -38,7 +40,7 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 		}
 	}
 
-	HDD.close();*/
+	HDD.close();
 }
 
 int CPU::checkArgument(int source, int size) {
@@ -46,10 +48,8 @@ int CPU::checkArgument(int source, int size) {
 		if(size == 1) { return ram.memory[source] & 0xFF; } else {return 0;}
 		if(size == 2) { return ram.memory[source + 1] <<  8 | (ram.memory[source] & 0xFF); } else {return 0;}
 		if(size == 3) { return ram.memory[source + 3] << 24 | (ram.memory[source + 2] << 16) | (ram.memory[source + 1] << 8) | (ram.memory[source] & 0xFF); } else {return 0;}
-	}else if (source == ram.memory.size() + 1) {
-		return interruptRegister;
 	}else {
-		return registers[source - (ram.memory.size() + 2)];
+		return registers[source - (ram.memory.size() + 1)];
 	}
 }
 
@@ -58,10 +58,8 @@ int CPU::checkArgumentH(int source, int size) {
 		if(size == 1) { return hdd.memory[source] & 0xFF; } else {return 0;}
 		if(size == 2) { return hdd.memory[source + 1] <<  8 | (hdd.memory[source] & 0xFF); } else {return 0;}
 		if(size == 3) { return hdd.memory[source + 3] << 24 | (hdd.memory[source + 2] << 16) | (hdd.memory[source + 1] << 8) | (hdd.memory[source] & 0xFF); } else {return 0;}
-	}else if (source == hdd.memory.size() + 1) {
-		return interruptRegister;
 	}else {
-		return registers[source - (hdd.memory.size() + 2)];
+		return registers[source - (hdd.memory.size() + 1)];
 	}
 }
 
@@ -70,10 +68,8 @@ int CPU::checkArgumentG(int source, int size) {
 		if(size == 1) { return gpu.vRam.memory[source] & 0xFF; } else {return 0;}
 		if(size == 2) { return gpu.vRam.memory[source + 1] <<  8 | (gpu.vRam.memory[source] & 0xFF); } else {return 0;}
 		if(size == 3) { return gpu.vRam.memory[source + 3] << 24 | (gpu.vRam.memory[source + 2] << 16) | (gpu.vRam.memory[source + 1] << 8) | (gpu.vRam.memory[source] & 0xFF); } else {return 0;}
-	}else if (source == gpu.vRam.memory.size() + 1) {
-		return interruptRegister;
 	}else {
-		return registers[source - (gpu.vRam.memory.size() + 2)];
+		return registers[source - (gpu.vRam.memory.size() + 1)];
 	}
 }
 
@@ -150,13 +146,11 @@ void CPU::execute() {
 		break; };
 
 		case 0x05: { //Shutdown the pc
-			/*std::ofstream file;
-
-			//So it is all set up
+			std::ofstream file;;
 
 			file.open("HDD.txt", std::ios::out | std::ios::trunc);
 			file.close();
-+
+
 			file.open("HDD.txt");
 			for (int i = 0; i < numSectors; i++) {
 				for (int j = 0; j < sectorSize; j++) {
@@ -165,7 +159,7 @@ void CPU::execute() {
 				file << '\n';
 			}
 			file.close();
-			std::cout << '\n';*/
+			std::cout << '\n';
 
 			std::cout << "The PC has shut down" << '\n';
 			halt = true;
@@ -287,7 +281,7 @@ void CPU::execute() {
 			}
 
 
-			break; }
+		break; }
 
 		case 0x12: { //Increment register by 1
 			byte argument = ram.memory[programCounter + 1];
@@ -390,7 +384,7 @@ void CPU::execute() {
 			programCounter += 2;
 		break; }
 
-		case 0x1D: {
+		case 0x1D: { //Load from vRam
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
@@ -399,7 +393,7 @@ void CPU::execute() {
 			programCounter += 5;
 		break; }
 
-		case 0x1E: {
+		case 0x1E: { //Write to vRam
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
@@ -419,7 +413,7 @@ void CPU::execute() {
 			programCounter += 5;
 		break; }
 
-		case 0x1F: {
+		case 0x1F: { //Write to vRam with offset
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
@@ -440,7 +434,7 @@ void CPU::execute() {
 			programCounter += 8;
 		break; }
 
-		case 0x20: {
+		case 0x20: { //Load from vRam with offset
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
@@ -449,24 +443,71 @@ void CPU::execute() {
 			registers[regA] = checkArgumentG(memPos + (offset * sizeA), sizeA);
 			programCounter += 8;
 		break; };
+
+		case 0x21: { //Load from interrupt register
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = interRegisters[regB];
+			programCounter += 2;
+		break; };
+
+		case 0x22: { //Jump from interrupt
+			int position = ram.memory[programCounter + 3] << 16 | ram.memory[programCounter + 2] << 8 | ram.memory[programCounter + 1];
+			programCounter = position;
+			interruptExecution = false;
+		break; }
+
+		case 0x23: { //Load from HDD
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			registers[regA] = checkArgumentH(memPos, sizeA);
+			programCounter += 5;
+		break; }
+
+		case 0x24: { //Write to HDD
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			if(sizeA >= 1 && sizeA <= 3) {
+				hdd.memory[position] = registers[regA] & 0xFF;
+				std::cout << (int)hdd.memory[position] << '\n';
+				if(sizeA >= 2) {
+					hdd.memory[position + 1] = (byte)(registers[regA] >> 8);
+				}
+				if(sizeA == 3) {
+					hdd.memory[position + 2] = (byte)(registers[regA] >> 16);
+					hdd.memory[position + 3] = (byte)(registers[regA] >> 24);
+				}
+			}else{
+				std::cout << "Invalid data type size at instruction 0x24 at memory position: 0x" << std::hex << programCounter << '\n';
+			}
+			programCounter += 5;
+		break; }
 	}
 }
 
 void CPU::interrupt(){
-	/*if (interrupted == true) {
+	if (interrupted == true && interruptExecution == false) {
 
 		currentIntPos = programCounter;
 
 		byte b1 = currentIntPos & 0xff;
 		byte b2 = (byte)(currentIntPos >> 8);
+		byte b3 = (byte)(currentIntPos >> 16);
 
 		ram.memory[interTartgetPos] = b1;
 		ram.memory[interTartgetPos + 1] = b2;
+		ram.memory[interTartgetPos + 2] = b3;
 
 		programCounter = interPos;
 
 		interrupted = false;
-	}*/
+		interruptExecution = true;
+	}
 }
 
 
@@ -474,6 +515,6 @@ void CPU::tick() {
 	if (halt == false) {
 		registerOP = ram.memory[programCounter];
 		execute();
-		//interrupt();
+		interrupt();
 	}
 }
