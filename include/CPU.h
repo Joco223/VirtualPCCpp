@@ -42,7 +42,7 @@ public:
 	int interFinishPos;
 	bool interrupted;
 	bool interruptExecution;
-	int currentTime;
+	unsigned int currentTime;
 	GPU& gpu;
 	bool halt;
 

@@ -125,6 +125,9 @@ int main(int argc, char* argv[]) {
 										 	{37, 8}, {12,77}, {22,87}, { 57,97}, { 59,107}, {69,117}, {78,127}, {48, 33},
 										 	{38, 9}, {13,78}, {23,88}, {225,98}, { 60,108}, {41,118}, {82,128}, {51, 27} };
 
+	int ticks = 0;
+	int targetTicks = 10;
+
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -146,7 +149,11 @@ int main(int argc, char* argv[]) {
 		pc1.cpu.tick();
 		gpu1.updateCharacters();
 		gpu1.tick();
-		gpu1.updateScreen();
+		if(ticks >= targetTicks){
+			gpu1.updateScreen();
+			ticks = 0;
+		}
+		ticks++;
 	}
 
 	//GPU1.join();

@@ -79,6 +79,7 @@ namespace Assembly {
 			if(argument == "regK") {return cpu.ram.memory.size() + 11; };
 			if(argument == "regL") {return cpu.ram.memory.size() + 12; };
 			if(argument == "regInter") {return cpu.ram.memory.size() + 13; };
+			if(argument == "regTimer") {return cpu.ram.memory.size() + 14; };
 		}
 	}
 
@@ -124,7 +125,8 @@ namespace Assembly {
 	bool isRegister(std::vector<std::string>& code, int i){
 		return code[i + 1] == "regA" || code[i + 1] == "regB" || code[i + 1] == "regC" || code[i + 1] == "regD" ||
 		   	   code[i + 1] == "regE" || code[i + 1] == "regF" || code[i + 1] == "regG" || code[i + 1] == "regH" ||
-		   	   code[i + 1] == "regI" || code[i + 1] == "regJ" || code[i + 1] == "regK" || code[i + 1] == "regL" || code[i + 1] == "regInter";
+		   	   code[i + 1] == "regI" || code[i + 1] == "regJ" || code[i + 1] == "regK" || code[i + 1] == "regL" ||
+			   code[i + 1] == "regInter" || ode[i + 1] == "regTimer";
 	}
 
 	int indexRegister(std::vector<std::string>& code, int i, int k){
@@ -141,6 +143,7 @@ namespace Assembly {
 		if(code[i + k] == "regK") {return 10;}
 		if(code[i + k] == "regL") {return 11;}
 		if(code[i + k] == "regInter") {return 12;}
+		if(code[i + k] == "regTimer") {return 13;}
 	}
 
 	int indexInterRegister(std::vector<std::string>& code, int i, int k){

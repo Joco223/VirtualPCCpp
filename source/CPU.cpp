@@ -14,7 +14,7 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 	gpu(gpu_)
 {
 
-	registers.resize(13);
+	registers.resize(14);
 	interRegisters.resize(8);
 	interrupted = false;
 	interruptExecution = false;
@@ -513,6 +513,8 @@ void CPU::interrupt(){
 
 void CPU::tick() {
 	if (halt == false) {
+		currentTime++;
+		registers[13] = currentTime;
 		registerOP = ram.memory[programCounter];
 		execute();
 		interrupt();

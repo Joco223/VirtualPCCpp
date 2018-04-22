@@ -55,6 +55,11 @@ stored in special registers (interRegA...interRegH) which can be accessed with
 
 --------------------------------------------------------------------------------------
 
+CPU timer (clock) is stored in 14th registed and acces by regTimer, can be used as any other
+register but is set to the current cpu tick every tick
+
+--------------------------------------------------------------------------------------
+
 Instruction set:
 --For >move< instructions, first argument is origin data location and second
 argument is target data location
