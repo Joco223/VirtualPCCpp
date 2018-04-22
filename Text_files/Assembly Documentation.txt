@@ -1,6 +1,6 @@
 General info:
 Character RGB values are limited to 8bit pallete (256 colors)
-Character space is limited X: 0 - 53, Y: 0 - 30 (For the resolution of 320x240)
+Character space is limited X: 0 - 106, Y: 0 - 60 (Resolution now is 640x480)
 Comments can be written with //, that line is ignored
 Main memory size is 16,000,000 bytes
 vRam size is 16,000,000 bytes
