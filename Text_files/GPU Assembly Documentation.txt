@@ -1,0 +1,114 @@
+General info:
+Character RGB values are limited to 8bit pallete (256 colors)
+Comments can be written with //, that line is ignored
+vRam size is 16,000,000 bytes
+
+--------------------------------------------------------------------------------------
+
+All data is defined in the CPU program
+
+--------------------------------------------------------------------------------------
+
+You can set jump postions for jmp instructions
+
+forward:
+
+You define jump positions by typing the name of it and putting a colon at the end of it
+
+--------------------------------------------------------------------------------------
+
+You can do regA...regL for using register values as arguments for instructions
+
+--------------------------------------------------------------------------------------
+
+
+Instruction set:
+--For >move< instructions, first argument is origin data location and second
+argument is target data location
+
+move.s - Move 8 bits of data from a register to an adress in memory or move 8
+bits of data from an adress in memory to a register (move.s x regA)
+
+move.d - Move 16 bits of data from a register to an adress in memory or move
+16 bits of data from an adress in memory to a register (move.d x regA)
+
+move.l - Move 32 bits of data from a register to an adress in memory or move
+32 bits of data from an adress in memory to a register (move.l x regA)
+
+--For >moveO< instructions, same argument rules apply as for >move<
+instructions but offset argument goes after the memory adress argument, not
+the register argument
+
+moveO.s - Move 8 bits of data from a register to an adress in memory with an
+offset or move 8 bits of data from an adress in memory with an offset to a
+register (moveO.s x offset regA)
+
+
+--For the following instructions you put the register you want to perform on
+as the argument
+
+clr - Set a register to 0 (clr regA)
+
+inc - Increment the value in a register (inc regA)
+
+dec - Decrement the value in a register (dec regA)
+
+cot - Display the value in a register to the console (cot regA)
+
+add - Sum two values in two registers, result is stored in the first register
+(add regA regB)
+
+sub - Subtract two values in two registers, result is stored in the first
+register (sub regA regB)
+
+mlt.s - Signed multiplication of values in two registers, result is stored in
+first register (mlt.s regA regB)
+
+mlt.u - Unsigned multiplication of values in two registers, result is stored
+in first register (mlt.u regA regB)
+
+div.s - Signed integer division of values in two registers, result is stored in first
+register (div.s regA regB)
+
+div.u - Unsigned integer division of values in two registers, result is stored in
+first register (div.y regA regB)
+
+jmp.z - Jump to given memory adress if value in register is 0 (jmp.z regA
+start)
+
+jmp.o - Jump to given memory adress if value in register is 1 (jmp.o regA
+start)
+
+jmp.u - Jump to given memory adress, jump is performed no matter the value in
+register (jmp.u start)
+
+cmp.s.b - Compare if first register holds a greater value than second register
+in signed mode, result is stored in first register (cmp.s.b regA regB)
+
+cmp.s.be - Compare if first register golds a greater or equal value than
+second regisrer in signed mode, result is stored in first register (cmp.s.be
+regA regB)
+
+cmp.s.e - Compare if first and second register hold the same value, result is
+stored in first register (cmp.s.e regA regB)
+
+cmp.u.b - Compare if first register holds a greater value than second register
+in unsigned mode, result is stored in first register (cmp.u.b regA regB)
+
+cmp.u.be - Compare if first register golds a greater or equal value than
+second register in unsigned mode, result is stored in first register (cmp.u.be
+regA regB)
+
+g.IDX - Get task X position (g.IDX regA)
+
+g.IDY - Get task Y position (g.IDY regA)
+
+g.ID - Get task ID (g.ID regA)
+
+displ - Set a color to a pixel on the screen, first parameter is x position,
+second is y positiond and third is color, only registers for arguments (displ regA regB regC)
+
+put one)
+
+Colors go from 0-255, a picture is in the folder same as vPC that shows all
+the color options

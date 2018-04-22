@@ -31,7 +31,7 @@ You define jump positions by typing the name of it and putting a colon at the en
 
 --------------------------------------------------------------------------------------
 
-You can do regA...regM for using register values as arguments for instructions
+You can do regA...regL for using register values as arguments for instructions
 
 --------------------------------------------------------------------------------------
 
