@@ -487,6 +487,14 @@ void CPU::execute() {
 			}
 			programCounter += 5;
 		break; }
+
+		case 0x25: { //Modulo
+			byte argument = ram.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] % registers[regB];
+			programCounter += 2;
+		break; }
 	}
 }
 

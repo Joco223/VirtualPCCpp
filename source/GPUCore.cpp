@@ -251,5 +251,13 @@ void GPUCore::execute(int registerOP) {
 			registers[regA] = (idX + coresYS * idY);
 			programCounter += 2;
 			break; }
+
+		case 0x19: { //Modulo
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte regB = getBits(argument, 1);
+			registers[regA] = registers[regA] % registers[regB];
+			programCounter += 2;
+		break; }
 	}
 }

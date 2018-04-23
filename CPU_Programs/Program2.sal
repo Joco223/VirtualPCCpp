@@ -9,7 +9,7 @@ s8 yDir2 1
 s8 xPos2 13
 s8 yPos2 3
 s8 xMax 100
-s8 yMax 55
+s8 yMax 58
 s8 min 1
 s8 o 83
 s8 empty 95

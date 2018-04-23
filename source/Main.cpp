@@ -14,6 +14,7 @@
 #include <time.h>
 #include <thread>
 #include <unordered_map>
+#include <chrono>
 
 #include "NSSDL.h"
 #include "SDLWindow.h"
@@ -126,7 +127,8 @@ int main(int argc, char* argv[]) {
 										 	{38, 9}, {13,78}, {23,88}, {225,98}, { 60,108}, {41,118}, {82,128}, {51, 27} };
 
 	int ticks = 0;
-	int targetTicks = 10;
+	int targetTicks = 15;
+	bool printed = false;
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -146,14 +148,21 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		pc1.cpu.tick();
-		gpu1.updateCharacters();
-		gpu1.tick();
-		if(ticks >= targetTicks){
-			gpu1.updateScreen();
+		//auto start = std::chrono::steady_clock::now();
+		for(int i = 0; i < 10; i++) {
+    		pc1.cpu.tick();
+    		gpu1.tick();
+		}
+		/*if(ticks >= targetTicks) {
+			auto end = std::chrono::steady_clock::now();
+			std::chrono::duration<double, std::nano> diff = end-start;
+			std::cout <<  diff.count() << '\n';
 			ticks = 0;
 		}
-		ticks++;
+		ticks++;*/
+
+		gpu1.updateCharacters();
+		gpu1.updateScreen();
 	}
 
 	//GPU1.join();

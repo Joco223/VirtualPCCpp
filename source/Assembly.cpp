@@ -126,7 +126,7 @@ namespace Assembly {
 		return code[i + 1] == "regA" || code[i + 1] == "regB" || code[i + 1] == "regC" || code[i + 1] == "regD" ||
 		   	   code[i + 1] == "regE" || code[i + 1] == "regF" || code[i + 1] == "regG" || code[i + 1] == "regH" ||
 		   	   code[i + 1] == "regI" || code[i + 1] == "regJ" || code[i + 1] == "regK" || code[i + 1] == "regL" ||
-			   code[i + 1] == "regInter" || ode[i + 1] == "regTimer";
+			   code[i + 1] == "regInter" || code[i + 1] == "regTimer";
 	}
 
 	int indexRegister(std::vector<std::string>& code, int i, int k){
@@ -338,6 +338,10 @@ namespace Assembly {
 				currentPos += 2;
 				line++;
 			}else if (instruction == "add") {
+				i += 2;
+				currentPos += 2;
+				line++;
+			}else if (instruction == "mod") {
 				i += 2;
 				currentPos += 2;
 				line++;
@@ -1094,6 +1098,17 @@ namespace Assembly {
 				line++;
 			}else if (instruction == "add") {
 				cpu.ram.memory[currentPos++] = 0x06;
+
+				byte arg = indexRegister(code, i, 1);
+				byte arg2 = indexRegister(code, i, 2);
+				arg |= (arg2 << 4);
+
+				cpu.ram.memory[currentPos++] = arg;
+
+				i += 2;
+				line++;
+			}else if (instruction == "mod") {
+				cpu.ram.memory[currentPos++] = 0x25;
 
 				byte arg = indexRegister(code, i, 1);
 				byte arg2 = indexRegister(code, i, 2);

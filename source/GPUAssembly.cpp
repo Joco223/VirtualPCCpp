@@ -649,6 +649,17 @@ namespace GPUAssembly {
 
 				i += 2;
 				line++;
+			}else if (instruction == "mod") {
+				gpu.progMem.memory[currentPos++] = 0x19;
+
+				byte arg = indexRegister(code, i, 1);
+				byte arg2 = indexRegister(code, i, 2);
+				arg |= (arg2 << 4);
+
+				gpu.progMem.memory[currentPos++] = arg;
+
+				i += 2;
+				line++;
 			}else if (instruction == "sub") {
 				gpu.progMem.memory[currentPos++] = 0x07;
 

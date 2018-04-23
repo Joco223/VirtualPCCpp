@@ -104,6 +104,9 @@ cot - Display the value in a register to the console (cot regA)
 add - Sum two values in two registers, result is stored in the first register
 (add regA regB)
 
+mod - Modulo two values in two registers, result is stored in the first register
+(mod regA regB)
+
 sub - Subtract two values in two registers, result is stored in the first
 register (sub regA regB)
 
