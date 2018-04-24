@@ -26,7 +26,7 @@
 #include "GPUAssembly.h"
 #include "Compiler.h"
 
-int scale = 2;
+int scale = 1;
 int width = (640 * scale);
 int height = (480 * scale);
 
