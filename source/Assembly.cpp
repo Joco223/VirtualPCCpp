@@ -460,6 +460,9 @@ namespace Assembly {
 				currentPos += 6;
 				i += 3;
 				line++;
+			}else if(instruction == "sb.update") {
+				currentPos++;
+				line++;
 			}else if(!instruction.compare(0, 2, "fn")) {
 				int r = 0;
 
@@ -1050,8 +1053,8 @@ namespace Assembly {
 					std::string regA = code[i + 1];
 					std::string paramA = code[i + 2];
 
-					byte arg = indexRegister(code, i, 1);
-					arg |= indexInterRegister(code, i, 2);
+					byte arg = indexRegister(code, i, 2);
+					arg |= indexInterRegister(code, i, 1);
 
 					cpu.ram.memory[currentPos++] = 0x21;
 					cpu.ram.memory[currentPos++] = arg;
@@ -1399,6 +1402,9 @@ namespace Assembly {
 				cpu.ram.memory[currentPos++] = b3;
 
 				i += 3;
+				line++;
+			}else if(instruction == "sb.update") {
+				cpu.ram.memory[currentPos++] = 0x26;
 				line++;
 			}else if(!instruction.compare(0, 2, "fn")) {
 				std::string name = code[i + 1];

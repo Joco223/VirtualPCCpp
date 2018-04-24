@@ -163,6 +163,8 @@ sb.setCF - Set the charater foreground color in the screen buffer held in the
 GPU, first and second register hold the x and y value and third argument is
 the value that is going to be set (sb.setCF regA regB x)
 
+sb.update - Updates the character bufffer, no arguments needed
+
 stop - Shuts down the vPC and saves the HDD to a file. Stop is a must at the end of
 a program, else the vPC will work incorrectly (Assembler will warn you if you didn't
 put one)

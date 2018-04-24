@@ -152,6 +152,7 @@ int main(int argc, char* argv[]) {
 		for(int i = 0; i < 10; i++) {
     		pc1.cpu.tick();
     		gpu1.tick();
+
 		}
 		/*if(ticks >= targetTicks) {
 			auto end = std::chrono::steady_clock::now();
@@ -161,7 +162,6 @@ int main(int argc, char* argv[]) {
 		}
 		ticks++;*/
 
-		gpu1.updateCharacters();
 		gpu1.updateScreen();
 	}
 

@@ -448,6 +448,7 @@ void CPU::execute() {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte regB = getBits(argument, 1);
+
 			registers[regA] = interRegisters[regB];
 			programCounter += 2;
 		break; };
@@ -492,8 +493,13 @@ void CPU::execute() {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte regB = getBits(argument, 1);
-			registers[regA] = registers[regA] % registers[regB];
+			registers[regB] = registers[regA] % registers[regB];
 			programCounter += 2;
+		break; }
+
+		case 0x26: { //Call updateCharacters
+			gpu.updateCharacters();
+			programCounter++;
 		break; }
 	}
 }
