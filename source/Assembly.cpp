@@ -64,7 +64,7 @@ namespace Assembly {
 		}
 
 		if (varExists == true) {
-			return vars[id].value;
+			return vars[id].position;
 		}else if (varExists == false) {
 			if(argument == "regA") {return cpu.ram.memory.size() +  1; };
 			if(argument == "regB") {return cpu.ram.memory.size() +  2; };
@@ -228,6 +228,10 @@ namespace Assembly {
 					currentPos += 4;
 					i += 2;
 					continue;
+				}else if (instruction == "pt") {
+					currentPos += 3;
+					i += 2;
+					continue;
 				}else if(instruction == "s8.a") {
 					std::string arg2 = code[i + 2];
 
@@ -241,10 +245,9 @@ namespace Assembly {
 							if(code[i + 3 + j] == "#"){
 								ended = true;
 								endInc = j + 1;
-							}else{
-								currentPos++;
 							}
 						}
+						currentPos++;
 
 					}
 
@@ -264,10 +267,9 @@ namespace Assembly {
 							if(code[i + 3 + j] == "#"){
 								ended = true;
 								endInc = j + 1;
-							}else{
-								currentPos += 2;
 							}
 						}
+						currentPos += 2;
 
 					}
 
@@ -287,6 +289,24 @@ namespace Assembly {
 					i += 2;
 					line++;
 				}else if(instruction[5] == 'l') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else{
+					std::cout << "Uknwown data type at instruction >move< at line " << line << '\n';
+					cpu.ram.Clear();
+					break;
+				}
+			}else if(instruction.compare(0, 6, "moveP.") == 0 && instruction.length() == 7) {
+				if(instruction[6] == 's'){
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[6] == 'd') {
+					currentPos += 5;
+					i += 2;
+					line++;
+				}else if(instruction[6] == 'l') {
 					currentPos += 5;
 					i += 2;
 					line++;
@@ -608,7 +628,7 @@ namespace Assembly {
 
 					variable temp;
 					temp.name = arg1;
-					temp.value = currentPos;
+					temp.position = currentPos;
 					temp.sDepth = scopeDepth;
 					temp.size = 1;
 					variables.push_back(temp);
@@ -625,7 +645,7 @@ namespace Assembly {
 
 					variable temp;
 					temp.name = arg1;
-					temp.value = currentPosG;
+					temp.position = currentPosG;
 					temp.sDepth = scopeDepth;
 					temp.size = 1;
 					gVariables.push_back(temp);
@@ -639,9 +659,10 @@ namespace Assembly {
 					std::string arg2 = code[i + 2];
 
 					int Arg2 = std::stoi(arg2);
+
 					variable temp;
 					temp.name = arg1;
-					temp.value = currentPos;
+					temp.position = currentPos;
 					temp.sDepth = scopeDepth;
 					temp.size = 2;
 					variables.push_back(temp);
@@ -653,6 +674,27 @@ namespace Assembly {
 					i += 2;
 					line++;
 					continue;
+				}else if (instruction == "pt") {
+					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
+
+					int Arg2 = std::stoi(arg2);
+
+					variable temp;
+					temp.name = arg1;
+					temp.position = currentPos;
+					temp.sDepth = scopeDepth;
+					temp.size = 2;
+					variables.push_back(temp);
+
+					byte b1, b2, b3;
+					convertByte3(Arg2, b1, b2, b3);
+					cpu.ram.memory[currentPos++] = b1;
+					cpu.ram.memory[currentPos++] = b2;
+					cpu.ram.memory[currentPos++] = b3;
+					i += 2;
+					line++;
+					continue;
 				}else if (instruction == "l32") {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
@@ -660,7 +702,7 @@ namespace Assembly {
 					int Arg2 = std::stoi(arg2);
 					variable temp;
 					temp.name = arg1;
-					temp.value = currentPos;
+					temp.position = currentPos;
 					temp.sDepth = scopeDepth;
 					temp.size = 4;
 					variables.push_back(temp);
@@ -681,7 +723,7 @@ namespace Assembly {
 					int Arg2 = std::stoi(arg2);
 					variable temp;
 					temp.name = arg1;
-					temp.value = currentPos;
+					temp.position = currentPos;
 					temp.sDepth = scopeDepth;
 					temp.size = 1;
 					variables.push_back(temp);
@@ -855,6 +897,126 @@ namespace Assembly {
 					}
 				}else{
 					std::cout << "Uknwown data type at instruction >move< at line " << line << '\n';
+					cpu.ram.Clear();
+					break;
+				}
+			}else if(instruction.compare(0, 6, "moveP.") == 0 && instruction.length() == 7) {
+				if(instruction[6] == 's'){
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x28;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (1 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x27;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (1 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[6] == 'd') {
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x28;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x2 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x27;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x2 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[6] == 'l') {
+					if(isRegister(code, i)) {
+						cpu.ram.memory[currentPos++] = 0x28;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x3 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}else{
+						cpu.ram.memory[currentPos++] = 0x27;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x3 << 4);
+
+						cpu.ram.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], cpu, variables, scopeDepth);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						cpu.ram.memory[currentPos++] = b1;
+						cpu.ram.memory[currentPos++] = b2;
+						cpu.ram.memory[currentPos++] = b3;
+
+						i += 2;
+						line++;
+					}
+				}else{
+					std::cout << "Uknwown data type at instruction >moveP< at line " << line << '\n';
 					cpu.ram.Clear();
 					break;
 				}
@@ -1425,7 +1587,7 @@ namespace Assembly {
 
 					variable temp;
 					temp.name = tempo;
-					temp.value = r;
+					temp.position = r;
 					temp.sDepth = scopeDepth;
 					temp.size = 4;
 					variables.push_back(temp);
@@ -1437,7 +1599,7 @@ namespace Assembly {
 				parameters.push_back(tempo);
 				variable temp2;
 				temp2.name = tempo;
-				temp2.value = r;
+				temp2.position = r;
 				temp2.sDepth = scopeDepth;
 				temp2.size = 1;
 				variables.push_back(temp2);

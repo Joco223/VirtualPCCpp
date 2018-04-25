@@ -1,0 +1,63 @@
+//Simple OS by Joco223
+//Started working on it 24/04/2018
+
+data.
+s8.a command 128 0 #
+s8 keyDown 1
+s8 cursX 1
+s8 startPos 1
+s8 cursY 1
+s8 currChar 0
+
+s8 > 29
+s8 _ 66
+s8 x 92
+s8 esc 118
+
+
+interrupt.s
+move.s keyDown regL
+cmp.s.e regL regInter
+jmp.z regL skip
+
+move.s esc regL
+moveI interRegA regH
+cmp.s.e regL regH
+jmp.z regL exit
+
+jmp.u end
+
+exit:
+
+moveI interRegA regL
+move.s regL currChar
+
+move.s cursX regL
+move.s cursY regK
+sb.setID regL regK currChar
+move.s cursX regL
+inc regL
+move.s regL cursX
+
+skip:
+interrupt.e
+
+
+program.start
+
+start:
+
+move.s startPos regA
+move.s cursY regB
+sb.setID regA regB >
+move.s cursX regA
+inc regA
+sb.setID regA regB _
+
+sb.update
+
+jmp.u start
+
+end:
+
+stop

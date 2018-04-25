@@ -1,451 +1,62 @@
-//Pong game by Joco223
-//Move player 1 with up and down arrows
-//Move player 2 with W and S
-//Exit and save the game with X
-//(If you exist in another way, the score wont be saved to the HDD)
+//Simple OS by Joco223
+//Started working on it 24/04/2018
 
 data.
-s8 speed 1
-s8 xDir 1
-s8 yDir 1
-s8 xPos 52
-s8 yPos 29
-s8 startX 52
-s8 startY 29
-s8 xMax 104
-s8 yMax 58
-s8 min 1
-s8 o 83
-s8 empty 95
-s8 prevX 0
-s8 prevY 0
-s8 time 20
-s8 totTime 0
-s8 playerY 26
-s8 oldPlayerY 26
-s8 player2Y 26
-s8 oldPlayer2Y 26
-s8 white 255
-s8 X 63
-s8 x 92
-s8 dist 3
-s8 dist3 103
-s8 dist4 101
-s8 dist5 99
-s8 dist2 4
-s8 two 2
-s8 five 5
-s8 down 130
-s8 up 128
-s8 W 91
-s8 S 87
 s8 keyDown 1
-s8 player1_score 0
-s8 player2_score 0
-s8 ten 10
-s8 hundred 100
-s8 p1 0
-s8 p2 0
-s8 p3 0
+s8 cursX 1
+s8 startPos 1
+s8 cursY 1
+s8 currChar 0
+
+s8 > 29
+s8 _ 66
+s8 x 92
+s8 esc 118
+
 
 interrupt.s
 move.s keyDown regL
 cmp.s.e regL regInter
 jmp.z regL skip
 
-move.s down regL
+move.s esc regL
 moveI interRegA regH
 cmp.s.e regL regH
-jmp.z regL skip2
-
-move.s playerY regL
-move.s regL oldPlayerY
-inc regL
-move.s regL playerY
-
-skip2:
-
-move.s up regL
-moveI interRegA regH
-cmp.s.e regL regH
-jmp.z regL skip3
-
-move.s playerY regL
-move.s regL oldPlayerY
-dec regL
-move.s regL playerY
-
-skip3:
-
-move.s S regL
-moveI interRegA regH
-cmp.s.e regL regH
-jmp.z regL skip4
-
-move.s player2Y regL
-move.s regL oldPlayer2Y
-inc regL
-move.s regL player2Y
-
-skip4:
-
-move.s W regL
-moveI interRegA regH
-cmp.s.e regL regH
-jmp.z regL skip5
-
-move.s player2Y regL
-move.s regL oldPlayer2Y
-dec regL
-move.s regL player2Y
-
-skip5:
-
-move.s x regL
-moveI interRegA regH
-cmp.s.e regL regH
-jmp.z regL skip6
+jmp.z regL exit
 
 jmp.u end
 
-skip6:
+exit:
+
+moveI interRegA regL
+move.s regL currChar
+
+move.s cursX regL
+move.s cursY regK
+sb.setID regL regK currChar
+move.s cursX regL
+inc regL
+move.s regL cursX
 
 skip:
 interrupt.e
 
-program.start
 
-move.h.s 0 regA
-move.s regA player1_score
-move.h.s 1 regA
-move.s regA player2_score
+program.start
 
 start:
 
-move.s dist regB
-move.s oldPlayerY regA
-sb.setID regB regA empty
+move.s startPos regA
+move.s cursY regB
+sb.setID regA regB >
+move.s cursX regA
 inc regA
-sb.setID regB regA empty
-inc regA
-sb.setID regB regA empty
-inc regA
-sb.setID regB regA empty
-inc regA
-sb.setID regB regA empty
-
-move.s dist regB
-move.s playerY regA
-sb.setID regB regA X
-inc regA
-sb.setID regB regA X
-inc regA
-sb.setID regB regA X
-inc regA
-sb.setID regB regA X
-inc regA
-sb.setID regB regA X
-
-move.s dist3 regB
-move.s oldPlayer2Y regA
-sb.setID regB regA empty
-inc regA
-sb.setID regB regA empty
-inc regA
-sb.setID regB regA empty
-inc regA
-sb.setID regB regA empty
-inc regA
-sb.setID regB regA empty
-
-move.s dist3 regB
-move.s player2Y regA
-sb.setID regB regA X
-inc regA
-sb.setID regB regA X
-inc regA
-sb.setID regB regA X
-inc regA
-sb.setID regB regA X
-inc regA
-sb.setID regB regA X
-
-
-//Ball mechanics
-//-------------------------------------------
-
-
-//Player1 bounce
-
-move.s time regB
-move.s totTime regA
-mod regA regB
-clr regA
-cmp.s.e regA regB
-jmp.z regA timer
-
-clr regA
-clr regB
-clr regC
-
-move.s yPos regA
-move.s playerY regB
-cmp.u.b regA regB
-jmp.z regA checkX
-
-move.s yPos regA
-move.s playerY regB
-move.s five regC
-add regB regC
-cmp.u.b regA regB
-jmp.o regA checkX
-
-move.s xPos regA
-move.s dist2 regB
-cmp.u.be regA regB
-jmp.o regA checkX
-
-move.s xDir regA
-inc regA
-move.s regA xDir
-
-checkX:
-
-//Player2 bounce
-
-clr regA
-clr regB
-clr regC
-
-move.s yPos regA
-move.s player2Y regB
-cmp.u.b regA regB
-jmp.z regA checkX2
-
-move.s yPos regA
-move.s player2Y regB
-move.s five regC
-add regB regC
-cmp.u.b regA regB
-jmp.o regA checkX2
-
-move.s xPos regA
-move.s dist4 regB
-cmp.u.be regA regB
-jmp.z regA checkX2
-
-move.s xDir regA
-dec regA
-move.s regA xDir
-
-checkX2:
-
-//Check X bounds
-
-move.s xPos regA
-move.s xMax regB
-cmp.u.be regA regB
-jmp.z regA check1
-
-move.s xDir regA
-dec regA
-move.s regA xDir
-
-move.s player1_score regA
-inc regA
-move.s regA player1_score
-
-move.s xPos regA
-move.s yPos regB
-sb.setID regA regB empty
-
-move.s startX regA
-move.s regA xPos
-move.s startY regA
-move.s regA yPos
-
-check1:
-
-move.s xPos regA
-move.s min regB
-cmp.u.be regA regB
-jmp.o regA check2
-
-move.s xDir regA
-inc regA
-move.s regA xDir
-
-move.s player2_score regA
-inc regA
-move.s regA player2_score
-
-move.s xPos regA
-move.s yPos regB
-sb.setID regA regB empty
-
-move.s startX regA
-move.s regA xPos
-move.s startY regA
-move.s regA yPos
-
-check2:
-
-//Check Y bounds
-
-move.s yPos regA
-move.s yMax regB
-cmp.u.be regA regB
-jmp.z regA check3
-
-move.s yDir regA
-dec regA
-move.s regA yDir
-
-check3:
-
-move.s yPos regA
-move.s min regB
-cmp.u.be regA regB
-jmp.o regA check4
-
-move.s yDir regA
-inc regA
-move.s regA yDir
-
-check4:
-
-//Check X direction
-
-move.s xDir regA
-move.s speed regB
-cmp.s.e regA regB
-jmp.z regA mov1
-
-move.s xPos regA
-move.s regA prevX
-inc regA
-move.s regA xPos
-
-mov1:
-
-move.s xDir regA
-clr regB
-cmp.s.e regA regB
-jmp.z regA mov2
-
-move.s xPos regA
-move.s regA prevX
-dec regA
-move.s regA xPos
-
-mov2:
-
-//Check Y direction
-
-move.s yDir regA
-move.s speed regB
-cmp.s.e regA regB
-jmp.z regA mov3
-
-move.s yPos regA
-move.s regA prevY
-inc regA
-move.s regA yPos
-
-mov3:
-
-move.s yDir regA
-clr regB
-cmp.s.e regA regB
-jmp.z regA mov4
-
-move.s yPos regA
-move.s regA prevY
-dec regA
-move.s regA yPos
-
-mov4:
-
-move.s prevX regA
-move.s prevY regB
-sb.setID regA regB empty
-
-move.s xPos regA
-move.s yPos regB
-sb.setID regA regB o
-
-timer:
-
-move.s totTime regA
-inc regA
-move.s regA totTime
-
-//Draw score p1
-
-move.s player1_score regA
-move.s hundred regB
-div.u regA regB
-move.s regA p1
-
-move.s player1_score regA
-mod regA regB
-move.s ten regC
-div.u regB regC
-move.s regB p2
-
-move.s hundred regB
-move.s player1_score regA
-mod regA regB
-move.s ten regC
-mod regB regC
-move.s regC p3
-
-move.s five regA
-move.s two regB
-sb.setID regA regB p1
-inc regA
-sb.setID regA regB p2
-inc regA
-sb.setID regA regB p3
-
-//Draw score p2
-
-move.s player2_score regA
-move.s hundred regB
-div.u regA regB
-move.s regA p1
-
-move.s player2_score regA
-mod regA regB
-move.s ten regC
-div.u regB regC
-move.s regB p2
-
-move.s hundred regB
-move.s player2_score regA
-mod regA regB
-move.s ten regC
-mod regB regC
-move.s regC p3
-
-move.s dist5 regA
-move.s two regB
-sb.setID regA regB p1
-inc regA
-sb.setID regA regB p2
-inc regA
-sb.setID regA regB p3
-
+sb.setID regA regB _
 
 sb.update
 
 jmp.u start
 
 end:
-
-move.s player1_score regA
-move.h.s regA 0
-move.s player2_score regA
-move.h.s regA 1
 
 stop

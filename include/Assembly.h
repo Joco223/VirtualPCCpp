@@ -10,7 +10,7 @@ namespace Assembly {
 	struct variable {
 		std::string name;
 		int size;
-		int value;
+		int position;
 		int sDepth;
 	};
 

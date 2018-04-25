@@ -6,7 +6,7 @@ GPU::GPU(int vRamSize, int coreCountX, int coureCountY, SDLWindow* screen_, Memo
 	vRam(Memory(vRamSize)),
 	ram(ram_),
 	screen(screen_),
-	started(true),
+	started(false),
 	currentTask(0),
 	screenUpdated(false)
 {
@@ -124,7 +124,6 @@ void GPU::startCores() {
 
 void GPU::tick() {
 	if(started) {
-
 		for (int i = 0; i < cores.size(); i++) {
 			if (cores[i].halt == true) {
 				if (currentTask < tasks.size()) {
