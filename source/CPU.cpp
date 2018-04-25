@@ -26,6 +26,8 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 	int j = 0;
 	int i = 0;
 
+	std::cout << "Loading HDD..." << '\n';
+
 	if (HDD.is_open()){
 		while (getline (HDD,line)) {
 			std::string buf;
@@ -37,8 +39,11 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 			}
 			i = 0;
 			j++;
+			std::cout << (int)(((float)(j * sectorSize + i) / (float)(sectorSize * numSectors)) * 100) << "% done..." << '\r';
 		}
 	}
+
+	std::cout << '\n' << "Finished loading the HDD..." << '\n' << '\n';
 
 	HDD.close();
 }
@@ -152,15 +157,20 @@ void CPU::execute() {
 			file.open("HDD.txt", std::ios::out | std::ios::trunc);
 			file.close();
 
+			std::cout << '\n' << "Saving the HDD..." << '\n';
+
 			file.open("HDD.txt");
 			for (int i = 0; i < numSectors; i++) {
 				for (int j = 0; j < sectorSize; j++) {
 					file << (int)hdd.memory[i * sectorSize + j] << " ";
 				}
+				std::cout << (int)(((float)(i + 1) / (float)numSectors) * 100) << "% done..." << '\r';
 				file << '\n';
 			}
 			file.close();
 			std::cout << '\n';
+
+			std::cout << "Finished saving the HDD..." << '\n';
 
 			std::cout << "The PC has shut down. Press Ctrl+C to exit the program." << '\n';
 			halt = true;

@@ -175,6 +175,8 @@ namespace Assembly {
 		int GadditionalMemory = 0;
 		int line = 0;
 		int stackPos = 0;
+		int ffbID = 0;
+		bool hasffb = false;
 
 		int scopeDepth = 0;
 
@@ -185,6 +187,8 @@ namespace Assembly {
 		bool dataM = false;
 		bool interM = false;
 		bool hasStop = false;
+
+		std::cout << '\n' << "Beginning part 1 compilation of vCPU program..." << '\n';
 
 		for (unsigned int i = 0; i < code.size(); i++) {
 
@@ -577,7 +581,11 @@ namespace Assembly {
 				}
 			}
 
+			std::cout << "vCPU program part 1 compilation " << (int)(((float)(i + 1) / (float)code.size()) * 100) << "% done..." << '\r';
+
 		}
+
+		std::cout << '\n' << "Part 1 of compilation done..." << '\n';
 
 		currentPos = 0;
 		currentPosG = 0;
@@ -586,6 +594,8 @@ namespace Assembly {
 		dataM = false;
 		interM = false;
 		scopeDepth = 0;
+
+		std::cout << '\n' << "Beginning part 2 compilation of vCPU program..." << '\n';
 
 		for (unsigned int i = 0; i < code.size(); i++) {
 
@@ -678,14 +688,23 @@ namespace Assembly {
 					std::string arg1 = code[i + 1];
 					std::string arg2 = code[i + 2];
 
-					int Arg2 = std::stoi(arg2);
-
 					variable temp;
 					temp.name = arg1;
 					temp.position = currentPos;
 					temp.sDepth = scopeDepth;
-					temp.size = 2;
+					temp.size = 3;
 					variables.push_back(temp);
+
+					int Arg2;
+
+					if(arg2 == "ffb"){
+						ffbID = variables.size() - 1;
+						hasffb = true;
+						Arg2 = 0;
+					}else{
+						Arg2 = std::stoi(arg2);
+					}
+
 
 					byte b1, b2, b3;
 					convertByte3(Arg2, b1, b2, b3);
@@ -2065,12 +2084,23 @@ namespace Assembly {
 					break;
 				}
 			}
-
+			std::cout << "vCPU program part 2 compilation " << (int)(((float)(i + 1) / (float)code.size()) * 100) << "% done..." << '\r';
 		}
+
+		std::cout << '\n' << "Part 2 of compilation done..." << '\n' << '\n';
 
 		if(hasStop == false){
 			std::cout << "No >stop< instruction found, aborting compilation..." << '\n';
 			cpu.ram.Clear();
+		}
+
+		if(hasffb == true){
+			//std::cout << ffbID << '\n';
+			byte b1, b2, b3;
+			convertByte3(currentPos, b1, b2, b3);
+			cpu.ram.memory[variables[ffbID].position] = b1;
+			cpu.ram.memory[variables[ffbID].position + 1] = b2;
+			cpu.ram.memory[variables[ffbID].position + 2] = b3;
 		}
 
 
@@ -2078,6 +2108,6 @@ namespace Assembly {
 
 		std::cout << "CPU program size is: " << currentPos << " bytes." << '\n';
 		std::cout << "Free RAM left: " << (cpu.ram.memory.size() - currentPos) << " bytes." << '\n';
-		std::cout << '\n';
+		std::cout << "vPC output:" << '\n' << '\n';
 	}
 }
