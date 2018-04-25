@@ -1,15 +1,9 @@
 data.
-s8 x 5
-s8 y 10
 
 interrupt.s
 interrupt.e
 
 program.start
 
-move.s x regA
-move.s y regB
-add regA regB
-cot regA
 
 stop

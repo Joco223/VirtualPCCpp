@@ -2095,7 +2095,6 @@ namespace Assembly {
 		}
 
 		if(hasffb == true){
-			//std::cout << ffbID << '\n';
 			byte b1, b2, b3;
 			convertByte3(currentPos, b1, b2, b3);
 			cpu.ram.memory[variables[ffbID].position] = b1;
