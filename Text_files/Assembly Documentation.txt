@@ -19,6 +19,7 @@ d16 - 16 bit number
 l32 - 32 bit number
 s8.a - array of 8 bit numbers
 s8.g - 8 bit number on vRam
+pt - 24bit pointer
 (more coming soon...)
 
 --------------------------------------------------------------------------------------
@@ -85,10 +86,12 @@ move.g.s - Same as move.s, just accessing the vRam and not Ram (no .d and .l yet
 moveO.g.s - Same as moveO.s, just accessing the vRam and not Ram (no .d and .l yet)
 
 --For >move.h< instructions, same argument rules apply as for >move<
-instructions but offset argument goes after the memory adress argument, not
-the register argument
 
 move.h.s - Same as move.s, just accessing the HDD and not Ram
+
+--For >moveP.< instructions, same argument rules apply as for >move<
+
+moveP.s - Load/write from/to memory from a pointer
 
 --For the following instructions you put the register you want to perform on
 as the argument
