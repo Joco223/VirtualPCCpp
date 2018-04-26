@@ -1,9 +1,47 @@
+//Test program to test performance
 data.
+l32 x 4095
+l32 totalSize 0
+l32 freeBytes 0
+pt curPos 0
 
 interrupt.s
 interrupt.e
 
 program.start
+move.l x regA
+mlt.u regA regA
+move.l regA totalSize
 
+back:
+
+move.l curPos regA
+move.l totalSize regB
+cmp.u.be regA regB
+jmp.o regA end
+
+    moveP.s curPos regD
+    clr regC
+    cmp.s.e regD regC
+    jmp.z regD step
+
+        move.l freeBytes regC
+        inc regC
+        move.l regC freeBytes
+
+    step:
+
+    move.l curPos regA
+    inc regA
+    move.l regA curPos
+
+jmp.u back
+
+end:
+
+move.l freeBytes regC
+cot regC
+move.l curPos regC
+cot regC
 
 stop

@@ -34,17 +34,11 @@ bool quit = false;
 
 typedef unsigned char byte;
 
-void runGPUCores (GPU *gpu) {
+void runVPC (PC* pc, GPU* gpu) {
 	while(true){
+		pc->cpu.tick();
 		gpu->tick();
 
-	}
-}
-
-void updateGPUSCreen (GPU *gpu){
-	while(true){
-		gpu->updateCharacters();
-		gpu->updateScreen();
 	}
 }
 
@@ -60,15 +54,15 @@ int main(int argc, char* argv[]) {
 
 	SDLWindow pc1W(window2, surface2, pixelSpace2, renderer2, texture2, pixels2);
 
-	Memory ram1(16000000);
-	Memory hdd1(4090 * 4090);
+	Memory ram1(16769025);
+	Memory hdd1(4096 * 4096);
 	//Sector size ^     ^ number of sectors
 
-	GPU gpu1(16000000, 16, 16, &pc1W, ram1);
+	GPU gpu1(16769025, 16, 16, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
-	CPU cpu1(4090, 4090, ram1, hdd1, gpu1);
+	CPU cpu1(4096, 4096, ram1, hdd1, gpu1);
 
 	std::vector<std::string> code;
 	std::vector<std::string> gpu_code;
@@ -111,9 +105,8 @@ int main(int argc, char* argv[]) {
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
 	bool shift = false;
+	bool interCheck = false;
 
-	//std::thread GPU1(runGPUCores, &gpu1);
-	//std::thread GPU1S(updateGPUSCreen, &gpu1);
 
 	std::unordered_map<int, int> mapKey = { {39, 0}, { 4,69}, {14,79}, { 24,89}, {224, 99}, {61,109}, {70,119}, {80,129}, {52,11},
 											{30, 1}, { 5,70}, {15,80}, { 25,90}, {226,100}, {62,110}, {71,120}, {81,130}, {54,22},
@@ -127,8 +120,14 @@ int main(int argc, char* argv[]) {
 										 	{38, 9}, {13,78}, {23,88}, {225,98}, { 60,108}, {41,118}, {82,128}, {51, 27} };
 
 	int ticks = 0;
-	int targetTicks = 15;
+	int targetTicks = 25;
+	long int totalTicks = 0;
+	int numOfLoops = 0;
 	bool printed = false;
+	int ticks2 = 0;
+	int targetTicks2 = 1000;
+
+	auto start = std::chrono::steady_clock::now();
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -148,21 +147,26 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		//auto start = std::chrono::steady_clock::now();
-		for(int i = 0; i < 10; i++) {
-    		pc1.cpu.tick();
-    		gpu1.tick();
+		for(int i = 0; i < 650; i++){
+			pc1.cpu.tick();
+			gpu1.tick();
+			//totalTicks++;
 		}
 		/*if(ticks >= targetTicks) {
 			auto end = std::chrono::steady_clock::now();
-			std::chrono::duration<double, std::nano> diff = end-start;
-			std::cout <<  diff.count() << '\n';
+			std::chrono::duration<double> diff = end-start;
+			if(diff.count() - (2 * numOfLoops) >= 2){
+				std::cout << (totalTicks / 2) << " t/s" << '\n';
+				totalTicks = 0;
+				numOfLoops++;
+			}
 			ticks = 0;
 		}
 		ticks++;*/
 
 		gpu1.updateScreen();
 	}
+
 
 	//GPU1.join();
 	//GPU1S.join();

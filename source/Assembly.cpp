@@ -233,7 +233,7 @@ namespace Assembly {
 					i += 2;
 					continue;
 				}else if (instruction == "pt") {
-					currentPos += 3;
+					currentPos += 4;
 					i += 2;
 					continue;
 				}else if(instruction == "s8.a") {
@@ -706,11 +706,12 @@ namespace Assembly {
 					}
 
 
-					byte b1, b2, b3;
-					convertByte3(Arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(Arg2, b1, b2, b3, b4);
 					cpu.ram.memory[currentPos++] = b1;
 					cpu.ram.memory[currentPos++] = b2;
 					cpu.ram.memory[currentPos++] = b3;
+					cpu.ram.memory[currentPos++] = b4;
 					i += 2;
 					line++;
 					continue;
@@ -931,11 +932,12 @@ namespace Assembly {
 
 						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
-						byte b1, b2, b3;
-						convertByte3(arg2, b1, b2, b3);
+						byte b1, b2, b3, b4;
+						convertByte4(arg2, b1, b2, b3, b4);
 						cpu.ram.memory[currentPos++] = b1;
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
+						cpu.ram.memory[currentPos++] = b4;
 
 						i += 2;
 						line++;
@@ -969,11 +971,12 @@ namespace Assembly {
 
 						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
-						byte b1, b2, b3;
-						convertByte3(arg2, b1, b2, b3);
+						byte b1, b2, b3, b4;
+						convertByte4(arg2, b1, b2, b3, b4);
 						cpu.ram.memory[currentPos++] = b1;
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
+						cpu.ram.memory[currentPos++] = b4;
 
 						i += 2;
 						line++;
@@ -1007,11 +1010,12 @@ namespace Assembly {
 
 						int arg2 = checkArgType(code[i + 2], cpu, variables, scopeDepth);
 
-						byte b1, b2, b3;
-						convertByte3(arg2, b1, b2, b3);
+						byte b1, b2, b3, b4;
+						convertByte4(arg2, b1, b2, b3, b4);
 						cpu.ram.memory[currentPos++] = b1;
 						cpu.ram.memory[currentPos++] = b2;
 						cpu.ram.memory[currentPos++] = b3;
+						cpu.ram.memory[currentPos++] = b4;
 
 						i += 2;
 						line++;
@@ -2095,11 +2099,12 @@ namespace Assembly {
 		}
 
 		if(hasffb == true){
-			byte b1, b2, b3;
-			convertByte3(currentPos, b1, b2, b3);
+			byte b1, b2, b3, b4;
+			convertByte4(currentPos, b1, b2, b3, b4);
 			cpu.ram.memory[variables[ffbID].position] = b1;
 			cpu.ram.memory[variables[ffbID].position + 1] = b2;
 			cpu.ram.memory[variables[ffbID].position + 2] = b3;
+			cpu.ram.memory[variables[ffbID].position + 3] = b4;
 		}
 
 

@@ -26,12 +26,18 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 	int j = 0;
 	int i = 0;
 
-	std::cout << "Loading HDD..." << '\n';
+	std::cout << "Loading HDD...  ";
+
+	std::string buf;
+	std::stringstream ss(line);
+	int prevP = 0;
+
+	std::cout << '[';
 
 	if (HDD.is_open()){
 		while (getline (HDD,line)) {
-			std::string buf;
-			std::stringstream ss(line);
+
+			ss.str(line);
 
 			while (ss >> buf) {
 				hdd.memory[j * sectorSize + i] = std::stoi(buf);
@@ -39,9 +45,16 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 			}
 			i = 0;
 			j++;
-			std::cout << (int)(((float)(j * sectorSize + i) / (float)(sectorSize * numSectors)) * 100) << "% done..." << '\r';
+			int percent = (int)(((float)(j * sectorSize + i) / (float)(sectorSize * numSectors)) * 100) / 5;
+
+			if(prevP < percent) {std::cout << '|';}
+			prevP = percent;
+
 		}
+
 	}
+
+	std::cout << ']' << '\r';
 
 	std::cout << '\n' << "Finished loading the HDD..." << '\n' << '\n';
 
@@ -157,17 +170,29 @@ void CPU::execute() {
 			file.open("HDD.txt", std::ios::out | std::ios::trunc);
 			file.close();
 
-			std::cout << '\n' << "Saving the HDD..." << '\n';
+			std::cout << '\n' << "Saving the HDD...  [";
+			int prevP = 0;
 
 			file.open("HDD.txt");
+
 			for (int i = 0; i < numSectors; i++) {
+				std::string tmp;
 				for (int j = 0; j < sectorSize; j++) {
-					file << (int)hdd.memory[i * sectorSize + j] << " ";
+					tmp.append(std::to_string((int)hdd.memory[i * sectorSize + j]));
+					tmp.append(" ");
 				}
-				std::cout << (int)(((float)(i + 1) / (float)numSectors) * 100) << "% done..." << '\r';
+				file << tmp;
 				file << '\n';
+
+				int percent = (int)(((float)(i + 1) / (float)numSectors) * 100) / 5;
+
+				if(prevP < percent) {std::cout << '|';}
+				prevP = percent;
 			}
+
 			file.close();
+
+			std::cout << ']';
 			std::cout << '\n';
 
 			std::cout << "Finished saving the HDD..." << '\n';
@@ -486,7 +511,6 @@ void CPU::execute() {
 			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			if(sizeA >= 1 && sizeA <= 3) {
 				hdd.memory[position] = registers[regA] & 0xFF;
-				std::cout << (int)hdd.memory[position] << '\n';
 				if(sizeA >= 2) {
 					hdd.memory[position + 1] = (byte)(registers[regA] >> 8);
 				}
@@ -518,7 +542,7 @@ void CPU::execute() {
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
 			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			registers[regA] = checkArgument(checkArgument(memPos, 4), sizeA);
+			registers[regA] = checkArgument(checkArgument(memPos, 3), sizeA);
 			programCounter += 5;
 		break; };
 
@@ -526,7 +550,7 @@ void CPU::execute() {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int pointer = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int pointer = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			int position = ram.memory[pointer + 2] << 16 | ram.memory[pointer + 1] << 8 | ram.memory[pointer];
 
 			if(sizeA >= 1 && sizeA <= 3) {
@@ -541,7 +565,7 @@ void CPU::execute() {
 			}else{
 				std::cout << "Invalid data type size at instruction 0x28 at memory position: 0x" << std::hex << programCounter << '\n';
 			}
-			programCounter += 5;
+			programCounter += 6;
 		break; }
 	}
 }
