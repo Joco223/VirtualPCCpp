@@ -34,11 +34,34 @@ bool quit = false;
 
 typedef unsigned char byte;
 
-void runVPC (PC* pc, GPU* gpu) {
-	while(true){
-		pc->cpu.tick();
-		gpu->tick();
+void runVPC (PC* pc1, GPU* gpu1, bool* update) {
+	int ticks = 0;
+	int targetTicks = 25;
+	long int totalTicks = 0;
+	int numOfLoops = 0;
+	int ticks2 = 0;
+	int targetTicks2 = 1000;
 
+	auto start = std::chrono::steady_clock::now();
+
+	while(true){
+		for(int i = 0; i < 1000000; i++){
+			pc1->cpu.tick();
+			gpu1->tick();
+			//totalTicks++;
+			if((i % 25000) == 0) {gpu1->updateScreen();}
+		}
+		/*if(ticks >= targetTicks) {
+			auto end = std::chrono::steady_clock::now();
+			std::chrono::duration<double> diff = end-start;
+			if(diff.count() - (2 * numOfLoops) >= 2){
+				std::cout << (totalTicks / 2) << " t/s" << '\n';
+				totalTicks = 0;
+				numOfLoops++;
+			}
+			ticks = 0;
+		}
+		ticks++;*/
 	}
 }
 
@@ -119,15 +142,12 @@ int main(int argc, char* argv[]) {
 										 	{37, 8}, {12,77}, {22,87}, { 57,97}, { 59,107}, {69,117}, {78,127}, {48, 33},
 										 	{38, 9}, {13,78}, {23,88}, {225,98}, { 60,108}, {41,118}, {82,128}, {51, 27} };
 
-	int ticks = 0;
-	int targetTicks = 25;
-	long int totalTicks = 0;
-	int numOfLoops = 0;
-	bool printed = false;
-	int ticks2 = 0;
-	int targetTicks2 = 1000;
 
-	auto start = std::chrono::steady_clock::now();
+
+	bool update = true;
+
+	std::thread rVPC1(runVPC, &pc1, &gpu1, &update);
+	//std::thread rVGPU1(runVGPU, &gpu1, &update);
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -146,27 +166,10 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 		}
-
-		for(int i = 0; i < 650; i++){
-			pc1.cpu.tick();
-			gpu1.tick();
-			//totalTicks++;
-		}
-		/*if(ticks >= targetTicks) {
-			auto end = std::chrono::steady_clock::now();
-			std::chrono::duration<double> diff = end-start;
-			if(diff.count() - (2 * numOfLoops) >= 2){
-				std::cout << (totalTicks / 2) << " t/s" << '\n';
-				totalTicks = 0;
-				numOfLoops++;
-			}
-			ticks = 0;
-		}
-		ticks++;*/
-
-		gpu1.updateScreen();
 	}
 
+	rVPC1.join();
+	//rVGPU1.join();
 
 	//GPU1.join();
 	//GPU1S.join();
