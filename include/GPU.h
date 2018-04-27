@@ -7,6 +7,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <time.h>
+#include <mutex>
 
 #include "Memory.h"
 #include "SDLWindow.h"
@@ -49,8 +50,10 @@ public:
 	std::vector<screenCharacter> screenCharacters;
 	std::vector<GPUCore> cores;
 	std::vector<screenPos> charactersNUpdate;
+	std::vector<screenPos> charactersNUpdate2;
 	SDL_Texture* font;
 	SDL_Texture* characterBuffer;
+	bool update;
 	int coresX, coresY;
 	bool started;
 	int currentTask;
@@ -61,7 +64,7 @@ public:
 	void setCharID(byte x, byte y, byte ID);
 	void setCharCB(byte x, byte y, byte cB);
 	void setCharCF(byte x, byte y, byte cF);
-	void updateCharacters();
+	void updateCharacters(std::mutex*);
 	void loadFont();
 	void updateScreen();
 	void executeCommand();

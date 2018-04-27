@@ -15,6 +15,7 @@
 #include <thread>
 #include <unordered_map>
 #include <chrono>
+#include <mutex>
 
 #include "NSSDL.h"
 #include "SDLWindow.h"
@@ -34,7 +35,7 @@ bool quit = false;
 
 typedef unsigned char byte;
 
-void runVPC (PC* pc1, GPU* gpu1, bool* update) {
+void runVPC (PC* pc1, GPU* gpu1, std::mutex* startT) {
 	int ticks = 0;
 	int targetTicks = 25;
 	long int totalTicks = 0;
@@ -45,17 +46,14 @@ void runVPC (PC* pc1, GPU* gpu1, bool* update) {
 	auto start = std::chrono::steady_clock::now();
 
 	while(true){
-		for(int i = 0; i < 1000000; i++){
-			pc1->cpu.tick();
-			gpu1->tick();
+		pc1->cpu.tick(startT);
+		gpu1->tick();
 			//totalTicks++;
-			if((i % 25000) == 0) {gpu1->updateScreen();}
-		}
 		/*if(ticks >= targetTicks) {
 			auto end = std::chrono::steady_clock::now();
 			std::chrono::duration<double> diff = end-start;
-			if(diff.count() - (2 * numOfLoops) >= 2){
-				std::cout << (totalTicks / 2) << " t/s" << '\n';
+			if(diff.count() - (10 * numOfLoops) >= 10){
+				std::cout << (totalTicks / 10) << " t/s" << '\n';
 				totalTicks = 0;
 				numOfLoops++;
 			}
@@ -145,9 +143,16 @@ int main(int argc, char* argv[]) {
 
 
 	bool update = true;
+	int keyCode = 0;
+	bool input = false;
 
-	std::thread rVPC1(runVPC, &pc1, &gpu1, &update);
+	std::mutex displayG;
+	std::thread rVPC1(runVPC, &pc1, &gpu1, &displayG);
 	//std::thread rVGPU1(runVGPU, &gpu1, &update);
+
+	auto start2 = std::chrono::steady_clock::now();
+	int numOfLoops2 = 0;
+
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -156,16 +161,34 @@ int main(int argc, char* argv[]) {
 				quit = true;
 				break;
 			case SDL_KEYDOWN:
-				if(mapKey.find(event.key.keysym.scancode) == mapKey.end()){
-					std::cout << "Unknown button: " << event.key.keysym.scancode << '\n';
-				}else{
-					pc1.cpu.interrupted = true;
-					pc1.cpu.registers[12] = 1;
-					pc1.cpu.interRegisters[0] = mapKey.find(event.key.keysym.scancode)->second;
-				}
+				input = true;
+				keyCode = event.key.keysym.scancode;
 				break;
 			}
 		}
+
+		auto end2 = std::chrono::steady_clock::now();
+		std::chrono::duration<double, std::milli> diff2 = end2-start2;
+		if(diff2.count() - (16 * numOfLoops2) >= 16){
+			//displayG.lock();
+			gpu1.updateCharacters(&displayG);
+			gpu1.updateScreen();
+			//displayG.unlock();
+
+			numOfLoops2++;
+		}
+
+		if(input == true){
+			if(mapKey.find(keyCode) == mapKey.end()){
+				std::cout << "Unknown button: " << keyCode << '\n';
+			}else{
+				pc1.cpu.interrupted = true;
+				pc1.cpu.registers[12] = 1;
+				pc1.cpu.interRegisters[0] = mapKey.find(keyCode)->second;
+			}
+			input = false;
+		}
+
 	}
 
 	rVPC1.join();

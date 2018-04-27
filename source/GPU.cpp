@@ -8,7 +8,8 @@ GPU::GPU(int vRamSize, int coreCountX, int coureCountY, SDLWindow* screen_, Memo
 	screen(screen_),
 	started(false),
 	currentTask(0),
-	screenUpdated(false)
+	screenUpdated(false),
+	update(true)
 {
 	for (int x = 0; x < (coreCountX * coureCountY); x++) {
 		cores.emplace_back(vRam, progMem, screen_, screenUpdated, coureCountY, x, 0);
@@ -31,6 +32,11 @@ GPU::GPU(int vRamSize, int coreCountX, int coureCountY, SDLWindow* screen_, Memo
 	}
 
 	characterBuffer = SDL_CreateTexture(screen->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 640 * scale, 480 * scale);
+	for(int y = 0; y < 60; y++){
+		for(int x = 0; x < 106; x++){
+			charactersNUpdate.push_back({x, y});
+		}
+	}
 }
 
 void GPU::loadFont() {
@@ -41,26 +47,21 @@ void GPU::loadFont() {
 
 void GPU::setCharID(byte x, byte y, byte id) {
 	screenCharacters[y * 106 + x].characterID = id;
-	charactersNUpdate.push_back({x, y});
 }
 
 void GPU::setCharCB(byte x, byte y, byte cB) {
 	screenCharacters[y * 106 + x].rB = (cB >> 5) & 0b00000111;
 	screenCharacters[y * 106 + x].gB = (cB >> 2) & 0b00111;
 	screenCharacters[y * 106 + x].bB = cB & 0b11;
-	charactersNUpdate.push_back({x, y});
 }
 
 void GPU::setCharCF(byte x, byte y, byte cF) {
 	screenCharacters[y * 106 + x].r = (cF >> 5) & 0b00000111;
 	screenCharacters[y * 106 + x].g = (cF >> 2) & 0b00111;
 	screenCharacters[y * 106 + x].b = cF & 0b11;
-	charactersNUpdate.push_back({x, y});
 }
 
-void GPU::updateCharacters() {
-	SDL_SetRenderTarget(screen->renderer, characterBuffer);
-
+void GPU::updateCharacters(std::mutex* start) {
 	SDL_Rect source;
 	SDL_Rect target;
 	source.w = 6;
@@ -69,7 +70,7 @@ void GPU::updateCharacters() {
 	target.h = 8 * scale;
 
 	for(auto& i : charactersNUpdate) {
-		if(i.x > 0 && i.x < 106 && i.y > 0 && i.y < 60) {
+		if(i.x >= 0 && i.x <= 106 && i.y >= 0 && i.y <= 60) {
 			source.x = 7 * 6;
 			source.y = 6 * 8;
 
@@ -89,11 +90,6 @@ void GPU::updateCharacters() {
 		}
 	}
 
-	SDL_SetRenderTarget(screen->renderer, nullptr);
-
-	if(charactersNUpdate.size() > 0){
-		charactersNUpdate.erase(charactersNUpdate.begin(), charactersNUpdate.end());
-	}
 }
 
 void GPU::updateScreen() {

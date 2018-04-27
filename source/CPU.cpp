@@ -98,7 +98,7 @@ byte getBits(byte origin, byte length){
 	return (origin >> (4 * length)) & 0xF;
 }
 
-void CPU::execute() {
+void CPU::execute(std::mutex* start) {
 	switch (registerOP) {
 		case 0x00: { //Halt
 			halt = true;
@@ -533,7 +533,7 @@ void CPU::execute() {
 		break; }
 
 		case 0x26: { //Call updateCharacters
-			gpu.updateCharacters();
+			//gpu.updateCharacters();
 			programCounter++;
 		break; }
 
@@ -591,12 +591,12 @@ void CPU::interrupt(){
 }
 
 
-void CPU::tick() {
+void CPU::tick(std::mutex* start) {
 	if (halt == false) {
 		currentTime++;
 		registers[13] = currentTime;
 		registerOP = ram.memory[programCounter];
-		execute();
+		execute(start);
 		interrupt();
 	}
 }
