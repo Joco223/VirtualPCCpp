@@ -1,0 +1,5 @@
+g.IDX regA
+g.IDY regB
+g.ID regC
+
+displ regA regB regC

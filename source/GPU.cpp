@@ -93,6 +93,8 @@ void GPU::updateCharacters(std::mutex* start) {
 }
 
 void GPU::updateScreen() {
+	SDL_UpdateTexture(screen->texture, nullptr, screen->pixels, screen->pixelSpace->pitch);
+	SDL_RenderCopy(screen->renderer, screen->texture, nullptr, nullptr);
 	SDL_RenderCopy(screen->renderer, characterBuffer, nullptr, nullptr);
 	SDL_RenderPresent(screen->renderer);
 }

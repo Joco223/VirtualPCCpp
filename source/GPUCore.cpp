@@ -21,9 +21,9 @@ void GPUCore::tick() {
 
 int GPUCore::checkArgument(int source, int size) {
 	if ((unsigned int)source <= vRam.memory.size()) {
-		if(size == 1) { return vRam.memory[source] & 0xFF; } else {return 0;}
-		if(size == 2) { return vRam.memory[source + 1] <<  8 | (vRam.memory[source] & 0xFF); } else {return 0;}
-		if(size == 3) { return vRam.memory[source + 3] << 24 | (vRam.memory[source + 2] << 16) | (vRam.memory[source + 1] << 8) | (vRam.memory[source] & 0xFF); } else {return 0;}
+		if(size == 1) { return vRam.memory[source] & 0xFF; }
+		if(size == 2) { return vRam.memory[source + 1] <<  8 | (vRam.memory[source] & 0xFF); }
+		if(size == 3) { return vRam.memory[source + 3] << 24 | (vRam.memory[source + 2] << 16) | (vRam.memory[source + 1] << 8) | (vRam.memory[source] & 0xFF); }
 	}else{
 		return registers[source - (vRam.memory.size() + 1)];
 	}
@@ -225,7 +225,9 @@ void GPUCore::execute(int registerOP) {
 			byte argument2 = progMem.memory[programCounter + 2];
 			byte regB = registers[getBits(argument2, 0)];
 
-			screen->pixels[registers[1] * 320 + registers[0]] = int(regR << 16) | int(regG << 8) | int(regB);
+			if(registers[0] >= 0 && registers[0] <= 640 && registers[1] >= 0 && registers[1] <= 480){
+				screen->pixels[registers[1] * 640 + registers[0]] = int(regR << 16) | int(regG << 8) | int(regB);
+			}
 
 			programCounter += 3;
 			screenUpdated = true;
