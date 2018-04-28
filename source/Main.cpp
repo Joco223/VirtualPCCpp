@@ -11,11 +11,9 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include <time.h>
 #include <thread>
 #include <unordered_map>
 #include <chrono>
-#include <mutex>
 
 #include "NSSDL.h"
 #include "SDLWindow.h"
@@ -35,7 +33,14 @@ bool quit = false;
 
 typedef unsigned char byte;
 
-void runVPC (PC* pc1, GPU* gpu1, std::mutex* startT) {
+void runvGPU(GPU* gpu1){
+	while(true){
+		gpu1->tick();
+	}
+
+}
+
+void runVPC (PC* pc1) {
 	int ticks = 0;
 	int targetTicks = 25;
 	long int totalTicks = 0;
@@ -46,9 +51,8 @@ void runVPC (PC* pc1, GPU* gpu1, std::mutex* startT) {
 	auto start = std::chrono::steady_clock::now();
 
 	while(true){
-		pc1->cpu.tick(startT);
-		gpu1->tick();
-			//totalTicks++;
+		pc1->cpu.tick();
+		//totalTicks++;
 		/*if(ticks >= targetTicks) {
 			auto end = std::chrono::steady_clock::now();
 			std::chrono::duration<double> diff = end-start;
@@ -79,7 +83,7 @@ int main(int argc, char* argv[]) {
 	Memory hdd1(4096 * 4096);
 	//Sector size ^     ^ number of sectors
 
-	GPU gpu1(16769025, 16, 16, &pc1W, ram1);
+	GPU gpu1(16769025, 32, 32, &pc1W, ram1);
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
@@ -146,9 +150,8 @@ int main(int argc, char* argv[]) {
 	int keyCode = 0;
 	bool input = false;
 
-	std::mutex displayG;
-	std::thread rVPC1(runVPC, &pc1, &gpu1, &displayG);
-	//std::thread rVGPU1(runVGPU, &gpu1, &update);
+	std::thread rVPC1(runVPC, &pc1);
+	std::thread rVGPU1(runvGPU, &gpu1);
 
 	auto start2 = std::chrono::steady_clock::now();
 	int numOfLoops2 = 0;
@@ -169,13 +172,9 @@ int main(int argc, char* argv[]) {
 
 		auto end2 = std::chrono::steady_clock::now();
 		std::chrono::duration<double, std::milli> diff2 = end2-start2;
-		if(diff2.count() - (16 * numOfLoops2) >= 16){
-			//displayG.lock();
-			gpu1.updateCharacters(&displayG);
-			gpu1.updateScreen();
-			//displayG.unlock();
-
-			numOfLoops2++;
+		if((int)diff2.count() % 16 == 0){
+			gpu1.updateCharacters();
+			gpu1.updateScreen();;
 		}
 
 		if(input == true){
@@ -192,10 +191,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	rVPC1.join();
-	//rVGPU1.join();
-
-	//GPU1.join();
-	//GPU1S.join();
+	rVGPU1.join();
 
 	SDL_Quit();
 

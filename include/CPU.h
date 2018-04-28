@@ -50,7 +50,7 @@ public:
 	int checkArgument(int, int);
 	int checkArgumentH(int, int);
 	int checkArgumentG(int, int);
-	void execute(std::mutex*);
+	void execute();
 	void interrupt();
-	void tick(std::mutex*);
+	void tick();
 };

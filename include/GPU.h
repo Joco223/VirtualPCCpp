@@ -64,7 +64,7 @@ public:
 	void setCharID(byte x, byte y, byte ID);
 	void setCharCB(byte x, byte y, byte cB);
 	void setCharCF(byte x, byte y, byte cF);
-	void updateCharacters(std::mutex*);
+	void updateCharacters();
 	void loadFont();
 	void updateScreen();
 	void executeCommand();

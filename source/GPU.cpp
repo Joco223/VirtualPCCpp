@@ -9,7 +9,7 @@ GPU::GPU(int vRamSize, int coreCountX, int coureCountY, SDLWindow* screen_, Memo
 	started(false),
 	currentTask(0),
 	screenUpdated(false),
-	update(true)
+	update(false)
 {
 	for (int x = 0; x < (coreCountX * coureCountY); x++) {
 		cores.emplace_back(vRam, progMem, screen_, screenUpdated, coureCountY, x, 0);
@@ -61,41 +61,46 @@ void GPU::setCharCF(byte x, byte y, byte cF) {
 	screenCharacters[y * 106 + x].b = cF & 0b11;
 }
 
-void GPU::updateCharacters(std::mutex* start) {
-	SDL_Rect source;
-	SDL_Rect target;
-	source.w = 6;
-	source.h = 8;
-	target.w = 6 * scale;
-	target.h = 8 * scale;
+void GPU::updateCharacters() {
+	if(update){
+		SDL_Rect source;
+		SDL_Rect target;
+		source.w = 6;
+		source.h = 8;
+		target.w = 6 * scale;
+		target.h = 8 * scale;
 
-	for(auto& i : charactersNUpdate) {
-		if(i.x >= 0 && i.x <= 106 && i.y >= 0 && i.y <= 60) {
-			source.x = 7 * 6;
-			source.y = 6 * 8;
+		for(auto& i : charactersNUpdate) {
+			if(i.x >= 0 && i.x <= 106 && i.y >= 0 && i.y <= 60) {
+				source.x = 7 * 6;
+				source.y = 6 * 8;
 
-			target.x = i.x * 6 * scale;
-			target.y = i.y * 8 * scale;
+				target.x = i.x * 6 * scale;
+				target.y = i.y * 8 * scale;
 
-			SDL_SetTextureColorMod(font, screenCharacters[i.y * 106 + i.x].rB * 36.428, screenCharacters[i.y * 106 + i.x].gB * 36.428, screenCharacters[i.y * 106 + i.x].bB * 85);
+				SDL_SetTextureColorMod(font, screenCharacters[i.y * 106 + i.x].rB * 36.428, screenCharacters[i.y * 106 + i.x].gB * 36.428, screenCharacters[i.y * 106 + i.x].bB * 85);
 
-			SDL_RenderCopy(screen->renderer, font, &source, &target);
+				SDL_RenderCopy(screen->renderer, font, &source, &target);
 
-			source.x = (screenCharacters[i.y * 106 + i.x].characterID % 10) * 6;
-			source.y = (screenCharacters[i.y * 106 + i.x].characterID / 10) * 8;
+				source.x = (screenCharacters[i.y * 106 + i.x].characterID % 10) * 6;
+				source.y = (screenCharacters[i.y * 106 + i.x].characterID / 10) * 8;
 
-			SDL_SetTextureColorMod(font, screenCharacters[i.y * 106 + i.x].r * 36.428, screenCharacters[i.y * 106 + i.x].g * 36.428, screenCharacters[i.y * 106 + i.x].b * 85);
+				SDL_SetTextureColorMod(font, screenCharacters[i.y * 106 + i.x].r * 36.428, screenCharacters[i.y * 106 + i.x].g * 36.428, screenCharacters[i.y * 106 + i.x].b * 85);
 
-			SDL_RenderCopy(screen->renderer, font, &source, &target);
+				SDL_RenderCopy(screen->renderer, font, &source, &target);
+			}
 		}
-	}
 
+		update = false;
+	}
 }
 
 void GPU::updateScreen() {
 	SDL_UpdateTexture(screen->texture, nullptr, screen->pixels, screen->pixelSpace->pitch);
 	SDL_RenderCopy(screen->renderer, screen->texture, nullptr, nullptr);
-	SDL_RenderCopy(screen->renderer, characterBuffer, nullptr, nullptr);
+	if(update){
+		SDL_RenderCopy(screen->renderer, characterBuffer, nullptr, nullptr);
+	}
 	SDL_RenderPresent(screen->renderer);
 }
 

@@ -228,6 +228,10 @@ namespace Assembly {
 					currentPos += 2;
 					i += 2;
 					continue;
+				}else if (instruction == "d16.g") {
+					currentPosG += 2;
+					i += 2;
+					continue;
 				}else if (instruction == "l32") {
 					currentPos += 4;
 					i += 2;
@@ -681,6 +685,26 @@ namespace Assembly {
 					convertByte2(Arg2, b1, b2);
 					cpu.ram.memory[currentPos++] = b1;
 					cpu.ram.memory[currentPos++] = b2;
+					i += 2;
+					line++;
+					continue;
+				}else if (instruction == "d16.g") {
+					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
+
+					int Arg2 = std::stoi(arg2);
+
+					variable temp;
+					temp.name = arg1;
+					temp.position = currentPosG;
+					temp.sDepth = scopeDepth;
+					temp.size = 2;
+					gVariables.push_back(temp);
+
+					byte b1, b2;
+					convertByte2(Arg2, b1, b2);
+					gpu.vRam.memory[currentPosG++] = b1;
+					gpu.vRam.memory[currentPosG++] = b2;
 					i += 2;
 					line++;
 					continue;
