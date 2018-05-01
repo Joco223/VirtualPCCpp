@@ -5,6 +5,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <SDL_net.h>
 
 #include "Memory.h"
 #include "GPU.h"
@@ -28,7 +29,12 @@ public:
 	int registerOP;
 
 	std::vector<unsigned int> registers;
+	std::vector<unsigned char> modemRegisters;
 	std::vector<unsigned int> interRegisters;
+	std::vector<bool> sockets;
+
+	std::string vPCaddress;
+	bool onlineMode;
 
 	std::vector<stack_object> stack;
 
@@ -50,7 +56,7 @@ public:
 	int checkArgument(int, int);
 	int checkArgumentH(int, int);
 	int checkArgumentG(int, int);
-	void execute();
+	void execute(TCPsocket);
 	void interrupt();
-	void tick();
+	void tick(TCPsocket*);
 };

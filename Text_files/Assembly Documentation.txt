@@ -1,4 +1,14 @@
 General info:
+
+--IMPORTANT
+You need to enter real IP address of vPC-Server.exe where you want your vPC to connect to,
+if you don't want to connect, just leave it empty and press enter, but by doing that all
+netowrk features are disabled.
+
+Netowrk packages are received as interrupts if the target socket is opened, the package
+is recieved as 8 bytes of data, first 3 is address of sender and 5 bytes of data
+--
+
 Character RGB values are limited to 8bit pallete (256 colors)
 Character space is limited X: 0 - 106, Y: 0 - 60 (Resolution now is 640x480)
 Comments can be written with //, that line is ignored
@@ -167,6 +177,21 @@ GPU, first and second register hold the x and y value and third argument is
 the value that is going to be set (sb.setCF regA regB x)
 
 sb.update - Updates the character bufffer, no arguments needed
+
+load.data - Load 5 bytes of data to the network package, the argument is a pointer where
+the data starts in Ram (load.data pointer)
+
+load.address - Load target addres to the network package, 3 registers is the addres, one
+for each part of it (load.address regA regB regC)
+
+load.socket - Load target socket to the network package, argument is a variable that
+contains the vaule which is the index of the socket (load.socket x) where x is 127 and
+socket 127 would be loaded
+
+toggle.socket - Toggle a socket, argument is a variable that contains the vaule which
+is the index of the socket (toggle.socket x) where x is 127 and socket 127 would be toggled
+
+send - Send the network package
 
 stop - Shuts down the vPC and saves the HDD to a file. Stop is a must at the end of
 a program, else the vPC will work incorrectly (Assembler will warn you if you didn't

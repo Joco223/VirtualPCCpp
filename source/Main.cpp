@@ -14,6 +14,7 @@
 #include <thread>
 #include <unordered_map>
 #include <chrono>
+#include <SDL_net.h>
 
 #include "NSSDL.h"
 #include "SDLWindow.h"
@@ -40,7 +41,7 @@ void runvGPU(GPU* gpu1){
 
 }
 
-void runVPC (PC* pc1) {
+void runVPC (PC* pc1, TCPsocket* clientSocket) {
 	int ticks = 0;
 	int targetTicks = 25;
 	long int totalTicks = 0;
@@ -51,7 +52,7 @@ void runVPC (PC* pc1) {
 	auto start = std::chrono::steady_clock::now();
 
 	while(true){
-		pc1->cpu.tick();
+		pc1->cpu.tick(clientSocket);
 		//totalTicks++;
 		/*if(ticks >= targetTicks) {
 			auto end = std::chrono::steady_clock::now();
@@ -68,6 +69,70 @@ void runVPC (PC* pc1) {
 }
 
 int main(int argc, char* argv[]) {
+
+	SDLNet_Init();
+
+	int port = 52239;
+	IPaddress serverIP;
+	char* pBuffer;
+	pBuffer = new char[9];
+	std::string IP;
+	std::cout << "Type in server IP address" << '\n';
+	std::cin >> IP;
+	bool OM = false;
+	std::string address;
+
+	SDLNet_SocketSet socketSet;
+	socketSet = SDLNet_AllocSocketSet(2);
+
+	TCPsocket clientSocket;
+
+	if(IP != ""){
+		int success = SDLNet_ResolveHost(&serverIP, IP.c_str(), port);
+
+		clientSocket = SDLNet_TCP_Open(&serverIP);
+		std::cout << SDLNet_GetError() << '\n';
+		SDLNet_TCP_AddSocket(socketSet, clientSocket);
+
+		int activeSockets = SDLNet_CheckSockets(socketSet, 1000);
+		int gotServerResponse = SDLNet_SocketReady(clientSocket);
+		int serverResponseByteCount = SDLNet_TCP_Recv(clientSocket, pBuffer, 3);
+
+		address.push_back(pBuffer[0]);
+		address.push_back(pBuffer[1]);
+		address.push_back(pBuffer[2]);
+
+		std::cout << "Successfully connected. vPC address is: " << (int)address[0] << "." << (int)address[1] << "." << (int)address[2] << '\n';
+		OM = true;
+	}
+
+ 	/*int input;
+	std::cout << "Chose run mode (0 to send a message, 1 to recieve)" << '\n';
+	std::cin >> input;
+
+	if(input == 1){
+		std::cout << "Waiting for message..." << '\n';
+		while(true){
+			int c = SDLNet_TCP_Recv(clientSocket, pBuffer, 9);
+			if(c > 0){
+				std::cout << pBuffer << '\n';
+			}
+		}
+	}else{
+		std::cout << "Sending message..." << '\n';
+		std::cout << "Type in target vPC address:" << '\n';
+		std::string target;
+		std::cin >> target;
+		std::string data;
+		std::cout << "Type in desired data (5 characters): " << '\n';
+		std::cin >> data;
+
+		std::string message = "0" + address + target + data;
+
+		SDLNet_TCP_Send(clientSocket, message.c_str(), 12);
+		std::cout << "Message sent..." << '\n';
+	}*/
+
 	SDL_Event event;
 
 	SDL_Window* window2;
@@ -89,6 +154,9 @@ int main(int argc, char* argv[]) {
 
 	CPU cpu1(4096, 4096, ram1, hdd1, gpu1);
 
+	cpu1.onlineMode = OM;
+	cpu1.vPCaddress = address;
+
 	std::vector<std::string> code;
 	std::vector<std::string> gpu_code;
 
@@ -99,11 +167,6 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> cCode;
 	std::vector<std::string> tokens;
 
-	//Compiler::readFile("Program.cl", cCode);
-
-	//Compiler::splitFile(cCode, tokens);
-
-	//Compiler::Parse(tokens);
 	std::vector<Assembly::variable> tmp2;
 
 	Assembly::readFile("CPU_Programs/Program2.sal", code);
@@ -149,13 +212,15 @@ int main(int argc, char* argv[]) {
 	bool update = true;
 	int keyCode = 0;
 	bool input = false;
+	bool firstMsg = true;
 
-	std::thread rVPC1(runVPC, &pc1);
+	std::thread rVPC1(runVPC, &pc1, &clientSocket);
 	std::thread rVGPU1(runvGPU, &gpu1);
 
 	auto start2 = std::chrono::steady_clock::now();
 	int numOfLoops2 = 0;
 
+	//for(int i = 0; i < 8; i++) {pBuffer[i] = 0;}
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {
@@ -168,6 +233,26 @@ int main(int argc, char* argv[]) {
 				keyCode = event.key.keysym.scancode;
 				break;
 			}
+		}
+
+		if(OM){
+			int c = SDLNet_TCP_Recv(clientSocket, pBuffer, 8);
+			if(c == 8){
+				if(pc1.cpu.sockets[pBuffer[8]] == true){
+					pc1.cpu.registers[12] = 3;
+					pc1.cpu.interRegisters[0] = (unsigned int)pBuffer[0];
+					pc1.cpu.interRegisters[1] = (unsigned int)pBuffer[1];
+					pc1.cpu.interRegisters[2] = (unsigned int)pBuffer[2];
+					pc1.cpu.interRegisters[3] = (unsigned int)pBuffer[3];
+					pc1.cpu.interRegisters[4] = (unsigned int)pBuffer[4];
+					pc1.cpu.interRegisters[5] = (unsigned int)pBuffer[5];
+					pc1.cpu.interRegisters[6] = (unsigned int)pBuffer[6];
+					pc1.cpu.interRegisters[7] = (unsigned int)pBuffer[7];
+					pc1.cpu.interrupted = true;
+				}
+			}
+		}else{
+			std::cout << "Online mode is off. Please connect vPC to a vPC server to use this" << '\n';
 		}
 
 		auto end2 = std::chrono::steady_clock::now();
@@ -192,6 +277,12 @@ int main(int argc, char* argv[]) {
 
 	rVPC1.join();
 	rVGPU1.join();
+
+	if(OM){
+		SDLNet_TCP_Close(clientSocket);
+		SDLNet_FreeSocketSet(socketSet);
+	}
+	delete pBuffer;
 
 	SDL_Quit();
 
