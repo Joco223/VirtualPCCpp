@@ -144,6 +144,7 @@ namespace Assembly {
 		if(code[i + k] == "regL") {return 11;}
 		if(code[i + k] == "regInter") {return 12;}
 		if(code[i + k] == "regTimer") {return 13;}
+		if(code[i + k] == "regFrame") {return 14;}
 	}
 
 	int indexInterRegister(std::vector<std::string>& code, int i, int k){
@@ -242,6 +243,10 @@ namespace Assembly {
 					continue;
 				}else if (instruction == "pt") {
 					currentPos += 4;
+					i += 2;
+					continue;
+				}else if (instruction == "pt.g") {
+					currentPosG += 4;
 					i += 2;
 					continue;
 				}else if(instruction == "s8.a") {
@@ -749,6 +754,28 @@ namespace Assembly {
 					cpu.ram.memory[currentPos++] = b2;
 					cpu.ram.memory[currentPos++] = b3;
 					cpu.ram.memory[currentPos++] = b4;
+					i += 2;
+					line++;
+					continue;
+				}else if (instruction == "pt.g") {
+					std::string arg1 = code[i + 1];
+					std::string arg2 = code[i + 2];
+
+					variable temp;
+					temp.name = arg1;
+					temp.position = currentPos;
+					temp.sDepth = scopeDepth;
+					temp.size = 3;
+					gVariables.push_back(temp);
+
+					int Arg2 = std::stoi(arg2);
+
+					byte b1, b2, b3, b4;
+					convertByte4(Arg2, b1, b2, b3, b4);
+					gpu.vRam.memory[currentPosG++] = b1;
+					gpu.vRam.memory[currentPosG++] = b2;
+					gpu.vRam.memory[currentPosG++] = b3;
+					gpu.vRam.memory[currentPosG++] = b4;
 					i += 2;
 					line++;
 					continue;
@@ -1503,7 +1530,7 @@ namespace Assembly {
 					cpu.ram.Clear();
 					break;
 				}
-			}else if(instruction.compare(0, 5, "moveP") == 0) {
+			}else if(instruction.compare(0, 5, "moveP") == 0 && instruction.length() == 6) {
 				if(isRegister(code, i)) {
 					std::string regA = code[i + 1];
 					std::string paramA = code[i + 2];

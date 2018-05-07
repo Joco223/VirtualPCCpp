@@ -71,6 +71,11 @@ register but is set to the current cpu tick every tick
 
 --------------------------------------------------------------------------------------
 
+Screen update timer (clock) is stored in 15th registed and acces by regFrame, can be used as
+any other register but is set to the current cpu tick every tick
+
+--------------------------------------------------------------------------------------
+
 Instruction set:
 --For >move< instructions, first argument is origin data location and second
 argument is target data location

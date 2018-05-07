@@ -43,6 +43,9 @@ moveO.s - Move 8 bits of data from a register to an adress in memory with an
 offset or move 8 bits of data from an adress in memory with an offset to a
 register (moveO.s x offset regA)
 
+--For >moveP.< instructions, same argument rules apply as for >move<
+
+moveP.s - Load/write from/to memory from a pointer
 
 --For the following instructions you put the register you want to perform on
 as the argument

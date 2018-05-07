@@ -258,6 +258,7 @@ int main(int argc, char* argv[]) {
 		auto end2 = std::chrono::steady_clock::now();
 		std::chrono::duration<double, std::milli> diff2 = end2-start2;
 		if((int)diff2.count() % 16 == 0){
+			pc1.cpu.currentFrame++;
 			gpu1.updateCharacters();
 			gpu1.updateScreen();;
 		}

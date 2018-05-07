@@ -49,6 +49,7 @@ public:
 	bool interrupted;
 	bool interruptExecution;
 	unsigned int currentTime;
+	unsigned int currentFrame;
 	GPU& gpu;
 	bool halt;
 

@@ -15,7 +15,7 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 	onlineMode(false)
 {
 
-	registers.resize(14);
+	registers.resize(15);
 	interRegisters.resize(12);
 	modemRegisters.resize(9);
 	sockets.resize(255);
@@ -183,15 +183,13 @@ void CPU::execute(TCPsocket clientSocket) {
 			file.open("HDD.txt");
 
 			for (int i = 0; i < numSectors; i++) {
-				std::string tmp;
 				for (int j = 0; j < sectorSize; j++) {
-					tmp.append(std::to_string((int)hdd.memory[i * sectorSize + j]));
-					tmp.append(" ");
+					file << (std::to_string((int)hdd.memory[i * sectorSize + j]));
+					file << " ";
 				}
-				file << tmp;
 				file << '\n';
 
-				int percent = (int)(((float)(i + 1) / (float)numSectors) * 100) / 5;
+				int percent = (int)(((float)(i + 1) / (float)(sectorSize * numSectors)) * 100) / 5;
 
 				if(prevP < percent) {std::cout << '|';}
 				prevP = percent;
@@ -734,6 +732,7 @@ void CPU::tick(TCPsocket* clientSocket) {
 	if (halt == false) {
 		currentTime++;
 		registers[13] = currentTime;
+		registers[14] = currentFrame;
 		registerOP = ram.memory[programCounter];
 		execute(*clientSocket);
 		interrupt();

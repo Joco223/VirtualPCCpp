@@ -22,8 +22,8 @@ void GPUCore::tick() {
 int GPUCore::checkArgument(int source, int size) {
 	if ((unsigned int)source <= vRam.memory.size()) {
 		if(size == 1) { return vRam.memory[source] & 0xFF; }
-		if(size == 2) { return vRam.memory[source + 1] <<  8 | (vRam.memory[source] & 0xFF); }
-		if(size == 3) { return vRam.memory[source + 3] << 24 | (vRam.memory[source + 2] << 16) | (vRam.memory[source + 1] << 8) | (vRam.memory[source] & 0xFF); }
+		if(size == 2) { return vRam.memory[source + 1] <<  8 | vRam.memory[source] & 0xFF; }
+		if(size == 3) { return vRam.memory[source + 3] << 24 | vRam.memory[source + 2] << 16 | vRam.memory[source + 1] << 8 | vRam.memory[source] & 0xFF; }
 	}else{
 		return registers[source - (vRam.memory.size() + 1)];
 	}
@@ -260,6 +260,37 @@ void GPUCore::execute(int registerOP) {
 			byte regB = getBits(argument, 1);
 			registers[regA] = registers[regA] % registers[regB];
 			programCounter += 2;
+		break; }
+
+		case 0x1A: { //Load from vRam with a pointer
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int memPos = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			registers[regA] = checkArgument(checkArgument(memPos, 3), sizeA);
+			programCounter += 6;
+		break; };
+
+		case 0x1B: { //Write to vRam from a pointer
+			byte argument = progMem.memory[programCounter + 1];
+			byte regA = getBits(argument, 0);
+			byte sizeA = getBits(argument, 1);
+			int pointer = progMem.memory[programCounter + 5] << 24 | progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int position = progMem.memory[pointer + 2] << 16 | progMem.memory[pointer + 1] << 8 | progMem.memory[pointer];
+
+			if(sizeA >= 1 && sizeA <= 3) {
+				vRam.memory[position] = registers[regA] & 0xFF;
+				if(sizeA >= 2) {
+					vRam.memory[position + 1] = (byte)(registers[regA] >> 8);
+				}
+				if(sizeA == 3) {
+					vRam.memory[position + 2] = (byte)(registers[regA] >> 16);
+					vRam.memory[position + 3] = (byte)(registers[regA] >> 24);
+				}
+			}else{
+				std::cout << "Invalid data type size at instruction 0x1B at memory position: 0x" << std::hex << programCounter << '\n';
+			}
+			programCounter += 6;
 		break; }
 	}
 }

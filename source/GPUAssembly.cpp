@@ -312,6 +312,10 @@ namespace GPUAssembly {
 				i += 3;
 				currentPos += 3;
 				line++;
+			}else if(instruction.compare(0, 6, "moveP.") == 0 && instruction.length() == 7) {
+				currentPos += 6;
+				i += 2;
+				line++;
 			}else{
 				if (instruction.back() == ':') {
 					std::string tmp = instruction;
@@ -877,6 +881,132 @@ namespace GPUAssembly {
 
 				i += 3;
 				line++;
+			}else if(instruction.compare(0, 6, "moveP.") == 0 && instruction.length() == 7) {
+				if(instruction[6] == 's'){
+					if(isRegister(code, i)) {
+						gpu.progMem.memory[currentPos++] = 0x1B;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (1 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b1, b2, b3, b4;
+						convertByte4(arg2, b1, b2, b3, b4);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+						gpu.progMem.memory[currentPos++] = b4;
+
+						i += 2;
+						line++;
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x1A;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (1 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+						currentPos++;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[6] == 'd') {
+					if(isRegister(code, i)) {
+						gpu.progMem.memory[currentPos++] = 0x1B;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x2 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b1, b2, b3, b4;
+						convertByte4(arg2, b1, b2, b3, b4);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+						gpu.progMem.memory[currentPos++] = b4;
+
+						i += 2;
+						line++;
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x1A;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x2 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+						currentPos++;
+
+						i += 2;
+						line++;
+					}
+				}else if(instruction[6] == 'l') {
+					if(isRegister(code, i)) {
+						gpu.progMem.memory[currentPos++] = 0x1B;
+
+						byte arg = indexRegister(code, i, 1);
+						arg |= (0x3 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 2], gpu, variables, 0);
+
+						byte b1, b2, b3, b4;
+						convertByte4(arg2, b1, b2, b3, b4);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+						gpu.progMem.memory[currentPos++] = b4;
+
+						i += 2;
+						line++;
+					}else{
+						gpu.progMem.memory[currentPos++] = 0x1A;
+
+						byte arg = indexRegister(code, i, 2);
+						arg |= (0x3 << 4);
+
+						gpu.progMem.memory[currentPos++] = arg;
+
+						int arg2 = checkArgType(code[i + 1], gpu, variables, 0);
+
+						byte b1, b2, b3;
+						convertByte3(arg2, b1, b2, b3);
+						gpu.progMem.memory[currentPos++] = b1;
+						gpu.progMem.memory[currentPos++] = b2;
+						gpu.progMem.memory[currentPos++] = b3;
+						currentPos++;
+
+						i += 2;
+						line++;
+					}
+				}else{
+					std::cout << "Uknwown data type at instruction >moveP< at line " << line << '\n';
+					gpu.progMem.Clear();
+					break;
+				}
 			}else{
 				if (instruction.back() == ':') {
 					line++;

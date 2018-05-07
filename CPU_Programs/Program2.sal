@@ -1,19 +1,8 @@
 data.
-s8 zero 0
-s8 p1 104
-s8 p2 115
-s8 p3 72
 
 interrupt.s
 interrupt.e
 
 program.start
-
-toggle.socket zero
-move.s p1 regA
-move.s p2 regB
-move.s p3 regC
-load.address regA regB regC
-send
 
 stop
