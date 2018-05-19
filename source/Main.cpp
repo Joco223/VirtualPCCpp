@@ -15,6 +15,8 @@
 #include <unordered_map>
 #include <chrono>
 #include <SDL_net.h>
+#include <sstream>
+#include <fstream>
 
 #include "NSSDL.h"
 #include "SDLWindow.h"
@@ -169,7 +171,7 @@ int main(int argc, char* argv[]) {
 
 	std::vector<Assembly::variable> tmp2;
 
-	Assembly::readFile("CPU_Programs/Program2.sal", code);
+	/*Assembly::readFile("CPU_Programs/Program2.sal", code);
 
 	Assembly::Compile(code, cpu1, gpu1, tmp2, addMem);
 
@@ -186,11 +188,40 @@ int main(int argc, char* argv[]) {
 		tmp.push_back(tempo);
 	};
 
-	GPUAssembly::Compile(gpu_code, gpu1, tmp);
+	GPUAssembly::Compile(gpu_code, gpu1, tmp);*/
 
 	gpu1.loadFont();
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
+
+	std::string name;
+	std::cout << "Name of the program you want to run: ";
+	std::cin >> name;
+
+	std::string line;
+	std::ifstream myfile(name);
+	int pos = 0;
+
+	if (myfile.is_open()){
+		while (getline (myfile, line)) {
+			if (!(line[0] == '/' && line[1] == '/')) {
+				if (line != "") {
+					std::string buf;
+					std::stringstream ss(line);
+
+					while (ss >> buf) {
+						if(pos == 0){
+							pc1.cpu.programCounter = std::stoi(buf);
+							pos++;
+						}else{
+							pc1.cpu.ram.memory[(pos-1)] = std::stoi(buf);
+							pos++;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	bool shift = false;
 	bool interCheck = false;

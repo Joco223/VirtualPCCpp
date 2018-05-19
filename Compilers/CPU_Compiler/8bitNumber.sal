@@ -1,0 +1,12 @@
+data.
+s8 x 100
+
+interrupt.s
+interrupt.e
+
+program.start
+
+move.s x regA
+cot regA
+
+stop

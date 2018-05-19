@@ -1,0 +1,9 @@
+Currently changing the way programs are compiled.
+Now you have to run CPU_Compiler.exe (Compilers/CPU_Compiler) in command line with two arguments,
+first is the input .sal file and the second is output name (CPU_Compiler.exe 8bitNumber.sal Test)
+Then, you take the newly created Test.cbc, take it to directory where vPC.exe is, and then when you
+run the vPC, it will ask you for the .cbc file, enter it and it is done, it will run the program.
+Current missing features:
+-No GPU Compiler
+-No interrupts
+-No GPU variables
