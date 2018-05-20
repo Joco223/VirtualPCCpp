@@ -2,11 +2,14 @@ data.
 s8 x 100
 
 interrupt.s
+cot regA
 interrupt.e
 
 program.start
 
 move.s x regA
-cot regA
+start:
+
+jmp.u start
 
 stop

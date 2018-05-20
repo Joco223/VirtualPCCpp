@@ -213,8 +213,17 @@ int main(int argc, char* argv[]) {
 						if(pos == 0){
 							pc1.cpu.programCounter = std::stoi(buf);
 							pos++;
+						}else if(pos == 1) {
+							pc1.cpu.interPos = std::stoi(buf);
+							pos++;
+						}else if(pos == 2) {
+							pc1.cpu.interFinishPos = std::stoi(buf);
+							pos++;
+						}else if(pos == 3) {
+							pc1.cpu.interTartgetPos = std::stoi(buf);
+							pos++;
 						}else{
-							pc1.cpu.ram.memory[(pos-1)] = std::stoi(buf);
+							pc1.cpu.ram.memory[(pos - 4)] = std::stoi(buf);
 							pos++;
 						}
 					}

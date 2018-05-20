@@ -178,7 +178,7 @@ int indexInterRegister(std::vector<std::string>& code, int i, int k){
 	if(code[i + k] == "interRegL") {return 11;}
 }
 
-void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::vector<byte>& GPUcompiled, int& startPos) {
+void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::vector<byte>& GPUcompiled, int& startPos, int& interPos, int& interFinishPos, int& interTartgetPos) {
 	std::vector<char> charactersA = {'0',  '1', '2', '3', '4',  '5',  '6', '7', '8', '9',
 									 '!', '\"', '#', '$', '%',  '&', '\'', '(', ')', '*',
 									 '+',  '-', ',', '.', '/', '\\',  ':', ';', '<', '>',
@@ -613,9 +613,9 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 	interM = false;
 	scopeDepth = 0;
 	startPos = 0;
-	int interPos = 0;
-	int interFinishPos = 0;
-	int interTartgetPos = 0;
+	interPos = 0;
+	interFinishPos = 0;
+	interTartgetPos = 0;
 
 	for (unsigned int i = 0; i < code.size(); i++) {
 
@@ -2463,7 +2463,10 @@ int main(int argc, char* argv[]) {
 	std::vector<byte> compiledC;
 	std::vector<byte> GPUcompiled;
 	int startPos = 0;
-	Compile(code, compiledC, GPUcompiled, startPos);
+	int interPos = 0;
+	int interFinishPos = 0;
+	int interTartgetPos = 0;
+	Compile(code, compiledC, GPUcompiled, startPos, interPos, interFinishPos, interTartgetPos);
 	std::ofstream compiledOut;
 	std::ofstream GPUcompiledOut;
 	std::string name(argv[2]);
@@ -2471,8 +2474,10 @@ int main(int argc, char* argv[]) {
 	std::string name2 = name + "_GPU.gdc";
 	compiledOut.open(name1);
 	GPUcompiledOut.open(name2);
-	std::cout << compiledC.size() << '\n';
 	compiledOut << startPos << '\n';
+	compiledOut << interPos << '\n';
+	compiledOut << interFinishPos << '\n';
+	compiledOut << interTartgetPos << '\n';
 	for(int i = 0; i < compiledC.size(); i++) { compiledOut << (unsigned int)compiledC[i]; compiledOut << '\n'; }
 	for(int i = 0; i < GPUcompiled.size(); i++) { GPUcompiledOut << (unsigned int)GPUcompiled[i]; GPUcompiledOut << '\n'; }
 	compiledOut.close();
