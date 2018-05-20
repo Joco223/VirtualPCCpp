@@ -230,7 +230,7 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 		if (instruction == "interrupt.e") {
 			interM = false;
-			currentPos += 4;
+			currentPos += 5;
 			continue;
 		}
 
@@ -312,15 +312,15 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 		if(instruction.compare(0, 5, "move.") == 0 && instruction.length() == 6) {
 			if(instruction[5] == 's'){
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else if(instruction[5] == 'd') {
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else if(instruction[5] == 'l') {
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else{
@@ -341,15 +341,15 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 			line++;
 		}else if(instruction.compare(0, 6, "moveO.") == 0) {
 			if(instruction[6] == 's'){
-				currentPos += 8;
+				currentPos += 10;
 				i += 3;
 				line++;
 			}else if(instruction[6] == 'd') {
-				currentPos += 8;
+				currentPos += 10;
 				i += 3;
 				line++;
 			}else if(instruction[6] == 'l') {
-				currentPos += 8;
+				currentPos += 10;
 				i += 3;
 				line++;
 			}else{
@@ -416,15 +416,15 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 			}
 		}else if (instruction.compare(0, 4, "jmp.") == 0) {
 			if(instruction[4] == 'z') {
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else if(instruction[4] == 'o') {
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else if(instruction[4] == 'u') {
-				currentPos += 5;
+				currentPos += 6;
 				i++;
 				line++;
 			}else{
@@ -474,29 +474,23 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 			currentPos += 2;
 			i += 2;
 			line++;
-		}else if (instruction == "wait") {
-			currentPos += 2;
-			i++;
-			line++;
 		}else if(instruction == "stop") {
 			hasStop = true;
+			currentPos++;
 			line++;
 		}else if(instruction == "sb.setID") {
-			currentPos += 6;
+			currentPos += 7;
 			i += 3;
 			line++;
 		}else if(instruction == "sb.setCB") {
-			currentPos += 6;
+			currentPos += 7;
 			i += 3;
 			line++;
 		}else if(instruction == "sb.setCF") {
-			currentPos += 6;
+			currentPos += 7;
 			i += 3;
 			line++;
-		}else if(instruction == "sb.update") {
-			currentPos++;
-			line++;
-		}else if(!instruction.compare(0, 2, "fn")) {
+		}/*else if(!instruction.compare(0, 2, "fn")) {
 			int r = 0;
 
 			while (code[i + 2 + r].back() == ',') {
@@ -514,17 +508,17 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 		}else if(!instruction.compare(0, 3, "ret")) {
 			currentPos += 2;;
 			i++;
-		}else if(instruction.compare(0, 7, "move.g.") == 0) {
+		}*/else if(instruction.compare(0, 7, "move.g.") == 0) {
 			if(instruction[7] == 's'){
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else if(instruction[7] == 'd') {
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else if(instruction[7] == 'l') {
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else{
@@ -533,15 +527,15 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 			}
 		}else if(instruction.compare(0, 7, "move.h.") == 0) {
 			if(instruction[7] == 's'){
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else if(instruction[7] == 'd') {
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else if(instruction[7] == 'l') {
-				currentPos += 5;
+				currentPos += 6;
 				i += 2;
 				line++;
 			}else{
@@ -550,15 +544,15 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 			}
 		}else if(instruction.compare(0, 8, "moveO.g.") == 0) {
 			if(instruction[8] == 's'){
-				currentPos += 8;
+				currentPos += 10;
 				i += 3;
 				line++;
 			}else if(instruction[8] == 'd') {
-				currentPos += 8;
+				currentPos += 10;
 				i += 3;
 				line++;
 			}else if(instruction[8] == 'l') {
-				currentPos += 8;
+				currentPos += 10;
 				i += 3;
 				line++;
 			}else{
@@ -574,11 +568,11 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 			i += 3;
 			line++;
 		}else if(instruction == "load.socket"){
-			currentPos += 4;
+			currentPos += 5;
 			i++;
 			line++;
 		}else if(instruction == "toggle.socket"){
-			currentPos += 4;
+			currentPos += 5;
 			i++;
 			line++;
 		}else if(instruction == "send"){
@@ -641,6 +635,7 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 			interM = false;
 			compiled[currentPos++] = 0x22;
 			interTartgetPos = currentPos;
+			compiled[currentPos++] = 0;
 			compiled[currentPos++] = 0;
 			compiled[currentPos++] = 0;
 			compiled[currentPos++] = 0;
@@ -873,11 +868,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -891,11 +887,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -911,11 +908,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -929,11 +927,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -949,11 +948,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -967,11 +967,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -1011,12 +1012,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
-					currentPos++;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -1051,12 +1052,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
-					currentPos++;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -1091,12 +1092,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
-					currentPos++;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -1136,12 +1137,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
-					currentPos++;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -1176,12 +1177,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
-					currentPos++;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -1216,12 +1217,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
-					currentPos++;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -1367,19 +1368,21 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					int arg3 = checkArgType(code[i + 3], variables, scopeDepth);
 
-					byte b4, b5, b6;
-					convertByte3(arg3, b4, b5, b6);
-					compiled[currentPos++] = b4;
+					byte b5, b6, b7, b8;
+					convertByte4(arg3, b5, b6, b7, b8);
 					compiled[currentPos++] = b5;
 					compiled[currentPos++] = b6;
+					compiled[currentPos++] = b7;
+					compiled[currentPos++] = b8;
 
 					i += 3;
 					line++;
@@ -1393,19 +1396,21 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					int arg3 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b4, b5, b6;
-					convertByte3(arg3, b4, b5, b6);
-					compiled[currentPos++] = b4;
+					byte b5, b6, b7, b8;
+					convertByte4(arg3, b5, b6, b7, b8);
 					compiled[currentPos++] = b5;
 					compiled[currentPos++] = b6;
+					compiled[currentPos++] = b7;
+					compiled[currentPos++] = b8;
 
 					i += 3;
 					line++;
@@ -1421,19 +1426,21 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					int arg3 = checkArgType(code[i + 3], variables, scopeDepth);
 
-					byte b4, b5, b6;
-					convertByte3(arg3, b4, b5, b6);
-					compiled[currentPos++] = b4;
+					byte b5, b6, b7, b8;
+					convertByte4(arg3, b5, b6, b7, b8);
 					compiled[currentPos++] = b5;
 					compiled[currentPos++] = b6;
+					compiled[currentPos++] = b7;
+					compiled[currentPos++] = b8;
 
 					i += 3;
 					line++;
@@ -1447,19 +1454,21 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					int arg3 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b4, b5, b6;
-					convertByte3(arg3, b4, b5, b6);
-					compiled[currentPos++] = b4;
+					byte b5, b6, b7, b8;
+					convertByte4(arg3, b5, b6, b7, b8);
 					compiled[currentPos++] = b5;
 					compiled[currentPos++] = b6;
+					compiled[currentPos++] = b7;
+					compiled[currentPos++] = b8;
 
 					i += 3;
 					line++;
@@ -1475,19 +1484,21 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					int arg3 = checkArgType(code[i + 3], variables, scopeDepth);
 
-					byte b4, b5, b6;
-					convertByte3(arg3, b4, b5, b6);
-					compiled[currentPos++] = b4;
+					byte b5, b6, b7, b8;
+					convertByte4(arg3, b5, b6, b7, b8);
 					compiled[currentPos++] = b5;
 					compiled[currentPos++] = b6;
+					compiled[currentPos++] = b7;
+					compiled[currentPos++] = b8;
 
 					i += 3;
 					line++;
@@ -1501,19 +1512,21 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = checkArgType(code[i + 1], variables, scopeDepth);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					int arg3 = checkArgType(code[i + 2], variables, scopeDepth);
 
-					byte b4, b5, b6;
-					convertByte3(arg3, b4, b5, b6);
-					compiled[currentPos++] = b4;
+					byte b5, b6, b7, b8;
+					convertByte4(arg3, b5, b6, b7, b8);
 					compiled[currentPos++] = b5;
 					compiled[currentPos++] = b6;
+					compiled[currentPos++] = b7;
+					compiled[currentPos++] = b8;
 
 					i += 3;
 					line++;
@@ -1693,11 +1706,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 				int arg2 = checkJmpPos(code[i + 2], jumpPositions, scopeDepth);
 
-				byte b1, b2, b3;
-				convertByte3(arg2, b1, b2, b3);
+				byte b1, b2, b3, b4;
+				convertByte4(arg2, b1, b2, b3, b4);
 				compiled[currentPos++] = b1;
 				compiled[currentPos++] = b2;
 				compiled[currentPos++] = b3;
+				compiled[currentPos++] = b4;
 
 				i += 2;
 				line++;
@@ -1711,11 +1725,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 				int arg2 = checkJmpPos(code[i + 2], jumpPositions, scopeDepth);
 
-				byte b1, b2, b3;
-				convertByte3(arg2, b1, b2, b3);
+				byte b1, b2, b3, b4;
+				convertByte4(arg2, b1, b2, b3, b4);
 				compiled[currentPos++] = b1;
 				compiled[currentPos++] = b2;
 				compiled[currentPos++] = b3;
+				compiled[currentPos++] = b4;
 
 				i += 2;
 				line++;
@@ -1729,11 +1744,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 				int arg2 = checkJmpPos(code[i + 1], jumpPositions, scopeDepth);
 
-				byte b1, b2, b3;
-				convertByte3(arg2, b1, b2, b3);
+				byte b1, b2, b3, b4;
+				convertByte4(arg2, b1, b2, b3, b4);
 				compiled[currentPos++] = b1;
 				compiled[currentPos++] = b2;
 				compiled[currentPos++] = b3;
+				compiled[currentPos++] = b4;
 
 				i++;
 				line++;
@@ -1841,11 +1857,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 			int arg2 = checkArgType(code[i + 3], variables, scopeDepth);
 
-			byte b1, b2, b3;
-			convertByte3(arg2, b1, b2, b3);
+			byte b1, b2, b3, b4;
+			convertByte4(arg2, b1, b2, b3, b4);
 			compiled[currentPos++] = b1;
 			compiled[currentPos++] = b2;
 			compiled[currentPos++] = b3;
+			compiled[currentPos++] = b4;
 
 			i += 3;
 			line++;
@@ -1861,11 +1878,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 			int arg2 = checkArgType(code[i + 3], variables, scopeDepth);
 
-			byte b1, b2, b3;
-			convertByte3(arg2, b1, b2, b3);
+			byte b1, b2, b3, b4;
+			convertByte4(arg2, b1, b2, b3, b4);
 			compiled[currentPos++] = b1;
 			compiled[currentPos++] = b2;
 			compiled[currentPos++] = b3;
+			compiled[currentPos++] = b4;
 
 			i += 3;
 			line++;
@@ -1881,16 +1899,14 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 			int arg2 = checkArgType(code[i + 3], variables, scopeDepth);
 
-			byte b1, b2, b3;
-			convertByte3(arg2, b1, b2, b3);
+			byte b1, b2, b3, b4;
+			convertByte4(arg2, b1, b2, b3, b4);
 			compiled[currentPos++] = b1;
 			compiled[currentPos++] = b2;
 			compiled[currentPos++] = b3;
+			compiled[currentPos++] = b4;
 
 			i += 3;
-			line++;
-		}else if(instruction == "sb.update") {
-			compiled[currentPos++] = 0x26;
 			line++;
 		}/*else if(!instruction.compare(0, 2, "fn")) {
 			std::string name = code[i + 1];
@@ -2265,11 +2281,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = std::stoi(code[i + 2]);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -2283,11 +2300,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = std::stoi(code[i + 1]);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -2303,11 +2321,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = std::stoi(code[i + 2]);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -2321,11 +2340,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = std::stoi(code[i + 1]);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -2341,11 +2361,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = std::stoi(code[i + 2]);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -2359,11 +2380,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 					int arg2 = std::stoi(code[i + 1]);
 
-					byte b1, b2, b3;
-					convertByte3(arg2, b1, b2, b3);
+					byte b1, b2, b3, b4;
+					convertByte4(arg2, b1, b2, b3, b4);
 					compiled[currentPos++] = b1;
 					compiled[currentPos++] = b2;
 					compiled[currentPos++] = b3;
+					compiled[currentPos++] = b4;
 
 					i += 2;
 					line++;
@@ -2403,11 +2425,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 			int arg = checkArgType(code[i + 1], variables, scopeDepth);
 
-			byte b1, b2, b3;
-			convertByte3(arg, b1, b2, b3);
+			byte b1, b2, b3, b4;
+			convertByte4(arg, b1, b2, b3, b4);
 			compiled[currentPos++] = b1;
 			compiled[currentPos++] = b2;
 			compiled[currentPos++] = b3;
+			compiled[currentPos++] = b4;
 
 			i++;
 			line++;
@@ -2416,11 +2439,12 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 
 			int arg = checkArgType(code[i + 1], variables, scopeDepth);
 
-			byte b1, b2, b3;
-			convertByte3(arg, b1, b2, b3);
+			byte b1, b2, b3, b4;
+			convertByte4(arg, b1, b2, b3, b4);
 			compiled[currentPos++] = b1;
 			compiled[currentPos++] = b2;
 			compiled[currentPos++] = b3;
+			compiled[currentPos++] = b4;
 
 			i++;
 			line++;
@@ -2451,9 +2475,6 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 		compiled[variables[ffbID].position + 3] = b4;
 	}
 
-
-	//finalCP = GadditionalMemory;
-
 	std::cout << "CPU program size is: " << currentPos << " bytes." << '\n';
 }
 
@@ -2470,6 +2491,8 @@ int main(int argc, char* argv[]) {
 	std::ofstream compiledOut;
 	std::ofstream GPUcompiledOut;
 	std::string name(argv[2]);
+	//.cbc - Compiler Byte Code
+	//.gdc - GPU Data Code
 	std::string name1 = name + ".cbc";
 	std::string name2 = name + "_GPU.gdc";
 	compiledOut.open(name1);

@@ -5,5 +5,9 @@ Then, you take the newly created Test.cbc, take it to directory where vPC.exe is
 run the vPC, it will ask you for the .cbc file, enter it and it is done, it will run the program.
 Current missing features:
 -No GPU Compiler
--No interrupts
 -No GPU variables
+
+Because of instruction set changes, recompile your programs! Now Ram is 64MB, HDD 256MB and vRam 128MB. Have fun :)
+
+No HDD.txt file included in the commit because it is too big currently, run CrateHDD.cbc program to create one
+I will make the file size soon™

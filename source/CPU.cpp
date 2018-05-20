@@ -72,7 +72,6 @@ int CPU::checkArgument(int source, int size) {
 		if(size == 1) { return ram.memory[source] & 0xFF; }
 		if(size == 2) { return ram.memory[source + 1] << 8 | ram.memory[source] & 0xFF ; }
 		if(size == 3) { return (ram.memory[source + 3] << 24) | (ram.memory[source + 2] << 16) | (ram.memory[source + 1] << 8) | (ram.memory[source] & 0xFF); }
-		if(size == 4) { return (ram.memory[source + 2] << 16) | (ram.memory[source + 1] << 8) | (ram.memory[source] & 0xFF); }
 	}else {
 		return registers[source - (ram.memory.size() + 1)];
 	}
@@ -114,17 +113,17 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 
 			registers[regA] = checkArgument(memPos, sizeA);
-			programCounter += 5;
+			programCounter += 6;
 		break; };
 
 		case 0x02: { //Write to memory in postion
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			if(sizeA >= 1 && sizeA <= 3) {
 				ram.memory[position] = registers[regA] & 0xFF;
 				if(sizeA >= 2) {
@@ -137,15 +136,15 @@ void CPU::execute(TCPsocket clientSocket) {
 			}else{
 				std::cout << "Invalid data type size at instruction 0x02 at memory position: 0x" << std::hex << programCounter << '\n';
 			}
-			programCounter += 5;
+			programCounter += 6;
 		break; }
 
 		case 0x03: { //Write to memory in postion with offset
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], sizeA);
+			int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int offset = checkArgument(ram.memory[programCounter + 9] << 24 | ram.memory[programCounter + 8] << 16 | ram.memory[programCounter + 7] << 8 | ram.memory[programCounter + 6], sizeA);
 			if(sizeA >= 1 && sizeA <= 4) {
 				ram.memory[position + (offset * sizeA)] = registers[regA] & 0xFF;
 				if(sizeA >= 2) {
@@ -158,17 +157,17 @@ void CPU::execute(TCPsocket clientSocket) {
 			}else{
 				std::cout << "Invalid data type size at instruction 0x03 at memory position: 0x" << std::hex << programCounter << '\n';
 			}
-			programCounter += 8;
+			programCounter += 10;
 		break; }
 
 		case 0x04: { //Load memory from a postion with offset
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], sizeA);
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int offset = checkArgument(ram.memory[programCounter + 9] << 24 | ram.memory[programCounter + 8] << 16 | ram.memory[programCounter + 7] << 8 | ram.memory[programCounter + 6], sizeA);
 			registers[regA] = checkArgument(memPos + (offset * sizeA), sizeA);
-			programCounter += 8;
+			programCounter += 10;
 		break; };
 
 		case 0x05: { //Shutdown the pc
@@ -298,13 +297,13 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte typeA = getBits(argument, 1);
-			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			switch(typeA) {
 				case 0x0: {
 					if(registers[regA] == 0){
 						programCounter = position;
 					}else{
-						programCounter += 5;
+						programCounter += 6;
 					}
 				break; }
 
@@ -312,7 +311,7 @@ void CPU::execute(TCPsocket clientSocket) {
 					if(registers[regA] == 1){
 						programCounter = position;
 					}else{
-						programCounter += 5;
+						programCounter += 6;
 					}
 				break; }
 
@@ -353,14 +352,14 @@ void CPU::execute(TCPsocket clientSocket) {
 		case 0x16: { //Change screen buffer elements
 			byte regA = getBits(ram.memory[programCounter + 1], 0);
 			byte regB = getBits(ram.memory[programCounter + 1], 1);
-			int memPos = ram.memory[programCounter + 5] << 16 | ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3];
+			int memPos = ram.memory[programCounter + 6] << 24 | ram.memory[programCounter + 5] << 16 | ram.memory[programCounter + 4] << 8 | ram.memory[programCounter + 3];
 			byte arg = checkArgument(memPos, 1);
 			byte mode = getBits(ram.memory[programCounter + 2], 0);
 			if(mode == 0) { gpu.setCharID(registers[regA], registers[regB], arg); };
 			if(mode == 1) { gpu.setCharCB(registers[regA], registers[regB], arg); };
 			if(mode == 2) { gpu.setCharCF(registers[regA], registers[regB], arg); };
 			gpu.update = true;
-			programCounter += 6;
+			programCounter += 7;
 			break; }
 
 		case 0x17: { //Set register to 0
@@ -430,16 +429,16 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			registers[regA] = checkArgumentG(memPos, sizeA);
-			programCounter += 5;
+			programCounter += 6;
 		break; }
 
 		case 0x1E: { //Write to vRam
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			if(sizeA >= 1 && sizeA <= 3) {
 				gpu.vRam.memory[position] = registers[regA] & 0xFF;
 				if(sizeA >= 2) {
@@ -452,15 +451,15 @@ void CPU::execute(TCPsocket clientSocket) {
 			}else{
 				std::cout << "Invalid data type size at instruction 0x1E at memory position: 0x" << std::hex << programCounter << '\n';
 			}
-			programCounter += 5;
+			programCounter += 6;
 		break; }
 
 		case 0x1F: { //Write to vRam with offset
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], sizeA);
+			int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int offset = checkArgument(ram.memory[programCounter + 9] << 24 | ram.memory[programCounter + 8] << 16 | ram.memory[programCounter + 7] << 8 | ram.memory[programCounter + 6], sizeA);
 			if(sizeA >= 1 && sizeA <= 4) {
 				gpu.vRam.memory[position + (offset * sizeA)] = registers[regA] & 0xFF;
 				if(sizeA >= 2) {
@@ -473,17 +472,17 @@ void CPU::execute(TCPsocket clientSocket) {
 			}else{
 				std::cout << "Invalid data type size at instruction 0x1F at memory position: 0x" << std::hex << programCounter << '\n';
 			}
-			programCounter += 8;
+			programCounter += 10;
 		break; }
 
 		case 0x20: { //Load from vRam with offset
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int offset = checkArgument(ram.memory[programCounter + 7] << 16 | ram.memory[programCounter + 6] << 8 | ram.memory[programCounter + 5], sizeA);
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int offset = checkArgument(ram.memory[programCounter + 9] << 24 | ram.memory[programCounter + 8] << 16 | ram.memory[programCounter + 7] << 8 | ram.memory[programCounter + 6], sizeA);
 			registers[regA] = checkArgumentG(memPos + (offset * sizeA), sizeA);
-			programCounter += 8;
+			programCounter += 10;
 		break; };
 
 		case 0x21: { //Load from interrupt register
@@ -496,7 +495,7 @@ void CPU::execute(TCPsocket clientSocket) {
 		break; };
 
 		case 0x22: { //Jump from interrupt
-			int position = ram.memory[programCounter + 3] << 16 | ram.memory[programCounter + 2] << 8 | ram.memory[programCounter + 1];
+			int position = ram.memory[programCounter + 4] << 24 | ram.memory[programCounter + 3] << 16 | ram.memory[programCounter + 2] << 8 | ram.memory[programCounter + 1];
 			programCounter = position;
 			interruptExecution = false;
 		break; }
@@ -505,16 +504,16 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			registers[regA] = checkArgumentH(memPos, sizeA);
-			programCounter += 5;
+			programCounter += 6;
 		break; }
 
 		case 0x24: { //Write to HDD
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int position = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			if(sizeA >= 1 && sizeA <= 3) {
 				hdd.memory[position] = registers[regA] & 0xFF;
 				if(sizeA >= 2) {
@@ -527,7 +526,7 @@ void CPU::execute(TCPsocket clientSocket) {
 			}else{
 				std::cout << "Invalid data type size at instruction 0x24 at memory position: 0x" << std::hex << programCounter << '\n';
 			}
-			programCounter += 5;
+			programCounter += 6;
 		break; }
 
 		case 0x25: { //Modulo
@@ -547,7 +546,7 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			registers[regA] = checkArgument(checkArgument(memPos, 3), sizeA);
 			programCounter += 6;
 		break; };
@@ -557,7 +556,7 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
 			int pointer = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int position = ram.memory[pointer + 2] << 16 | ram.memory[pointer + 1] << 8 | ram.memory[pointer];
+			int position = ram.memory[pointer + 3] << 24 | ram.memory[pointer + 2] << 16 | ram.memory[pointer + 1] << 8 | ram.memory[pointer];
 
 			if(sizeA >= 1 && sizeA <= 3) {
 				ram.memory[position] = registers[regA] & 0xFF;
@@ -578,7 +577,7 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			registers[regA] = checkArgumentH(checkArgument(memPos, 3), sizeA);
 			programCounter += 6;
 		break; };
@@ -588,7 +587,7 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
 			int pointer = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int position = ram.memory[pointer + 2] << 16 | ram.memory[pointer + 1] << 8 | ram.memory[pointer];
+			int position = ram.memory[pointer + 3] << 24 | ram.memory[pointer + 2] << 16 | ram.memory[pointer + 1] << 8 | ram.memory[pointer];
 
 			if(sizeA >= 1 && sizeA <= 3) {
 				hdd.memory[position] = registers[regA] & 0xFF;
@@ -609,7 +608,7 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			registers[regA] = checkArgumentG(checkArgument(memPos, 3), sizeA);
 			programCounter += 6;
 		break; };
@@ -619,7 +618,7 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
 			int pointer = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int position = ram.memory[pointer + 2] << 16 | ram.memory[pointer + 1] << 8 | ram.memory[pointer];
+			int position = ram.memory[pointer + 3] << 24 | ram.memory[pointer + 2] << 16 | ram.memory[pointer + 1] << 8 | ram.memory[pointer];
 
 			if(sizeA >= 1 && sizeA <= 3) {
 				gpu.vRam.memory[position] = registers[regA] & 0xFF;
@@ -670,24 +669,24 @@ void CPU::execute(TCPsocket clientSocket) {
 
 		case 0x2F: { //Toggle a socket
 			if(onlineMode){
-				int memPos = ram.memory[programCounter + 3] << 16 | ram.memory[programCounter + 2] << 8 | ram.memory[programCounter + 1];
+				int memPos = ram.memory[programCounter + 4] << 24 | ram.memory[programCounter + 3] << 16 | ram.memory[programCounter + 2] << 8 | ram.memory[programCounter + 1];
 
 				sockets[checkArgument(memPos, 1)] = !sockets[checkArgument(memPos, 1)];
 			}else{
 				std::cout << "Online mode is off. Please connect vPC to a vPC server to use this" << '\n';
 			}
-			programCounter += 4;
+			programCounter += 5;
 		break; }
 
 		case 0x30: { //Set socket for connection
 			if(onlineMode){
-				int memPos = ram.memory[programCounter + 3] << 16 | ram.memory[programCounter + 2] << 8 | ram.memory[programCounter + 1];
+				int memPos = ram.memory[programCounter + 4] << 24 | ram.memory[programCounter + 3] << 16 | ram.memory[programCounter + 2] << 8 | ram.memory[programCounter + 1];
 
 				modemRegisters[8] = checkArgument(memPos, 1);
 			}else{
 				std::cout << "Online mode is off. Please connect vPC to a vPC server to use this" << '\n';
 			}
-			programCounter += 4;
+			programCounter += 5;
 		break; }
 
 		case 0x31: { //Send a message
@@ -719,6 +718,7 @@ void CPU::interrupt(){
 		ram.memory[interTartgetPos] = b1;
 		ram.memory[interTartgetPos + 1] = b2;
 		ram.memory[interTartgetPos + 2] = b3;
+		ram.memory[interTartgetPos + 3] = b3;
 
 		programCounter = interPos;
 

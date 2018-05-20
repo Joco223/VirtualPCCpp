@@ -146,15 +146,14 @@ int main(int argc, char* argv[]) {
 
 	SDLWindow pc1W(window2, surface2, pixelSpace2, renderer2, texture2, pixels2);
 
-	Memory ram1(16769025);
-	Memory hdd1(4096 * 4096);
-	//Sector size ^     ^ number of sectors
+	Memory ram1(67108864); //64MB Ram
+	Memory hdd1(268435456); //256MB HDD
 
-	GPU gpu1(16769025, 32, 32, &pc1W, ram1);
+	GPU gpu1(134217728, 32, 32, &pc1W, ram1); //128MB vRam
 
 	NSSDL::initSDL(gpu1.screen, width, height);
 
-	CPU cpu1(4096, 4096, ram1, hdd1, gpu1);
+	CPU cpu1(16384, 16384, ram1, hdd1, gpu1);
 
 	cpu1.onlineMode = OM;
 	cpu1.vPCaddress = address;
