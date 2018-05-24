@@ -198,6 +198,8 @@ is the index of the socket (toggle.socket x) where x is 127 and socket 127 would
 
 send - Send the network package
 
+set - Directly aasign value to a register (set regA 543)
+
 stop - Shuts down the vPC and saves the HDD to a file. Stop is a must at the end of
 a program, else the vPC will work incorrectly (Assembler will warn you if you didn't
 put one)

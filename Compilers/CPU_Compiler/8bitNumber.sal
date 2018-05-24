@@ -1,9 +1,13 @@
 data.
-s8 x 100
 
 interrupt.s
 interrupt.e
 
 program.start
+
+set regA 124
+move.s regA 0x50
+move.s 0x50 regB
+cot regB
 
 stop

@@ -188,7 +188,7 @@ void CPU::execute(TCPsocket clientSocket) {
 				}
 				file << '\n';
 
-				int percent = (int)(((float)(i + 1) / (float)(sectorSize * numSectors)) * 100) / 5;
+				int percent = (int)(((float)(i + 1) / (float)(numSectors)) * 100) / 5;
 
 				if(prevP < percent) {std::cout << '|';}
 				prevP = percent;
@@ -702,6 +702,13 @@ void CPU::execute(TCPsocket clientSocket) {
 				std::cout << "Online mode is off. Please connect vPC to a vPC server to use this" << '\n';
 			}
 			programCounter++;
+		break; }
+
+		case 0x32: { //Set register to some value
+			unsigned int reg = ram.memory[programCounter + 1];
+			unsigned int value = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			registers[reg] = value;
+			programCounter += 6;
 		break; }
 	}
 }
