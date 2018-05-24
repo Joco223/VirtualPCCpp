@@ -1,6 +1,13 @@
 #define SDL_MAIN_HANDLED
 
-#include <SDL_net.h>
+#ifdef __linux
+#include <SDL2/SDL_net.h>
+#endif
+
+#ifdef _WIN32
+    #include <SDL_net.h>
+#endif
+
 #include <iostream>
 #include <vector>
 #include <string>

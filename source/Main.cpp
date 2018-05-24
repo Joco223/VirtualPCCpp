@@ -8,16 +8,23 @@
 #include <SDL2/SDL.h>
 #endif
 
+#ifdef __linux
+#include <SDL2/SDL_net.h>
+#endif
+
+#ifdef _WIN32
+    #include <SDL_net.h>
+#endif
+
 #include <vector>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <unordered_map>
 #include <chrono>
-#include <SDL_net.h>
+
 #include <sstream>
 #include <fstream>
-
 #include "NSSDL.h"
 #include "SDLWindow.h"
 #include "Memory.h"
@@ -106,6 +113,8 @@ int main(int argc, char* argv[]) {
 
 		std::cout << "Successfully connected. vPC address is: " << (int)address[0] << "." << (int)address[1] << "." << (int)address[2] << '\n';
 		OM = true;
+	}else{
+		std::cout << "Online mode disabled." << '\n';
 	}
 
  	/*int input;
@@ -194,7 +203,7 @@ int main(int argc, char* argv[]) {
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
 
 	std::string name;
-	std::cout << "Name of the program you want to run: ";
+	std::cout << "Name of the .cbc file you want to run: ";
 	std::cin >> name;
 
 	std::string line;
@@ -291,7 +300,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 		}
-		
+
 		auto end2 = std::chrono::steady_clock::now();
 		std::chrono::duration<double, std::milli> diff2 = end2-start2;
 		if((int)diff2.count() % 16 == 0){
