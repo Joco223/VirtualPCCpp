@@ -45,17 +45,17 @@ void GPUCore::execute(int registerOP) {
 			byte argument = progMem.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int memPos = progMem.memory[programCounter + 5] << 24 | progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
 			registers[regA] = checkArgument(memPos, sizeA);
-			programCounter += 5;
+			programCounter += 6;
 		break; };
 
 		case 0x03: {
 			byte argument = progMem.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int position = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
-			int offset = checkArgument(progMem.memory[programCounter + 7] << 16 | progMem.memory[programCounter + 6] << 8 | progMem.memory[programCounter + 5], sizeA);
+			int position =progMem.memory[programCounter + 5] << 24 | progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int offset = checkArgument(progMem.memory[programCounter + 9] << 24 | progMem.memory[programCounter + 8] << 16 | progMem.memory[programCounter + 7] << 8 | progMem.memory[programCounter + 6], sizeA);
 			if(sizeA >= 1 && sizeA <= 4) {
 				vRam.memory[position + (offset * sizeA)] = registers[regA] & 0xFF;
 				if(sizeA >= 2) {
@@ -66,17 +66,17 @@ void GPUCore::execute(int registerOP) {
 					vRam.memory[position + (offset * sizeA) + 3] = (byte)(registers[regA] >> 24);
 				}
 			}
-			programCounter += 8;
+			programCounter += 10;
 		break; }
 
 		case 0x04: {
 			byte argument = progMem.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
-			int offset = checkArgument(progMem.memory[programCounter + 7] << 16 | progMem.memory[programCounter + 6] << 8 | progMem.memory[programCounter + 5], sizeA);
+			int memPos = progMem.memory[programCounter + 5] << 24 | progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int offset = checkArgument(progMem.memory[programCounter + 9] << 24 | progMem.memory[programCounter + 8] << 16 | progMem.memory[programCounter + 7] << 8 | progMem.memory[programCounter + 6], sizeA);
 			registers[regA] = checkArgument(memPos + (offset * sizeA), sizeA);
-			programCounter += 8;
+			programCounter += 10;
 		break; };
 
 		case 0x06: { //Addition
@@ -171,13 +171,13 @@ void GPUCore::execute(int registerOP) {
 			byte argument = progMem.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte typeA = getBits(argument, 1);
-			int position = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int position = progMem.memory[programCounter + 5] << 24 | progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
 			switch(typeA) {
 				case 0x0: {
 					if(registers[regA] == 0){
 						programCounter = position;
 					}else{
-						programCounter += 5;
+						programCounter += 6;
 					}
 				break; }
 
@@ -185,7 +185,7 @@ void GPUCore::execute(int registerOP) {
 					if(registers[regA] == 1){
 						programCounter = position;
 					}else{
-						programCounter += 5;
+						programCounter += 6;
 					}
 				break; }
 
@@ -266,16 +266,16 @@ void GPUCore::execute(int registerOP) {
 			byte argument = progMem.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int memPos = progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int memPos = progMem.memory[programCounter + 5] << 24 | progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
 			registers[regA] = checkArgument(checkArgument(memPos, 3), sizeA);
-			programCounter += 6;
+			programCounter += 8;
 		break; };
 
 		case 0x1B: { //Write to vRam from a pointer
 			byte argument = progMem.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte sizeA = getBits(argument, 1);
-			int pointer = progMem.memory[programCounter + 5] << 24 | progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
+			int pointer =progMem.memory[programCounter + 6] << 24 | progMem.memory[programCounter + 5] << 24 | progMem.memory[programCounter + 4] << 16 | progMem.memory[programCounter + 3] << 8 | progMem.memory[programCounter + 2];
 			int position = progMem.memory[pointer + 2] << 16 | progMem.memory[pointer + 1] << 8 | progMem.memory[pointer];
 
 			if(sizeA >= 1 && sizeA <= 3) {
@@ -290,7 +290,7 @@ void GPUCore::execute(int registerOP) {
 			}else{
 				std::cout << "Invalid data type size at instruction 0x1B at memory position: 0x" << std::hex << programCounter << '\n';
 			}
-			programCounter += 6;
+			programCounter += 7;
 		break; }
 	}
 }

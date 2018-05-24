@@ -238,10 +238,6 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 				currentPos++;
 				i += 2;
 				continue;
-			}else if (instruction == "s8.g") {
-				currentPosG++;
-				i += 2;
-				continue;
 			}else if (instruction == "d16") {
 				currentPos += 2;
 				i += 2;
@@ -670,16 +666,9 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 				i += 2;
 				line++;
 				continue;
-			}else if (instruction == "pt") {
+			}else if (instruction == "l32") {
 				std::string arg1 = code[i + 1];
 				std::string arg2 = code[i + 2];
-
-				variable temp;
-				temp.name = arg1;
-				temp.position = currentPos;
-				temp.sDepth = scopeDepth;
-				temp.size = 3;
-				variables.push_back(temp);
 
 				unsigned int Arg2;
 
@@ -691,21 +680,6 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 					Arg2 = std::stoi(arg2);
 				}
 
-
-				byte b1, b2, b3, b4;
-				convertByte4(Arg2, b1, b2, b3, b4);
-				compiled[currentPos++] = b1;
-				compiled[currentPos++] = b2;
-				compiled[currentPos++] = b3;
-				compiled[currentPos++] = b4;
-				i += 2;
-				line++;
-				continue;
-			}else if (instruction == "l32") {
-				std::string arg1 = code[i + 1];
-				std::string arg2 = code[i + 2];
-
-				unsigned int Arg2 = std::stoi(arg2);
 				variable temp;
 				temp.name = arg1;
 				temp.position = currentPos;
@@ -753,33 +727,7 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, std::v
 				i += (2 + endInc);
 				line++;
 				continue;
-			}/*else if(instruction == "d16.a") {
-				std::string arg1 = code[i + 1];
-				std::string arg2 = code[i + 2];
-				vars.push_back(arg1);
-				int Arg2 = std::stoi(arg2);
-				varValues.push_back(currentPos);
-				bool ended = false;
-				int endInc = Arg2;
-				for (int j = 0; j < Arg2; j++) {
-					int element = 0;
-					if (ended == false) {
-						if(code[i + 3 + j] == "#"){
-							ended = true;
-							endInc = j + 1;
-						}else{
-							element = checkArgType(code[i + 3 + j], cpu, vars, varValues);
-						}
-					}
-					byte b1, b2;
-					convertByte2(element, b1, b2);
-					cpu.ram.memory[currentPos++] = b1;
-					cpu.ram.memory[currentPos++] = b2;
-				}
-				i += (2 + endInc);
-				line++;
-				continue;
-			}*/
+			}
 		}
 
 		if(instruction.compare(0, 5, "move.") == 0 && instruction.length() == 6) {

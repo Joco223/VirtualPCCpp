@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
 
 	TCPsocket clientSocket;
 
-	if(IP != ""){
+	if(IP != "0.0.0.0"){
 		int success = SDLNet_ResolveHost(&serverIP, IP.c_str(), port);
 
 		clientSocket = SDLNet_TCP_Open(&serverIP);
@@ -149,9 +149,9 @@ int main(int argc, char* argv[]) {
 	Memory ram1(67108864); //64MB Ram
 	Memory hdd1(268435456); //256MB HDD
 
-	GPU gpu1(134217728, 32, 32, &pc1W, ram1); //128MB vRam
+	NSSDL::initSDL(&pc1W, width, height);
 
-	NSSDL::initSDL(gpu1.screen, width, height);
+	GPU gpu1(134217728, 32, 32, &pc1W, ram1); //128MB vRam
 
 	CPU cpu1(16384, 16384, ram1, hdd1, gpu1);
 
@@ -290,10 +290,8 @@ int main(int argc, char* argv[]) {
 					pc1.cpu.interrupted = true;
 				}
 			}
-		}else{
-			std::cout << "Online mode is off. Please connect vPC to a vPC server to use this" << '\n';
 		}
-
+		
 		auto end2 = std::chrono::steady_clock::now();
 		std::chrono::duration<double, std::milli> diff2 = end2-start2;
 		if((int)diff2.count() % 16 == 0){

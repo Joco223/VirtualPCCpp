@@ -5,9 +5,13 @@ Then, you take the newly created Test.cbc, take it to directory where vPC.exe is
 run the vPC, it will ask you for the .cbc file, enter it and it is done, it will run the program.
 Current missing features:
 -No GPU Compiler
--No GPU variables
 
 Because of instruction set changes, recompile your programs! Now Ram is 64MB, HDD 256MB and vRam 128MB. Have fun :)
 
 No HDD.txt file included in the commit because it is too big currently, run CrateHDD.cbc program to create one
-I will make the file size soon™
+I will make the file size smaller soon™
+
+To load data into HDD without opening the text file, in HDD_Loader, run HDD_Loader.exe with arguments, which .txt file
+is the HDD, which one is the data you want to put into the HDD and and memory position where the data will begin from
+(HDD_Loader.exe HDD.txt Test.exe 0). Wait a bit for it to say "Finished..." before closing the program, the HDD.txt will
+appear before that but wait until it is fully completed.

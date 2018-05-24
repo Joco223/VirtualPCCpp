@@ -1,13 +1,11 @@
 data.
+l32 data 300
+l32 curData 300
 
 interrupt.s
 interrupt.e
 
 program.start
 
-set regA 124
-move.s regA 0x50
-move.s 0x50 regB
-cot regB
 
 stop
