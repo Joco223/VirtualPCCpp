@@ -26,15 +26,18 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 	interruptExecution = false;
 
 	std::ifstream HDD;
-	HDD.open("HDD.txt");
-	std::string line;
+	HDD.open("HDD.data", std::ios::binary);
 
-	int j = 0;
-	int i = 0;
+	std::cout << "Loading HDD..." << '\n';
 
-	std::cout << "Loading HDD...  ";
+	char* buffer = new char[268435456];
+	HDD.read(buffer, 268435456);
 
-	std::string buf;
+	for(int i = 0; i < 268435456; i++) {
+		hdd.memory[i] = buffer[i];
+	}
+
+	/*std::string buf;
 	std::stringstream ss(line);
 	int prevP = 0;
 
@@ -60,11 +63,12 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 
 	}
 
-	std::cout << ']' << '\r';
+	std::cout << ']' << '\r';*/
 
 	std::cout << '\n' << "Finished loading the HDD..." << '\n' << '\n';
 
 	HDD.close();
+	delete buffer;
 }
 
 int CPU::checkArgument(int source, int size) {
@@ -173,15 +177,16 @@ void CPU::execute(TCPsocket clientSocket) {
 		case 0x05: { //Shutdown the pc
 			std::ofstream file;;
 
-			file.open("HDD.txt", std::ios::out | std::ios::trunc);
+			file.open("HDD.data", std::ios::out | std::ios::trunc);
 			file.close();
 
-			std::cout << '\n' << "Saving the HDD...  [";
-			int prevP = 0;
+			std::cout << '\n' << "Saving the HDD..." << '\n';
 
-			file.open("HDD.txt");
+			file.open("HDD.data", std::ios::binary);
 
-			for (int i = 0; i < numSectors; i++) {
+			file.write((char*)hdd.memory.data(), 268435456);
+
+			/*for (int i = 0; i < numSectors; i++) {
 				for (int j = 0; j < sectorSize; j++) {
 					file << (std::to_string((int)hdd.memory[i * sectorSize + j]));
 					file << " ";
@@ -192,12 +197,9 @@ void CPU::execute(TCPsocket clientSocket) {
 
 				if(prevP < percent) {std::cout << '|';}
 				prevP = percent;
-			}
+			}*/
 
 			file.close();
-
-			std::cout << ']';
-			std::cout << '\n';
 
 			std::cout << "Finished saving the HDD..." << '\n';
 
