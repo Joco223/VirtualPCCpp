@@ -306,7 +306,7 @@ int main(int argc, char* argv[]) {
 		if((int)diff2.count() % 16 == 0){
 			pc1.cpu.currentFrame++;
 			gpu1.updateCharacters();
-			gpu1.updateScreen();;
+			gpu1.updateScreen();
 		}
 
 		if(input == true){

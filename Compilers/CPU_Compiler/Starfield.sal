@@ -1,0 +1,21 @@
+data.
+s8 x 10
+s8 y 10
+s8 color 255
+s8 fill 14
+
+interrupt.s
+interrupt.e
+
+program.start
+
+move.s x regA
+move.s y regB
+sb.setID regA regB fill
+sb.setCF regA regB color
+
+start:
+
+jmp.u start
+
+stop
