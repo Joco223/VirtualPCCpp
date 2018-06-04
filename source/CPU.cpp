@@ -37,34 +37,6 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 		hdd.memory[i] = buffer[i];
 	}
 
-	/*std::string buf;
-	std::stringstream ss(line);
-	int prevP = 0;
-
-	std::cout << '[';
-
-	if (HDD.is_open()){
-		while (getline (HDD,line)) {
-
-			ss.str(line);
-
-			while (ss >> buf) {
-				hdd.memory[j * sectorSize + i] = std::stoi(buf);
-				i++;
-			}
-			i = 0;
-			j++;
-			int percent = (int)(((float)(j * sectorSize + i) / (float)(sectorSize * numSectors)) * 100) / 5;
-
-			if(prevP < percent) {std::cout << '|';}
-			prevP = percent;
-
-		}
-
-	}
-
-	std::cout << ']' << '\r';*/
-
 	std::cout << '\n' << "Finished loading the HDD..." << '\n' << '\n';
 
 	HDD.close();
@@ -185,19 +157,6 @@ void CPU::execute(TCPsocket clientSocket) {
 			file.open("HDD.data", std::ios::binary);
 
 			file.write((char*)hdd.memory.data(), 268435456);
-
-			/*for (int i = 0; i < numSectors; i++) {
-				for (int j = 0; j < sectorSize; j++) {
-					file << (std::to_string((int)hdd.memory[i * sectorSize + j]));
-					file << " ";
-				}
-				file << '\n';
-
-				int percent = (int)(((float)(i + 1) / (float)(numSectors)) * 100) / 5;
-
-				if(prevP < percent) {std::cout << '|';}
-				prevP = percent;
-			}*/
 
 			file.close();
 

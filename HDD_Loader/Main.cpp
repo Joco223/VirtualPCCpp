@@ -11,37 +11,25 @@ int main(int argc, char** argv) {
     std::vector<byte> data;
 
     std::ifstream HDD;
-    HDD.open(argv[1]);
-	std::string line;
+    HDD.open(argv[1], std::ios::binary);
 	std::cout << "Loading HDD..." << '\n';
-	std::string buf;
-	std::stringstream ss(line);
 
-    hdd.resize(16384 * 16384);
+    hdd.resize(268435456);
 
-    int j = 0;
-	int i = 0;
+    char* buffer = new char[268435456];
+	HDD.read(buffer, 268435456);
 
-	if (HDD.is_open()){
-		while (getline (HDD,line)) {
-			ss.str(line);
-			while (ss >> buf) {
-				hdd[j * 16384 + i] = std::stoi(buf);
-                i++;
-			}
-            i = 0;
-            j++;
-		}
-
+	for(int i = 0; i < 268435456; i++) {
+		hdd[i] = buffer[i];
 	}
 
-    HDD.close();
+	std::cout << '\n' << "Finished loading the HDD..." << '\n' << '\n';
 
-    std::cout << "Finished loading HDD..." << '\n';
+	HDD.close();
+	delete buffer;
 
     std::ifstream DATA;
     DATA.open(argv[2]);
-    std::string line2;
     std::cout << "Loading data..." << '\n';
     std::string buf2;
     std::stringstream ss2(line2);
@@ -75,15 +63,9 @@ int main(int argc, char** argv) {
 
     std::cout << '\n' << "Saving the HDD...";
 
-    file.open(argv[1]);
+    file.open(argv[1], std::ios::binary);
 
-    for (int i = 0; i < 16384; i++) {
-        for (int j = 0; j < 16384; j++) {
-            file << (std::to_string((int)hdd[i * 16384 + j]));
-            file << " ";
-        }
-        file << '\n';
-    }
+    file.write((char*)hdd.data(), 268435456);
 
     file.close();
 
