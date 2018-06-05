@@ -10,13 +10,13 @@ typedef unsigned char byte;
 struct variable {
 	std::string name;
 	int size;
-	int position;
+	unsigned int position;
 	int sDepth;
 };
 
 struct jump_pos {
 	std::string name;
-	int position;
+	unsigned int position;
 	int sDepth;
 };
 
@@ -63,6 +63,8 @@ int checkJmpPos(std::string argument, std::vector<jump_pos>& jmps, int currentDe
 
 	if (varExists == true) {
 		tmp = jmps[id].position;
+	}else{
+		tmp = std::stoi(argument);
 	}
 
 	return tmp;
@@ -1208,7 +1210,7 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, int& s
 
 				compiled[currentPos++] = arg;
 
-				unsigned int arg2 = checkJmpPos(code[i + 2], jumpPositions, scopeDepth);
+				unsigned int arg2 = checkJmpPos(code[i + 2], jumpPositions, scopeDepth) - currentPos + 2;
 
 				byte b1, b2, b3, b4;
 				convertByte4(arg2, b1, b2, b3, b4);
@@ -1227,7 +1229,7 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, int& s
 
 				compiled[currentPos++] = arg;
 
-				unsigned int arg2 = checkJmpPos(code[i + 2], jumpPositions, scopeDepth);
+				unsigned int arg2 = checkJmpPos(code[i + 2], jumpPositions, scopeDepth) - currentPos + 2;
 
 				byte b1, b2, b3, b4;
 				convertByte4(arg2, b1, b2, b3, b4);
@@ -1246,7 +1248,7 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, int& s
 
 				compiled[currentPos++] = arg;
 
-				unsigned int arg2 = checkJmpPos(code[i + 1], jumpPositions, scopeDepth);
+				unsigned int arg2 = checkJmpPos(code[i + 1], jumpPositions, scopeDepth) - currentPos + 2;
 
 				byte b1, b2, b3, b4;
 				convertByte4(arg2, b1, b2, b3, b4);
@@ -1493,7 +1495,7 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, int& s
 			compiled[currentPos++] = reg;
 
 			i++;
-			line++
+			line++;
 		}else{
 			if (instruction.back() == ':') {
 				line++;

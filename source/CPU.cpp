@@ -258,11 +258,11 @@ void CPU::execute(TCPsocket clientSocket) {
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
 			byte typeA = getBits(argument, 1);
-			int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			unsigned int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			switch(typeA) {
 				case 0x0: {
 					if(registers[regA] == 0){
-						programCounter = position;
+						programCounter += static_cast<signed int>(position);
 					}else{
 						programCounter += 6;
 					}
@@ -270,14 +270,14 @@ void CPU::execute(TCPsocket clientSocket) {
 
 				case 0x1: {
 					if(registers[regA] == 1){
-						programCounter = position;
+						programCounter += static_cast<signed int>(position);
 					}else{
 						programCounter += 6;
 					}
 				break; }
 
 				case 0x2: {
-					programCounter = position;
+					programCounter += static_cast<signed int>(position);
 				break; }
 			}
 

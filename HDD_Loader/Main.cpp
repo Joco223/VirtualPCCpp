@@ -30,18 +30,15 @@ int main(int argc, char** argv) {
 
     std::ifstream DATA;
     DATA.open(argv[2]);
+    std::string line2;
     std::cout << "Loading data..." << '\n';
     std::string buf2;
     std::stringstream ss2(line2);
 
     if (DATA.is_open()){
-		while (getline (DATA,line2)) {
-			ss2.str(line2);
-			while (ss2 >> buf2) {
-				data.push_back(std::stoi(buf2));
-			}
-		}
-
+        while (getline (DATA,line2)) {
+            data.push_back(std::stoi(line2));
+	    }
 	}
 
     DATA.close();
@@ -61,7 +58,7 @@ int main(int argc, char** argv) {
     file.open(argv[1], std::ios::out | std::ios::trunc);
     file.close();
 
-    std::cout << '\n' << "Saving the HDD...";
+    std::cout << '\n' << "Saving the HDD..." << '\n';
 
     file.open(argv[1], std::ios::binary);
 
