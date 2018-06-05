@@ -2,18 +2,12 @@
 
 #ifdef _WIN32
 #include <SDL.h>
+#include <SDL_net.h>
 #endif
 
 #ifdef __linux
 #include <SDL2/SDL.h>
-#endif
-
-#ifdef __linux
 #include <SDL2/SDL_net.h>
-#endif
-
-#ifdef _WIN32
-    #include <SDL_net.h>
 #endif
 
 #include <vector>

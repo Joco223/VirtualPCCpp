@@ -8,9 +8,10 @@ Because of instruction set changes, recompile your programs! Now Ram is 64MB, HD
 
 To load data into HDD without opening the text file, in HDD_Loader, run HDD_Loader.exe with arguments, which .txt file
 is the HDD, which one is the data you want to put into the HDD and and memory position where the data will begin from
-(HDD_Loader.exe HDD.txt Test.exe 0). Wait a bit for it to say "Finished..." before closing the program, the HDD.txt will
+(HDD_Loader.exe HDD.data Test.txt 0). Wait a bit for it to say "Finished..." before closing the program, the HDD.txt will
 appear before that but wait until it is fully completed.
 
 To run GPU programs, you first need to compile them with GPU Compiler, then you need to trasnfer them to the HDD with
 HDD_Loader then you need to copy over the data from HDD to vRam inside the vPC with a program and then use >setPC< instruction
-to set the GPU program counter to the beggining of the GPU program and then as normal sue gpu.str to create tasks
+to set the GPU program counter to the beggining of the GPU program and then as normal sue gpu.str to create tasks. GPU Compiler
+is used the same way as CPU Compiler
