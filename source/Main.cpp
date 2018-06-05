@@ -22,18 +22,15 @@
 #include <thread>
 #include <unordered_map>
 #include <chrono>
-
 #include <sstream>
 #include <fstream>
+
 #include "NSSDL.h"
 #include "SDLWindow.h"
 #include "Memory.h"
 #include "CPU.h"
 #include "PC.h"
 #include "GPU.h"
-#include "Assembly.h"
-#include "GPUAssembly.h"
-#include "Compiler.h"
 
 int scale = 1;
 int width = (640 * scale);
@@ -167,37 +164,6 @@ int main(int argc, char* argv[]) {
 	cpu1.onlineMode = OM;
 	cpu1.vPCaddress = address;
 
-	std::vector<std::string> code;
-	std::vector<std::string> gpu_code;
-
-	std::vector<int> vValues;
-	std::vector<std::string> vNames;
-	int addMem = 0;
-
-	std::vector<std::string> cCode;
-	std::vector<std::string> tokens;
-
-	std::vector<Assembly::variable> tmp2;
-
-	/*Assembly::readFile("CPU_Programs/Program2.sal", code);
-
-	Assembly::Compile(code, cpu1, gpu1, tmp2, addMem);
-
-	GPUAssembly::readFile("GPU_Programs/Program.sgal", gpu_code);
-
-	std::vector<GPUAssembly::variable> tmp;
-
-	for(int i = 0; i < tmp2.size(); i++) {
-		GPUAssembly::variable tempo;
-		tempo.name = tmp2[i].name;
-		tempo.size = tmp2[i].size;
-		tempo.value = tmp2[i].position;
-		tempo.sDepth = 0;
-		tmp.push_back(tempo);
-	};
-
-	GPUAssembly::Compile(gpu_code, gpu1, tmp);*/
-
 	gpu1.loadFont();
 
 	PC pc1(cpu1, ram1, hdd1, gpu1.screen);
@@ -267,8 +233,6 @@ int main(int argc, char* argv[]) {
 
 	auto start2 = std::chrono::steady_clock::now();
 	int numOfLoops2 = 0;
-
-	//for(int i = 0; i < 8; i++) {pBuffer[i] = 0;}
 
 	while (quit == false) {
 		while (SDL_PollEvent(&event)) {

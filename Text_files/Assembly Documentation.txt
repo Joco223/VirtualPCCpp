@@ -12,24 +12,20 @@ is recieved as 8 bytes of data, first 3 is address of sender and 5 bytes of data
 Character RGB values are limited to 8bit pallete (256 colors)
 Character space is limited X: 0 - 106, Y: 0 - 60 (Resolution now is 640x480)
 Comments can be written with //, that line is ignored
-Main memory size is 16,000,000 bytes
-vRam size is 16,000,000 bytes
-HDD size is 16,728,100 bytes
+Ram memory size is 64MB
+vRam size is 128MB
+HDD size is 256MB
 
 --------------------------------------------------------------------------------------
 
 You have data sections so you can do:
 data.s         //Needed if you want variables
 s8 x 5         //Variable x with type of 1 byte and stored value 5
-s8.a y 3 1 2 3 //Array y with type of 2 byte elements (3 of them) with values 1 2 and 3
 
 Data types:
 s8 - 8 bit number
 d16 - 16 bit number
 l32 - 32 bit number
-s8.a - array of 8 bit numbers
-s8.g - 8 bit number on vRam
-pt - 24bit pointer
 (more coming soon...)
 
 --------------------------------------------------------------------------------------
@@ -89,17 +85,6 @@ move.d - Move 16 bits of data from a register to an adress in memory or move
 move.l - Move 32 bits of data from a register to an adress in memory or move
 32 bits of data from an adress in memory to a register (move.l x regA)
 
---For >moveO< instructions, same argument rules apply as for >move<
-instructions but offset argument goes after the memory adress argument, not
-the register argument
-
-moveO.s - Move 8 bits of data from a register to an adress in memory with an
-offset or move 8 bits of data from an adress in memory with an offset to a
-register (moveO.s x offset regA)
-
-move.g.s - Same as move.s, just accessing the vRam and not Ram (no .d and .l yet)
-moveO.g.s - Same as moveO.s, just accessing the vRam and not Ram (no .d and .l yet)
-
 --For >move.h< instructions, same argument rules apply as for >move<
 
 move.h.s - Same as move.s, just accessing the HDD and not Ram
@@ -107,6 +92,14 @@ move.h.s - Same as move.s, just accessing the HDD and not Ram
 --For >moveP.< instructions, same argument rules apply as for >move<
 
 moveP.s - Load/write from/to memory from a pointer
+
+--For >moveP.h.< instructions, same argument rules apply as for >moveP.<
+
+moveP.h.s - Load/write from/to memory from a pointer from HDD
+
+--For >moveP.g.< instructions, same argument rules apply as for >move<
+
+moveP.g.s - Load/write from/to memory from a pointer from vRam
 
 --For the following instructions you put the register you want to perform on
 as the argument
@@ -199,6 +192,8 @@ is the index of the socket (toggle.socket x) where x is 127 and socket 127 would
 send - Send the network package
 
 set - Directly aasign value to a register (set regA 543)
+
+setPC - Set GPU program counter (setPC regA)
 
 stop - Shuts down the vPC and saves the HDD to a file. Stop is a must at the end of
 a program, else the vPC will work incorrectly (Assembler will warn you if you didn't

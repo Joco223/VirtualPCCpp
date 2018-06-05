@@ -37,7 +37,7 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 		hdd.memory[i] = buffer[i];
 	}
 
-	std::cout << '\n' << "Finished loading the HDD..." << '\n' << '\n';
+	std::cout << "Finished loading the HDD..." << '\n';
 
 	HDD.close();
 	delete buffer;
@@ -298,10 +298,10 @@ void CPU::execute(TCPsocket clientSocket) {
 			programCounter += 2;
 		break; }
 
-		case 0x14: {
+		/*case 0x14: {
 			gpu.startCores();
 			programCounter++;
-			break; }
+			break; }*/
 
 		case 0x15: { //Decrement register by 1
 			byte argument = ram.memory[programCounter + 1];
@@ -670,6 +670,11 @@ void CPU::execute(TCPsocket clientSocket) {
 			unsigned int value = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
 			registers[reg] = value;
 			programCounter += 6;
+		break; }
+
+		case 0x33: { //Set GPU targetProgramCounter
+			gpu.targetPC = registers[ram.memory[programCounter + 1]];
+			programCounter += 2;
 		break; }
 	}
 }

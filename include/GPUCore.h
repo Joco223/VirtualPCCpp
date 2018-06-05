@@ -10,7 +10,6 @@
 class GPUCore {
 public:
 	Memory& vRam;
-	Memory& progMem;
 	bool& screenUpdated;
 	int coresYS;
 	SDLWindow* screen;
@@ -21,7 +20,7 @@ public:
 	int idY;
 	bool halt;
 
-	GPUCore(Memory&, Memory&, SDLWindow*, bool&, int, int, int);
+	GPUCore(Memory&, SDLWindow*, bool&, int, int, int);
 	byte getBits(byte, byte);
 	int checkArgument(int, int);
 	void execute(int);

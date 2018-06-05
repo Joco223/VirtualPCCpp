@@ -12,7 +12,7 @@ GPU::GPU(int vRamSize, int coreCountX, int coureCountY, SDLWindow* screen_, Memo
 	update(false)
 {
 	for (int x = 0; x < (coreCountX * coureCountY); x++) {
-		cores.emplace_back(vRam, progMem, screen_, screenUpdated, coureCountY, x, 0);
+		cores.emplace_back(vRam, screen_, screenUpdated, coureCountY, x, 0);
 	}
 
 	for(int y = 0; y < 60; y++) {
@@ -106,19 +106,9 @@ void convertByte(int number, byte& b1, byte& b2, byte& b3) {
 	b3 = (byte)(number >> 16);
 }
 
-void GPU::startCores() {
-	for (int i = 0; i < cores.size(); i++) {
-		if (tasks.size() > 0) {
-			cores[i].programCounter = 0;
-			cores[i].idX = tasks[0].x;
-			cores[i].idY = tasks[0].y;
-			tasks.erase(tasks.begin());
-			cores[i].halt = false;
-		}else{
-			cores[i].idX = 0;
-			cores[i].idY = 0;
-		}
-	}
+void GPU::setPC(int PC) {
+	targetPC = PC;
+	for(int i = 0; i < cores.size(); i++) {cores[i].programCounter = PC;};
 }
 
 void GPU::tick() {
@@ -126,7 +116,7 @@ void GPU::tick() {
 		for (int i = 0; i < cores.size(); i++) {
 			if (cores[i].halt == true) {
 				if (currentTask < tasks.size()) {
-					cores[i].programCounter = 0;
+					cores[i].programCounter = targetPC;
 					cores[i].idX = tasks[currentTask].x;
 					cores[i].idY = tasks[currentTask].y;
 					cores[i].halt = false;

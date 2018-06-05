@@ -39,10 +39,7 @@ extern int scale;
 
 class GPU {
 public:
-	Memory commandBuffer;
-	Memory commandArgBuffer;
 	Memory vRam;
-	Memory progMem;
 	Memory& ram;
 	SDLWindow* screen;
 	int programCounter;
@@ -50,7 +47,6 @@ public:
 	std::vector<screenCharacter> screenCharacters;
 	std::vector<GPUCore> cores;
 	std::vector<screenPos> charactersNUpdate;
-	std::vector<screenPos> charactersNUpdate2;
 	SDL_Texture* font;
 	SDL_Texture* characterBuffer;
 	bool update;
@@ -59,6 +55,7 @@ public:
 	int currentTask;
 	bool screenUpdated;
 	int tasksX, tasksY;
+	int targetPC;
 
 	GPU(int, int, int, SDLWindow*, Memory&);
 	void setCharID(byte x, byte y, byte ID);
@@ -69,6 +66,6 @@ public:
 	void updateScreen();
 	void executeCommand();
 	void executeThread();
-	void startCores();
+	void setPC(int);
 	void tick();
 };

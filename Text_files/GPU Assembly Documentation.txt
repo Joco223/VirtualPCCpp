@@ -1,11 +1,7 @@
 General info:
-Character RGB values are limited to 8bit pallete (256 colors)
+Colors are full 255 RGB pallete
 Comments can be written with //, that line is ignored
-vRam size is 16,000,000 bytes
-
---------------------------------------------------------------------------------------
-
-All data is defined in the CPU program
+vRam size is 128 MB
 
 --------------------------------------------------------------------------------------
 
@@ -35,17 +31,13 @@ move.d - Move 16 bits of data from a register to an adress in memory or move
 move.l - Move 32 bits of data from a register to an adress in memory or move
 32 bits of data from an adress in memory to a register (move.l x regA)
 
---For >moveO< instructions, same argument rules apply as for >move<
-instructions but offset argument goes after the memory adress argument, not
-the register argument
+--For >moveP.< instructions first argument is pointer (which is stored in a register)
+while second argument is the target register (moveP.s.r regA regB), add .r or .w for
+reading and writing
 
-moveO.s - Move 8 bits of data from a register to an adress in memory with an
-offset or move 8 bits of data from an adress in memory with an offset to a
-register (moveO.s x offset regA)
+moveP.s.r - Read from memory from a pointer
 
---For >moveP.< instructions, same argument rules apply as for >move<
-
-moveP.s - Load/write from/to memory from a pointer
+moveP.s.w - Write to memory from a pointer
 
 --For the following instructions you put the register you want to perform on
 as the argument
@@ -114,7 +106,4 @@ g.ID - Get task ID (g.ID regA)
 displ - Set a color to a pixel on the screen, first parameter is x position,
 second is y positiond and third is color, only registers for arguments (displ regA regB regC)
 
-put one)
-
-Colors go from 0-255, a picture is in the folder same as vPC that shows all
-the color options
+set - Directly aasign value to a register (set regA 543)
