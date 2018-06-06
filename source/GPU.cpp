@@ -97,6 +97,7 @@ void GPU::updateCharacters() {
 
 void GPU::updateScreen() {
 	SDL_UpdateTexture(screen->texture, nullptr, screen->pixels, screen->pixelSpace->pitch);
+	SDL_RenderCopy(screen->renderer, screen->texture, nullptr, nullptr);
 	SDL_RenderPresent(screen->renderer);
 }
 
@@ -106,9 +107,8 @@ void convertByte(int number, byte& b1, byte& b2, byte& b3) {
 	b3 = (byte)(number >> 16);
 }
 
-void GPU::setPC(int PC) {
-	targetPC = PC;
-	for(int i = 0; i < cores.size(); i++) {cores[i].programCounter = PC;};
+void GPU::setPC() {
+	for(int i = 0; i < cores.size(); i++) {cores[i].programCounter = targetPC;};
 }
 
 void GPU::tick() {

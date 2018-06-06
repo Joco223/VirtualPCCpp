@@ -66,6 +66,6 @@ public:
 	void updateScreen();
 	void executeCommand();
 	void executeThread();
-	void setPC(int);
+	void setPC();
 	void tick();
 };

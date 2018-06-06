@@ -5,7 +5,15 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <cstring>
+
+#ifdef _WIN32
 #include <SDL_net.h>
+#endif
+
+#ifdef __linux
+#include <SDL2/SDL_net.h>
+#endif
 
 #include "Memory.h"
 #include "GPU.h"
@@ -29,6 +37,7 @@ public:
 	int registerOP;
 
 	std::vector<unsigned int> registers;
+	//std::vector<float> fRegisters;
 	std::vector<unsigned char> modemRegisters;
 	std::vector<unsigned int> interRegisters;
 	std::vector<bool> sockets;

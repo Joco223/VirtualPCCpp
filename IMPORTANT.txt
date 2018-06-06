@@ -15,3 +15,8 @@ To run GPU programs, you first need to compile them with GPU Compiler, then you 
 HDD_Loader then you need to copy over the data from HDD to vRam inside the vPC with a program and then use >setPC< instruction
 to set the GPU program counter to the beggining of the GPU program and then as normal sue gpu.str to create tasks. GPU Compiler
 is used the same way as CPU Compiler
+
+-----INFORMATION-----
+
+To use the example GPU program which is ran from HDD, use HDD Loader to copy over test.cgbc to HDD at memory location 0, then run
+program GC.cbc and magic will happen :)

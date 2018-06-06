@@ -16,6 +16,7 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 {
 
 	registers.resize(15);
+	//fRegisters.resize(12);
 	interRegisters.resize(12);
 	modemRegisters.resize(9);
 	sockets.resize(255);
@@ -115,36 +116,25 @@ void CPU::execute(TCPsocket clientSocket) {
 			programCounter += 6;
 		break; }
 
-		case 0x03: { //Write to memory in postion with offset
+		/*case 0x03: { //Read memory at position into a float registers
 			byte argument = ram.memory[programCounter + 1];
-			byte regA = getBits(argument, 0);
-			byte sizeA = getBits(argument, 1);
-			int position = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int offset = checkArgument(ram.memory[programCounter + 9] << 24 | ram.memory[programCounter + 8] << 16 | ram.memory[programCounter + 7] << 8 | ram.memory[programCounter + 6], sizeA);
-			if(sizeA >= 1 && sizeA <= 4) {
-				ram.memory[position + (offset * sizeA)] = registers[regA] & 0xFF;
-				if(sizeA >= 2) {
-					ram.memory[position + (offset * sizeA) + 1] = (byte)(registers[regA] >> 8);
-				}
-				if(sizeA == 4) {
-					ram.memory[position + (offset * sizeA) + 2] = (byte)(registers[regA] >> 16);
-					ram.memory[position + (offset * sizeA) + 3] = (byte)(registers[regA] >> 24);
-				}
-			}else{
-				std::cout << "Invalid data type size at instruction 0x03 at memory position: 0x" << std::hex << programCounter << '\n';
-			}
-			programCounter += 10;
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			std::memcpy(&fRegisters[argument]    , &ram.memory[memPos + 3], 1);
+			std::memcpy(&fRegisters[argument] + 1, &ram.memory[memPos + 2], 1);
+			std::memcpy(&fRegisters[argument] + 2, &ram.memory[memPos + 1], 1);
+			std::memcpy(&fRegisters[argument] + 3, &ram.memory[memPos    ], 1);
+			programCounter += 6;
 		break; }
 
-		case 0x04: { //Load memory from a postion with offset
+		case 0x04: { //Write to memory at position into a float registers
 			byte argument = ram.memory[programCounter + 1];
-			byte regA = getBits(argument, 0);
-			byte sizeA = getBits(argument, 1);
 			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int offset = checkArgument(ram.memory[programCounter + 9] << 24 | ram.memory[programCounter + 8] << 16 | ram.memory[programCounter + 7] << 8 | ram.memory[programCounter + 6], sizeA);
-			registers[regA] = checkArgument(memPos + (offset * sizeA), sizeA);
-			programCounter += 10;
-		break; };
+			std::memcpy(&fRegisters[argument]    , &ram.memory[memPos + 3], 1);
+			std::memcpy(&fRegisters[argument] + 1, &ram.memory[memPos + 2], 1);
+			std::memcpy(&fRegisters[argument] + 2, &ram.memory[memPos + 1], 1);
+			std::memcpy(&fRegisters[argument] + 3, &ram.memory[memPos    ], 1);
+			programCounter += 6;
+		break; }*/
 
 		case 0x05: { //Shutdown the pc
 			std::ofstream file;;
@@ -674,8 +664,38 @@ void CPU::execute(TCPsocket clientSocket) {
 
 		case 0x33: { //Set GPU targetProgramCounter
 			gpu.targetPC = registers[ram.memory[programCounter + 1]];
+			gpu.setPC();
 			programCounter += 2;
 		break; }
+
+		/*case 0x34: { //Read memory at pointer position into a float registers
+			byte argument = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int memPos2 = checkArgument(memPos, 3);
+			std::memcpy(&fRegisters[argument]    , &ram.memory[memPos2 + 3], 1);
+			std::memcpy(&fRegisters[argument] + 1, &ram.memory[memPos2 + 2], 1);
+			std::memcpy(&fRegisters[argument] + 2, &ram.memory[memPos2 + 1], 1);
+			std::memcpy(&fRegisters[argument] + 3, &ram.memory[memPos2    ], 1);
+			programCounter += 6;
+		break; }
+
+		case 0x35: { //Write to memory at pointer position into a float registers
+			byte argument = ram.memory[programCounter + 1];
+			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			int memPos2 = checkArgument(memPos, 3);
+			std::memcpy(&fRegisters[argument]    , &ram.memory[memPos2 + 3], 1);
+			std::memcpy(&fRegisters[argument] + 1, &ram.memory[memPos2 + 2], 1);
+			std::memcpy(&fRegisters[argument] + 2, &ram.memory[memPos2 + 1], 1);
+			std::memcpy(&fRegisters[argument] + 3, &ram.memory[memPos2    ], 1);
+			programCounter += 6;
+		break; }
+
+		case 0x36: { //Set float register to some value
+			unsigned int reg = ram.memory[programCounter + 1];
+			unsigned int value = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
+			fRegisters[reg] = value;
+			programCounter += 6;
+		break; }*/
 	}
 }
 

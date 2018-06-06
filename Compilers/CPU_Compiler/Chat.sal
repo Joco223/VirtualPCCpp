@@ -1,5 +1,4 @@
 data.
-s8 maxY 60
 
 interrupt.s
 interrupt.e
