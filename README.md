@@ -20,3 +20,6 @@ This is a simulation of a fully fledged PC. It includes the following:
 There are no stupid suggestions, feel free to message me and suggest what you think should be added. Have fun programming! :)
 
 Discord server invite for anyone who wants to suggest stuff, report bugs, show-off programs etc: https://discord.gg/bN8jy2X
+
+Some example programs here:
+https://imgur.com/a/jei5SAp
