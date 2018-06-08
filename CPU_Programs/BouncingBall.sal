@@ -1,0 +1,125 @@
+data.
+s8 speed 1
+s8 xDir 1
+s8 yDir 1
+s8 xPos 3
+s8 yPos 3
+s8 xMax 50
+s8 yMax 27
+s8 min 1
+s8 o 83
+s8 empty 95
+s8 prevX 0
+s8 prevY 0
+
+program.start
+
+start:
+
+move.s xPos regA
+move.s xMax regB
+cmp.u.be regA regB
+jmp.z regA check1
+
+move.s xDir regA
+dec regA
+move.s regA xDir
+
+check1:
+
+move.s xPos regA
+move.s min regB
+cmp.u.be regA regB
+jmp.o regA check2
+
+move.s xDir regA
+inc regA
+move.s regA xDir
+
+check2:
+
+
+
+move.s yPos regA
+move.s yMax regB
+cmp.u.be regA regB
+jmp.z regA check3
+
+move.s yDir regA
+dec regA
+move.s regA yDir
+
+check3:
+
+move.s yPos regA
+move.s min regB
+cmp.u.be regA regB
+jmp.o regA check4
+
+move.s yDir regA
+inc regA
+move.s regA yDir
+
+check4:
+
+
+
+move.s xDir regA
+move.s speed regB
+cmp.s.e regA regB
+jmp.z regA mov1
+
+move.s xPos regA
+move.s regA prevX
+inc regA
+move.s regA xPos
+
+mov1:
+
+move.s xDir regA
+clr regB
+cmp.s.e regA regB
+jmp.z regA mov2
+
+move.s xPos regA
+move.s regA prevX
+dec regA
+move.s regA xPos
+
+mov2:
+
+
+
+move.s yDir regA
+move.s speed regB
+cmp.s.e regA regB
+jmp.z regA mov3
+
+move.s yPos regA
+move.s regA prevY
+inc regA
+move.s regA yPos
+
+mov3:
+
+move.s yDir regA
+clr regB
+cmp.s.e regA regB
+jmp.z regA mov4
+
+move.s yPos regA
+move.s regA prevY
+dec regA
+move.s regA yPos
+
+mov4:
+
+move.s prevX regA
+move.s prevY regB
+sb.setID regA regB empty
+
+move.s xPos regA
+move.s yPos regB
+sb.setID regA regB o
+
+jmp.u start

@@ -1,0 +1,215 @@
+//Made by Joco223, load both RenderTriangle.sal and RenderTriangle.sgal
+data.
+d16.g x1 0
+d16.g x2 640
+d16.g x3 640
+d16.g y1 0
+d16.g y2 480
+d16.g y3 0
+d16.g maxX 0
+d16.g minX 0
+d16.g maxY 0
+d16.g minY 0
+d16.g w0 0
+d16.g w1 0
+d16.g w2 0
+d16.g p0 0
+d16.g p1 0
+d16.g p2 0
+d16.g p3 0
+d16.g p4 0
+d16.g p5 0
+s8.g color 255
+
+interrupt.s
+interrupt.e
+
+program.start
+
+//MaxX check
+
+move.g.d x1 regA
+move.g.d x2 regB
+cmp.u.b regA regB
+jmp.z regA cx1
+
+    move.g.d x1 regA
+    move.g.d x3 regB
+    cmp.u.b regA regB
+    jmp.z regA cx2
+
+    move.g.d x1 regA
+    move.g.d regA maxX
+
+    jmp.u eX1
+
+    cx2:
+
+    move.g.d x3 regA
+    move.g.d regA maxX
+
+    jmp.u eX1
+
+cx1:
+
+move.g.d x2 regA
+move.g.d x3 regB
+cmp.u.b regA regB
+jmp.z regA cx3
+
+    move.g.d x2 regA
+    move.g.d regA maxX
+
+    jmp.u eX1
+
+cx3:
+
+move.g.d x3 regA
+move.g.d regA maxX
+
+eX1:
+
+//MaxY check
+
+move.g.d y1 regA
+move.g.d y2 regB
+cmp.u.b regA regB
+jmp.z regA cy1
+
+    move.g.d y1 regA
+    move.g.d y3 regB
+    cmp.u.b regA regB
+    jmp.z regA cy2
+
+    move.g.d y1 regA
+    move.g.d regA maxY
+
+    jmp.u eY1
+
+    cy2:
+
+    move.g.d y3 regA
+    move.g.d regA maxY
+
+    jmp.u eY1
+
+cy1:
+
+move.g.d y2 regA
+move.g.d y3 regB
+cmp.u.b regA regB
+jmp.z regA cy3
+
+    move.g.d y2 regA
+    move.g.d regA maxY
+
+    jmp.u eY1
+
+cy3:
+
+move.g.d y3 regA
+move.g.d regA maxY
+
+eY1:
+
+//MinX check
+
+move.g.d x1 regA
+move.g.d x2 regB
+cmp.u.b regB regA
+jmp.z regB cx12
+
+    move.g.d x1 regA
+    move.g.d x3 regB
+    cmp.u.b regB regA
+    jmp.z regB cx22
+
+    move.g.d x1 regA
+    move.g.d regA minX
+
+    jmp.u eX12
+
+    cx22:
+
+    move.g.d x3 regA
+    move.g.d regA minX
+
+    jmp.u eX12
+
+cx12:
+
+move.g.d x2 regA
+move.g.d x3 regB
+cmp.u.b regB regA
+jmp.z regB cx32
+
+    move.g.d x2 regA
+    move.g.d regA minX
+
+    jmp.u eX12
+
+cx32:
+
+move.g.d x3 regA
+move.g.d regA minX
+
+eX12:
+
+//MinY check
+
+move.g.d y1 regA
+move.g.d y2 regB
+cmp.u.b regB regA
+jmp.z regB cy12
+
+    move.g.d y1 regA
+    move.g.d y3 regB
+    cmp.u.b regB regA
+    jmp.z regB cy22
+
+    move.g.d y1 regA
+    move.g.d regA minY
+
+    jmp.u eY12
+
+    cy22:
+
+    move.g.d y3 regA
+    move.g.d regA minY
+
+    jmp.u eY12
+
+cy12:
+
+move.g.d y2 regA
+move.g.d y3 regB
+cmp.u.b regB regA
+jmp.z regB cy32
+
+    move.g.d y2 regA
+    move.g.d regA minY
+
+    jmp.u eY12
+
+cy32:
+
+move.g.d y3 regA
+move.g.d regA minY
+
+eY12:
+
+move.g.d maxX regA
+move.g.d minX regB
+sub regA regB
+
+move.g.d maxY regC
+move.g.d minY regD
+sub regC regD
+
+gpu.str regA regC
+
+back:
+
+jmp.u back
+
+stop

@@ -1,0 +1,120 @@
+//Made by Joco223, load both RenderTriangle.sal and RenderTriangle.sgal
+//W0
+
+move.d minX regA
+g.IDX regL
+add regA regL
+
+move.d x1 regB
+sub regA regB
+
+move.d y2 regC
+move.d y1 regD
+sub regC regD
+
+mlt.u regA regC
+
+move.d minY regB
+g.IDY regL
+add regB regL
+
+move.d y1 regC
+sub regB regC
+
+move.d x2 regC
+move.d x1 regD
+sub regC regD
+
+mlt.u regB regC
+
+sub regA regB
+
+//W1
+
+move.d minX regB
+g.IDX regL
+add regB regL
+
+move.d x2 regC
+sub regB regC
+
+move.d y3 regD
+move.d y2 regE
+sub regD regE
+
+mlt.u regB regD
+
+move.d minY regC
+g.IDY regL
+add regC regL
+
+move.d y2 regD
+sub regC regD
+
+move.d x3 regD
+move.d x2 regE
+sub regD regE
+
+mlt.u regC regD
+
+sub regB regC
+
+//W2
+
+move.d minX regC
+g.IDX regL
+add regC regL
+
+move.d x3 regD
+sub regC regD
+
+move.d y1 regE
+move.d y3 regF
+sub regE regF
+
+mlt.u regC regE
+
+move.d minY regD
+g.IDY regL
+add regD regL
+
+move.d y3 regE
+sub regD regE
+
+move.d x1 regE
+move.d x3 regF
+sub regE regF
+
+mlt.u regD regE
+
+sub regC regD
+
+//Check
+
+clr regD
+cmp.s.be regA regD
+jmp.z regA end
+
+    cmp.s.be regB regD
+    jmp.z regB end2
+
+        cmp.s.be regC regD
+        jmp.z regC end3
+
+        move.s color regE
+
+        move.d minX regA
+        g.IDX regL
+        add regA regL
+
+        move.d minY regB
+        g.IDY regL
+        add regB regL
+
+        displ regA regB regE
+
+        end3:
+
+    end2:
+
+end:

@@ -1,0 +1,93 @@
+data.
+s8.a set 100 82 26 29 68 0 47 44 39 11 18 2 36 50 57 72 55 80 34 85 22 76 94 97 93 40 7 92 78 4 24 51 8 17 30 43 64 65 88 98 83 38 41 21 9 5 52 99 15 42 27 23 71 31 54 66 37 53 74 70 77 69 90 95 75 73 10 87 63 6 56 58 16 3 46 13 61 59 60 79 89 25 49 48 12 20 1 84 62 35 96 14 32 91 67 81 28 19 45 86 33
+s8 k 100
+s8 r 100
+s8 f 0
+s8 c 0
+s8 d 0
+s8 l 0
+s8 swap 0
+
+program.start
+
+start:
+
+move.s c regA
+move.s k regB
+cmp.u.b regB regA
+
+jmp.z regB print
+
+move.s k regA
+dec regA
+move.s regA f
+
+start2:
+
+move.s d regA
+move.s f regB
+cmp.u.b regB regA
+
+jmp.z regB part1
+
+move.s d regA
+inc regA
+move.s regA l
+
+moveO.s set d regA
+moveO.s set l regB
+cmp.u.b regA regB
+
+jmp.z regA part3
+
+moveO.s set d regA
+move.s regA swap
+
+moveO.s set l regA
+moveO.s regA set d
+
+move.s swap regA
+moveO.s regA set l
+
+part3:
+
+move.s d regA
+inc regA
+move.s regA d
+
+jmp.u start2
+
+part1:
+
+clr regA
+move.s regA d
+
+move.s c regA
+inc regA
+move.s regA c
+
+jmp.u start
+
+print:
+
+clr regA
+move.s regA c
+
+part4:
+
+move.s c regA
+move.s r regB
+cmp.u.b regB regA
+
+jmp.z regB end
+
+moveO.s set c regA
+cot regA
+
+move.s c regA
+inc regA
+move.s regA c
+
+jmp.u part4
+
+end:

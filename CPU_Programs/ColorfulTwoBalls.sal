@@ -1,0 +1,257 @@
+data.
+s8 speed 1
+s8 xDir 1
+s8 yDir 1
+s8 xPos 3
+s8 yPos 3
+s8 xDir2 0
+s8 yDir2 1
+s8 xPos2 13
+s8 yPos2 3
+s8 xMax 50
+s8 yMax 27
+s8 min 1
+s8 o 83
+s8 empty 95
+s8 prevX 0
+s8 prevY 0
+s8 prevX2 0
+s8 prevY2 0
+s8 zero 0
+s8 color1 0
+s8 color2 0
+
+program.start
+
+start:
+
+move.s xPos regA
+move.s xMax regB
+cmp.u.be regA regB
+jmp.z regA check1
+
+move.s xDir regA
+dec regA
+move.s regA xDir
+
+check1:
+
+move.s xPos regA
+move.s min regB
+cmp.u.be regA regB
+jmp.o regA check2
+
+move.s xDir regA
+inc regA
+move.s regA xDir
+
+check2:
+
+
+
+move.s yPos regA
+move.s yMax regB
+cmp.u.be regA regB
+jmp.z regA check3
+
+move.s yDir regA
+dec regA
+move.s regA yDir
+
+check3:
+
+move.s yPos regA
+move.s min regB
+cmp.u.be regA regB
+jmp.o regA check4
+
+move.s yDir regA
+inc regA
+move.s regA yDir
+
+check4:
+
+
+
+move.s xDir regA
+move.s speed regB
+cmp.s.e regA regB
+jmp.z regA mov1
+
+move.s xPos regA
+move.s regA prevX
+inc regA
+move.s regA xPos
+
+mov1:
+
+move.s xDir regA
+clr regB
+cmp.s.e regA regB
+jmp.z regA mov2
+
+move.s xPos regA
+move.s regA prevX
+dec regA
+move.s regA xPos
+
+mov2:
+
+
+
+move.s yDir regA
+move.s speed regB
+cmp.s.e regA regB
+jmp.z regA mov3
+
+move.s yPos regA
+move.s regA prevY
+inc regA
+move.s regA yPos
+
+mov3:
+
+move.s yDir regA
+clr regB
+cmp.s.e regA regB
+jmp.z regA mov4
+
+move.s yPos regA
+move.s regA prevY
+dec regA
+move.s regA yPos
+
+mov4:
+
+move.s prevX regA
+move.s prevY regB
+sb.setID regA regB empty
+sb.setCB regA regB zero
+
+move.s xPos regA
+move.s yPos regB
+add regA regB
+move.s regA color1
+move.s xPos regA
+move.s yPos regB
+sb.setCB regA regB color1
+sb.setID regA regB o
+
+
+
+
+
+move.s xPos2 regA
+move.s xMax regB
+cmp.u.be regA regB
+jmp.z regA check12
+
+move.s xDir2 regA
+dec regA
+move.s regA xDir2
+
+check12:
+
+move.s xPos2 regA
+move.s min regB
+cmp.u.be regA regB
+jmp.o regA check22
+
+move.s xDir2 regA
+inc regA
+move.s regA xDir2
+
+check22:
+
+
+
+move.s yPos2 regA
+move.s yMax regB
+cmp.u.be regA regB
+jmp.z regA check32
+
+move.s yDir2 regA
+dec regA
+move.s regA yDir2
+
+check32:
+
+move.s yPos2 regA
+move.s min regB
+cmp.u.be regA regB
+jmp.o regA check42
+
+move.s yDir2 regA
+inc regA
+move.s regA yDir2
+
+check42:
+
+
+
+move.s xDir2 regA
+move.s speed regB
+cmp.s.e regA regB
+jmp.z regA mov12
+
+move.s xPos2 regA
+move.s regA prevX2
+inc regA
+move.s regA xPos2
+
+mov12:
+
+move.s xDir2 regA
+clr regB
+cmp.s.e regA regB
+jmp.z regA mov22
+
+move.s xPos2 regA
+move.s regA prevX2
+dec regA
+move.s regA xPos2
+
+mov22:
+
+
+
+move.s yDir2 regA
+move.s speed regB
+cmp.s.e regA regB
+jmp.z regA mov32
+
+move.s yPos2 regA
+move.s regA prevY2
+inc regA
+move.s regA yPos2
+
+mov32:
+
+move.s yDir2 regA
+clr regB
+cmp.s.e regA regB
+jmp.z regA mov42
+
+move.s yPos2 regA
+move.s regA prevY2
+dec regA
+move.s regA yPos2
+
+mov42:
+
+move.s prevX2 regA
+move.s prevY2 regB
+sb.setID regA regB empty
+sb.setCB regA regB zero
+
+move.s xPos2 regA
+move.s yPos2 regB
+add regA regB
+move.s regA color2
+move.s xPos2 regA
+move.s yPos2 regB
+sb.setCB regA regB color2
+sb.setID regA regB o
+
+
+jmp.u start

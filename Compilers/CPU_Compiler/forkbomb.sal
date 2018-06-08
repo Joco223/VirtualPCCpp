@@ -1,0 +1,18 @@
+data.
+l32 point 0
+
+interrupt.s
+interrupt.e
+
+program.start
+
+start:
+
+moveP.s point regA
+move.l point regA
+inc regA
+move.l regA point
+
+jmp.u start
+
+stop
