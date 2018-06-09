@@ -103,7 +103,7 @@ g.IDY - Get task Y position (g.IDY regA)
 
 g.ID - Get task ID (g.ID regA)
 
-displ - Set a color to a pixel on the screen, first parameter is x position,
-second is y positiond and third is color, only registers for arguments (displ regA regB regC)
+displ - Set a color to a pixel on the screen, x position is used from regA, y
+position from regB and 3 arguments for color, only registers (displ regC regD regE)
 
 set - Directly aasign value to a register (set regA 543)

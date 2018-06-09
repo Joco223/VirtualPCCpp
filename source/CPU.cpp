@@ -47,8 +47,9 @@ CPU::CPU(int sectorSize_, int numSectors_, Memory& ram_, Memory& hdd_, GPU& gpu_
 int CPU::checkArgument(int source, int size) {
 	if ((unsigned int)source <= ram.memory.size()) {
 		if(size == 1) { return ram.memory[source] & 0xFF; }
-		if(size == 2) { return ram.memory[source + 1] << 8 | ram.memory[source] & 0xFF ; }
-		if(size == 3) { return (ram.memory[source + 3] << 24) | (ram.memory[source + 2] << 16) | (ram.memory[source + 1] << 8) | (ram.memory[source] & 0xFF); }
+		else if(size == 2) { return ram.memory[source + 1] << 8 | ram.memory[source] & 0xFF ; }
+		else if(size == 3) { return (ram.memory[source + 3] << 24) | (ram.memory[source + 2] << 16) | (ram.memory[source + 1] << 8) | (ram.memory[source] & 0xFF); }
+		else { return 0; std::cout << "Invalid size at checkArgument" << '\n';}
 	}else {
 		return registers[source - (ram.memory.size() + 1)];
 	}
@@ -57,8 +58,9 @@ int CPU::checkArgument(int source, int size) {
 int CPU::checkArgumentH(int source, int size) {
 	if ((unsigned int)source <= ram.memory.size()) {
 		if(size == 1) { return hdd.memory[source] & 0xFF; }
-		if(size == 2) { return hdd.memory[source + 1] <<  8 | (hdd.memory[source] & 0xFF); }
-		if(size == 3) { return hdd.memory[source + 3] << 24 | (hdd.memory[source + 2] << 16) | (hdd.memory[source + 1] << 8) | (hdd.memory[source] & 0xFF); }
+		else if(size == 2) { return hdd.memory[source + 1] <<  8 | (hdd.memory[source] & 0xFF); }
+		else if(size == 3) { return hdd.memory[source + 3] << 24 | (hdd.memory[source + 2] << 16) | (hdd.memory[source + 1] << 8) | (hdd.memory[source] & 0xFF); }
+		else { return 0; std::cout << "Invalid size at checkArgumentH" << '\n';}
 	}else {
 		return registers[source - (hdd.memory.size() + 1)];
 	}
@@ -67,8 +69,9 @@ int CPU::checkArgumentH(int source, int size) {
 int CPU::checkArgumentG(int source, int size) {
 	if ((unsigned int)source <= gpu.vRam.memory.size()) {
 		if(size == 1) { return gpu.vRam.memory[source] & 0xFF; }
-		if(size == 2) { return gpu.vRam.memory[source + 1] <<  8 | (gpu.vRam.memory[source] & 0xFF); }
-		if(size == 3) { return gpu.vRam.memory[source + 3] << 24 | (gpu.vRam.memory[source + 2] << 16) | (gpu.vRam.memory[source + 1] << 8) | (gpu.vRam.memory[source] & 0xFF); }
+		else if(size == 2) { return gpu.vRam.memory[source + 1] <<  8 | (gpu.vRam.memory[source] & 0xFF); }
+		else if(size == 3) { return gpu.vRam.memory[source + 3] << 24 | (gpu.vRam.memory[source + 2] << 16) | (gpu.vRam.memory[source + 1] << 8) | (gpu.vRam.memory[source] & 0xFF); }
+		else { return 0; std::cout << "Invalid size at checkArgumentG" << '\n';}
 	}else {
 		return registers[source - (gpu.vRam.memory.size() + 1)];
 	}
@@ -115,26 +118,6 @@ void CPU::execute(TCPsocket clientSocket) {
 			}
 			programCounter += 6;
 		break; }
-
-		/*case 0x03: { //Read memory at position into a float registers
-			byte argument = ram.memory[programCounter + 1];
-			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			std::memcpy(&fRegisters[argument]    , &ram.memory[memPos + 3], 1);
-			std::memcpy(&fRegisters[argument] + 1, &ram.memory[memPos + 2], 1);
-			std::memcpy(&fRegisters[argument] + 2, &ram.memory[memPos + 1], 1);
-			std::memcpy(&fRegisters[argument] + 3, &ram.memory[memPos    ], 1);
-			programCounter += 6;
-		break; }
-
-		case 0x04: { //Write to memory at position into a float registers
-			byte argument = ram.memory[programCounter + 1];
-			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			std::memcpy(&fRegisters[argument]    , &ram.memory[memPos + 3], 1);
-			std::memcpy(&fRegisters[argument] + 1, &ram.memory[memPos + 2], 1);
-			std::memcpy(&fRegisters[argument] + 2, &ram.memory[memPos + 1], 1);
-			std::memcpy(&fRegisters[argument] + 3, &ram.memory[memPos    ], 1);
-			programCounter += 6;
-		break; }*/
 
 		case 0x05: { //Shutdown the pc
 			std::ofstream file;;
@@ -287,11 +270,6 @@ void CPU::execute(TCPsocket clientSocket) {
 			std::cout << registers[regA] << '\n';
 			programCounter += 2;
 		break; }
-
-		/*case 0x14: {
-			gpu.startCores();
-			programCounter++;
-			break; }*/
 
 		case 0x15: { //Decrement register by 1
 			byte argument = ram.memory[programCounter + 1];
@@ -488,11 +466,6 @@ void CPU::execute(TCPsocket clientSocket) {
 			programCounter += 2;
 		break; }
 
-		case 0x26: { //Call updateCharacters
-			//gpu.updateCharacters();
-			programCounter++;
-		break; }
-
 		case 0x27: { //Load from ram with a pointer
 			byte argument = ram.memory[programCounter + 1];
 			byte regA = getBits(argument, 0);
@@ -668,34 +641,70 @@ void CPU::execute(TCPsocket clientSocket) {
 			programCounter += 2;
 		break; }
 
-		/*case 0x34: { //Read memory at pointer position into a float registers
-			byte argument = ram.memory[programCounter + 1];
-			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int memPos2 = checkArgument(memPos, 3);
-			std::memcpy(&fRegisters[argument]    , &ram.memory[memPos2 + 3], 1);
-			std::memcpy(&fRegisters[argument] + 1, &ram.memory[memPos2 + 2], 1);
-			std::memcpy(&fRegisters[argument] + 2, &ram.memory[memPos2 + 1], 1);
-			std::memcpy(&fRegisters[argument] + 3, &ram.memory[memPos2    ], 1);
-			programCounter += 6;
+		case 0x34: { //Copy from Ram to vRam
+			byte arg1 = ram.memory[programCounter + 1];
+			byte regA = getBits(arg1, 0);
+			byte regB = getBits(arg1, 1);
+			byte regC = ram.memory[programCounter + 2];
+
+			for(int i = 0; i < registers[regC]; i++) {
+				gpu.vRam.memory[registers[regB] + i] = ram.memory[registers[regA] + i];
+			}
+
+			programCounter += 3;
 		break; }
 
-		case 0x35: { //Write to memory at pointer position into a float registers
-			byte argument = ram.memory[programCounter + 1];
-			int memPos = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			int memPos2 = checkArgument(memPos, 3);
-			std::memcpy(&fRegisters[argument]    , &ram.memory[memPos2 + 3], 1);
-			std::memcpy(&fRegisters[argument] + 1, &ram.memory[memPos2 + 2], 1);
-			std::memcpy(&fRegisters[argument] + 2, &ram.memory[memPos2 + 1], 1);
-			std::memcpy(&fRegisters[argument] + 3, &ram.memory[memPos2    ], 1);
-			programCounter += 6;
+		case 0x35: { //Copy from vRam to Ram
+			byte arg1 = ram.memory[programCounter + 1];
+			byte regA = getBits(arg1, 0);
+			byte regB = getBits(arg1, 1);
+			byte regC = ram.memory[programCounter + 2];
+
+			for(int i = 0; i < registers[regC]; i++) {
+				ram.memory[registers[regB] + i] = gpu.vRam.memory[registers[regA] + i];
+			}
+
+			programCounter += 3;
 		break; }
 
-		case 0x36: { //Set float register to some value
-			unsigned int reg = ram.memory[programCounter + 1];
-			unsigned int value = ram.memory[programCounter + 5] << 24 | ram.memory[programCounter + 4] << 16 | ram.memory[programCounter + 3] << 8 | ram.memory[programCounter + 2];
-			fRegisters[reg] = value;
-			programCounter += 6;
-		break; }*/
+		case 0x36: { //Copy from Ram to HDD
+			byte arg1 = ram.memory[programCounter + 1];
+			byte regA = getBits(arg1, 0);
+			byte regB = getBits(arg1, 1);
+			byte regC = ram.memory[programCounter + 2];
+
+			for(int i = 0; i < registers[regC]; i++) {
+				hdd.memory[registers[regB] + i] = ram.memory[registers[regA] + i];
+			}
+
+			programCounter += 3;
+		break; }
+
+		case 0x37: { //Copy from HDD to Ram
+			byte arg1 = ram.memory[programCounter + 1];
+			byte regA = getBits(arg1, 0);
+			byte regB = getBits(arg1, 1);
+			byte regC = ram.memory[programCounter + 2];
+
+			for(int i = 0; i < registers[regC]; i++) {
+				ram.memory[registers[regB] + i] = hdd.memory[registers[regA] + i];
+			}
+
+			programCounter += 3;
+		break; }
+
+		case 0x38: { //Copy from Ram to Ram
+			byte arg1 = ram.memory[programCounter + 1];
+			byte regA = getBits(arg1, 0);
+			byte regB = getBits(arg1, 1);
+			byte regC = ram.memory[programCounter + 2];
+
+			for(int i = 0; i < registers[regC]; i++) {
+				ram.memory[registers[regB] + i] = ram.memory[registers[regA] + i];
+			}
+
+			programCounter += 3;
+		break; }
 	}
 }
 

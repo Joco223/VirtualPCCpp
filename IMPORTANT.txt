@@ -16,7 +16,10 @@ HDD_Loader then you need to copy over the data from HDD to vRam inside the vPC w
 to set the GPU program counter to the beggining of the GPU program and then as normal sue gpu.str to create tasks. GPU Compiler
 is used the same way as CPU Compiler
 
------INFORMATION-----
+---UPDATE---
+I have removed CPU and GPU programs since they have been updates, new ones coming soon.
 
-To use the example GPU program which is ran from HDD, use HDD Loader to copy over test.cgbc to HDD at memory location 0, then run
-program GC.cbc and magic will happen :)
+cb.set instructions have been removed fromn the CPU. To display characters now you need to move data to start of vRam.
+    0 -  6360 - character IDs
+ 6360 - 12720 - character background color
+12720 - 19080 - character foreground colors

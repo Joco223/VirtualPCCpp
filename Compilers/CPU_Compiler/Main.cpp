@@ -388,18 +388,6 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, int& s
 			hasStop = true;
 			currentPos++;
 			line++;
-		}else if(instruction == "sb.setID") {
-			currentPos += 7;
-			i += 3;
-			line++;
-		}else if(instruction == "sb.setCB") {
-			currentPos += 7;
-			i += 3;
-			line++;
-		}else if(instruction == "sb.setCF") {
-			currentPos += 7;
-			i += 3;
-			line++;
 		}else if(instruction == "load.data") {
 			currentPos += 5;
 			i++;
@@ -426,6 +414,26 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, int& s
 		}else if(instruction == "setPC") {
 			currentPos += 2;
 			i++;
+			line++;
+		}else if(instruction == "cpy.rv") {
+			currentPos += 3;
+			i +=3;
+			line++;
+		}else if(instruction == "cpy.vr") {
+			currentPos += 3;
+			i +=3;
+			line++;
+		}else if(instruction == "cpy.rh") {
+			currentPos += 3;
+			i +=3;
+			line++;
+		}else if(instruction == "cpy.hr") {
+			currentPos += 3;
+			i +=3;
+			line++;
+		}else if(instruction == "cpy.rr") {
+			currentPos += 3;
+			i +=3;
 			line++;
 		}else{
 			if (instruction.back() == ':') {
@@ -1351,69 +1359,6 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, int& s
 		}else if(instruction == "stop") {
 			compiled[currentPos++] = 0x05;
 			line++;
-		}else if(instruction == "sb.setID") {
-			compiled[currentPos++] = 0x16;
-
-			byte arg1 = indexRegister(code, i, 1);
-			arg1 |= (indexRegister(code, i , 2) << 4);
-
-			compiled[currentPos++] = arg1;
-
-			compiled[currentPos++] = 0x0;
-
-			unsigned int arg2 = checkArgType(code[i + 3], variables, scopeDepth);
-
-			byte b1, b2, b3, b4;
-			convertByte4(arg2, b1, b2, b3, b4);
-			compiled[currentPos++] = b1;
-			compiled[currentPos++] = b2;
-			compiled[currentPos++] = b3;
-			compiled[currentPos++] = b4;
-
-			i += 3;
-			line++;
-		}else if(instruction == "sb.setCB") {
-			compiled[currentPos++] = 0x16;
-
-			byte arg1 = indexRegister(code, i, 1);
-			arg1 |= (indexRegister(code, i , 2) << 4);
-
-			compiled[currentPos++] = arg1;
-
-			compiled[currentPos++] = 0x1;
-
-			unsigned int arg2 = checkArgType(code[i + 3], variables, scopeDepth);
-
-			byte b1, b2, b3, b4;
-			convertByte4(arg2, b1, b2, b3, b4);
-			compiled[currentPos++] = b1;
-			compiled[currentPos++] = b2;
-			compiled[currentPos++] = b3;
-			compiled[currentPos++] = b4;
-
-			i += 3;
-			line++;
-		}else if(instruction == "sb.setCF") {
-			compiled[currentPos++] = 0x16;
-
-			byte arg1 = indexRegister(code, i, 1);
-			arg1 |= (indexRegister(code, i , 2) << 4);
-
-			compiled[currentPos++] = arg1;
-
-			compiled[currentPos++] = 0x2;
-
-			unsigned int arg2 = checkArgType(code[i + 3], variables, scopeDepth);
-
-			byte b1, b2, b3, b4;
-			convertByte4(arg2, b1, b2, b3, b4);
-			compiled[currentPos++] = b1;
-			compiled[currentPos++] = b2;
-			compiled[currentPos++] = b3;
-			compiled[currentPos++] = b4;
-
-			i += 3;
-			line++;
 		}else if(instruction == "load.data") {
 			compiled[currentPos++] = 0x2D;
 
@@ -1495,6 +1440,66 @@ void Compile(std::vector<std::string>& code, std::vector<byte>& compiled, int& s
 			compiled[currentPos++] = reg;
 
 			i++;
+			line++;
+		}else if(instruction == "cpy.rv") {
+			compiled[currentPos++] = 0x34;
+
+			byte arg = indexRegister(code, i, 1);
+			arg |= (indexRegister(code, i, 2) << 4);
+			byte arg2 = indexRegister(code, i, 3);
+
+			compiled[currentPos++] = arg;
+			compiled[currentPos++] = arg2;
+
+			i += 3;
+			line++;
+		}else if(instruction == "cpy.vr") {
+			compiled[currentPos++] = 0x35;
+
+			byte arg = indexRegister(code, i, 1);
+			arg |= (indexRegister(code, i, 2) << 4);
+			byte arg2 = indexRegister(code, i, 3);
+
+			compiled[currentPos++] = arg;
+			compiled[currentPos++] = arg2;
+
+			i += 3;
+			line++;
+		}else if(instruction == "cpy.rh") {
+			compiled[currentPos++] = 0x36;
+
+			byte arg = indexRegister(code, i, 1);
+			arg |= (indexRegister(code, i, 2) << 4);
+			byte arg2 = indexRegister(code, i, 3);
+
+			compiled[currentPos++] = arg;
+			compiled[currentPos++] = arg2;
+
+			i += 3;
+			line++;
+		}else if(instruction == "cpy.hr") {
+			compiled[currentPos++] = 0x37;
+
+			byte arg = indexRegister(code, i, 1);
+			arg |= (indexRegister(code, i, 2) << 4);
+			byte arg2 = indexRegister(code, i, 3);
+
+			compiled[currentPos++] = arg;
+			compiled[currentPos++] = arg2;
+
+			i += 3;
+			line++;
+		}else if(instruction == "cpy.rr") {
+			compiled[currentPos++] = 0x38;
+
+			byte arg = indexRegister(code, i, 1);
+			arg |= (indexRegister(code, i, 2) << 4);
+			byte arg2 = indexRegister(code, i, 3);
+
+			compiled[currentPos++] = arg;
+			compiled[currentPos++] = arg2;
+
+			i += 3;
 			line++;
 		}else{
 			if (instruction.back() == ':') {

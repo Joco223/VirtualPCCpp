@@ -42,29 +42,8 @@ void runvGPU(GPU* gpu1){
 }
 
 void runVPC (PC* pc1, TCPsocket* clientSocket) {
-	int ticks = 0;
-	int targetTicks = 25;
-	long int totalTicks = 0;
-	int numOfLoops = 0;
-	int ticks2 = 0;
-	int targetTicks2 = 1000;
-
-	auto start = std::chrono::steady_clock::now();
-
 	while(true){
 		pc1->cpu.tick(clientSocket);
-		//totalTicks++;
-		/*if(ticks >= targetTicks) {
-			auto end = std::chrono::steady_clock::now();
-			std::chrono::duration<double> diff = end-start;
-			if(diff.count() - (10 * numOfLoops) >= 10){
-				std::cout << (totalTicks / 10) << " t/s" << '\n';
-				totalTicks = 0;
-				numOfLoops++;
-			}
-			ticks = 0;
-		}
-		ticks++;*/
 	}
 }
 
@@ -107,33 +86,6 @@ int main(int argc, char* argv[]) {
 	}else{
 		std::cout << "Online mode disabled." << '\n';
 	}
-
- 	/*int input;
-	std::cout << "Chose run mode (0 to send a message, 1 to recieve)" << '\n';
-	std::cin >> input;
-
-	if(input == 1){
-		std::cout << "Waiting for message..." << '\n';
-		while(true){
-			int c = SDLNet_TCP_Recv(clientSocket, pBuffer, 9);
-			if(c > 0){
-				std::cout << pBuffer << '\n';
-			}
-		}
-	}else{
-		std::cout << "Sending message..." << '\n';
-		std::cout << "Type in target vPC address:" << '\n';
-		std::string target;
-		std::cin >> target;
-		std::string data;
-		std::cout << "Type in desired data (5 characters): " << '\n';
-		std::cin >> data;
-
-		std::string message = "0" + address + target + data;
-
-		SDLNet_TCP_Send(clientSocket, message.c_str(), 12);
-		std::cout << "Message sent..." << '\n';
-	}*/
 
 	SDL_Event event;
 
@@ -263,7 +215,6 @@ int main(int argc, char* argv[]) {
 		std::chrono::duration<double, std::milli> diff2 = end2-start2;
 		if((int)diff2.count() % 16 == 0){
 			pc1.cpu.currentFrame++;
-			gpu1.updateCharacters();
 			gpu1.updateScreen();
 		}
 

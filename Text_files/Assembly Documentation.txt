@@ -162,18 +162,6 @@ regA regB)
 gpu.str - Start the GPU program, first and second register hold the X and Y
 size of the program (gpu.str regA regB)
 
-sb.setID - Set character ID in the screen buffer held in the GPU, first and
-second register hold the x and y value and third argument is value that is
-going to be set (sb.setID regA regB x)
-
-sb.setCB - Set the character background color in the screen buffer held in the
-GPU, first and second register hold the x and y value and third argument is
-the value that is going to be set (sb.setCB regA regB x)
-
-sb.setCF - Set the charater foreground color in the screen buffer held in the
-GPU, first and second register hold the x and y value and third argument is
-the value that is going to be set (sb.setCF regA regB x)
-
 sb.update - Updates the character bufffer, no arguments needed
 
 load.data - Load 5 bytes of data to the network package, the argument is a pointer where
@@ -194,6 +182,21 @@ send - Send the network package
 set - Directly aasign value to a register (set regA 543)
 
 setPC - Set GPU program counter (setPC regA)
+
+cpy.rh - Copy data from Ram to HDD (cpy.rh regA regB regC), first argument is origin starting
+location, second argument is target startic location and third argument amount of data
+
+cpy.hr - Copy data from HDD to Ram (cpy.rh regA regB regC), first argument is origin starting
+location, second argument is target startic location and third argument amount of data
+
+cpy.rv - Copy data from Ram to vRam (cpy.rh regA regB regC), first argument is origin starting
+location, second argument is target startic location and third argument amount of data
+
+cpy.vr - Copy data from vRam to Ram (cpy.rh regA regB regC), first argument is origin starting
+location, second argument is target startic location and third argument amount of data
+
+cpy.rr - Copy data from Ram to Ram (cpy.rh regA regB regC), first argument is origin starting
+location, second argument is target startic location and third argument amount of data
 
 stop - Shuts down the vPC and saves the HDD to a file. Stop is a must at the end of
 a program, else the vPC will work incorrectly (Assembler will warn you if you didn't

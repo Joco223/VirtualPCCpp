@@ -23,18 +23,18 @@ struct jump_pos {
 
 std::vector<std::string> lines;
 
-void convertByte2(int& number, byte& b1, byte& b2) {
+void convertByte2(unsigned int& number, byte& b1, byte& b2) {
 	b1 = number & 0xff;
 	b2 = (byte)(number >> 8);
 }
 
-void convertByte3(int& number, byte& b1, byte& b2, byte& b3) {
+void convertByte3(unsigned int& number, byte& b1, byte& b2, byte& b3) {
 	b1 = number & 0xff;
 	b2 = (byte)(number >> 8);
 	b3 = (byte)(number >> 16);
 }
 
-void convertByte4(int& number, byte& b1, byte& b2, byte& b3, byte& b4) {
+void convertByte4(unsigned int& number, byte& b1, byte& b2, byte& b3, byte& b4) {
 	b1 = number & 0xff;
 	b2 = (byte)(number >> 8);
 	b3 = (byte)(number >> 16);
@@ -267,8 +267,32 @@ std::vector<byte> Compile(std::vector<std::string>& code) {
 			i += 3;
 			currentPos += 3;
 			line++;
-		}else if(instruction.compare(0, 6, "moveP.") == 0 && instruction.length() == 7) {
+		}else if(instruction == "moveP.s.r") {
 			currentPos += 3;
+			i += 2;
+			line++;
+		}else if(instruction == "moveP.d.r") {
+			currentPos += 3;
+			i += 2;
+			line++;
+		}else if(instruction == "moveP.l.r") {
+			currentPos += 3;
+			i += 2;
+			line++;
+		}else if(instruction == "moveP.s.w") {
+			currentPos += 3;
+			i += 2;
+			line++;
+		}else if(instruction == "moveP.d.w") {
+			currentPos += 3;
+			i += 2;
+			line++;
+		}else if(instruction == "moveP.l.w") {
+			currentPos += 3;
+			i += 2;
+			line++;
+		}else if(instruction == "set") {
+			currentPos += 6;
 			i += 2;
 			line++;
 		}else{
@@ -314,7 +338,7 @@ std::vector<byte> Compile(std::vector<std::string>& code) {
 
 					compiled[currentPos++] = arg;
 
-					int arg2 = std::stoi(code[i + 1]);
+					unsigned int arg2 = std::stoi(code[i + 1]);
 
 					byte b1, b2, b3, b4;
 					convertByte4(arg2, b1, b2, b3, b4);
@@ -337,7 +361,7 @@ std::vector<byte> Compile(std::vector<std::string>& code) {
 
 					compiled[currentPos++] = arg;
 
-					int arg2 = std::stoi(code[i + 1]);
+					unsigned int arg2 = std::stoi(code[i + 1]);
 
 					byte b1, b2, b3, b4;
 					convertByte4(arg2, b1, b2, b3, b4);
@@ -360,7 +384,7 @@ std::vector<byte> Compile(std::vector<std::string>& code) {
 
 					compiled[currentPos++] = arg;
 
-					int arg2 = std::stoi(code[i + 1]);
+					unsigned int arg2 = std::stoi(code[i + 1]);
 
 					byte b1, b2, b3, b4;
 					convertByte4(arg2, b1, b2, b3, b4);
@@ -526,7 +550,7 @@ std::vector<byte> Compile(std::vector<std::string>& code) {
 
 				compiled[currentPos++] = arg;
 
-				int arg2 = checkJmpPos(code[i + 2], jumpPositions, 0);
+				unsigned int arg2 = checkJmpPos(code[i + 2], jumpPositions, 0);
 
 				byte b1, b2, b3, b4;
 				convertByte4(arg2, b1, b2, b3, b4);
@@ -545,7 +569,7 @@ std::vector<byte> Compile(std::vector<std::string>& code) {
 
 				compiled[currentPos++] = arg;
 
-				int arg2 = checkJmpPos(code[i + 2], jumpPositions, 0);
+				unsigned int arg2 = checkJmpPos(code[i + 2], jumpPositions, 0);
 
 				byte b1, b2, b3, b4;
 				convertByte4(arg2, b1, b2, b3, b4);
@@ -564,7 +588,7 @@ std::vector<byte> Compile(std::vector<std::string>& code) {
 
 				compiled[currentPos++] = arg;
 
-				int arg2 = checkJmpPos(code[i + 1], jumpPositions, 0);
+				unsigned int arg2 = checkJmpPos(code[i + 1], jumpPositions, 0);
 
 				byte b1, b2, b3, b4;
 				convertByte4(arg2, b1, b2, b3, b4);
@@ -712,6 +736,23 @@ std::vector<byte> Compile(std::vector<std::string>& code) {
 			arg |= (3 << 4);
 			compiled[currentPos++] = arg;
 			compiled[currentPos++] = indexRegister(code, i, 2);
+			i += 2;
+			line++;
+		}else if(instruction == "set") {
+			compiled[currentPos++] = 0x1C;
+
+			byte reg = indexRegister(code, i, 1);
+			compiled[currentPos++] = reg;
+
+			unsigned int arg = std::stoi(code[i + 2]);
+
+			byte b1, b2, b3, b4;
+			convertByte4(arg, b1, b2, b3, b4);
+			compiled[currentPos++] = b1;
+			compiled[currentPos++] = b2;
+			compiled[currentPos++] = b3;
+			compiled[currentPos++] = b4;
+
 			i += 2;
 			line++;
 		}else{
